@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer</title>
+<title>CHARACTER DATABASE | Shared Viewer v4.2</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3195,6 +3195,20 @@ body.public-online-character #hubView{
   display:none!important;
 }
 
+
+/* v4.2 ------------------------------------------------------------ */
+.public-viewer-version{
+  margin:12px 0 0;
+  color:#a0a9b0;
+  font-size:8px;
+  letter-spacing:.08em;
+}
+
+/* Public PC LIST is backed by Supabase data, not IndexedDB. */
+body.public-online-database .database-table-wrap .database-empty{
+  margin-top:20px;
+}
+
 </style>
 </head>
 <body>
@@ -3674,6 +3688,7 @@ body.public-online-character #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
+    <p class="public-viewer-version">Viewer v4.2</p>
   </div>
 </div>
 
@@ -3745,6 +3760,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
+const PUBLIC_VIEWER_VERSION='4.2';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -5982,7 +5998,7 @@ function openDbFilterPopover(button,key){
  pop.classList.remove('hidden');
 }
 async function renderDatabaseView(){
- if(!db)return;
+ if(!db && !(PUBLIC_VIEWER_ONLY&&publicRemoteData))return;
  let list=(await all()).map(ensureShape);
  if(current){
    const i=list.findIndex(x=>x.id===current.id);
@@ -6340,14 +6356,19 @@ function showViewer(){
  }
 }async function saveCurrent(e){
  e?.preventDefault(); if(!current)return; syncFormToModel();
- current.updatedAt=new Date().toISOString(); await put(structuredClone(current)); $('saveNote').textContent='保存しました：'+new Date().toLocaleString(); renderHeader();renderList(); if(document.body.classList.contains('database-mode'))renderDatabaseView();
+ current.updatedAt=new Date().toISOString();
+ await put(structuredClone(current));
+ const cfg=loadOnlineSyncConfig();
+ $('saveNote').textContent='保存しました：'+new Date().toLocaleString()+(onlineSyncConfigured(cfg)&&cfg.enabled?'（公開同期待機中）':'');
+ renderHeader();renderList();
+ if(document.body.classList.contains('database-mode'))renderDatabaseView();
 }
 async function exportBackup(){
  await ensureDbReady();
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
