@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v4.2</title>
+<title>CHARACTER DATABASE | Shared Viewer v4.3</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3096,13 +3096,19 @@ body.public-online-database .right-rail,
 body.public-online-database #workspaceTools,
 body.public-online-database #editor,
 body.public-online-database #emptyState,
-body.public-online-database .db-no-share,
 body.public-online-database .database-bulk-actions,
 body.public-online-database #addKpBtn,
 body.public-online-database #addYosoBtn,
 body.public-online-database .record-actions,
 body.public-online-database .report-edit-image-btn{
   display:none!important;
+}
+body.public-online-database .db-no-share{
+  display:inline-block!important;
+  opacity:.72;
+}
+body.public-online-database .db-no-share:hover{
+  opacity:1;
 }
 body.public-online-database .layout{
   display:block!important;
@@ -3207,6 +3213,18 @@ body.public-online-character #hubView{
 /* Public PC LIST is backed by Supabase data, not IndexedDB. */
 body.public-online-database .database-table-wrap .database-empty{
   margin-top:20px;
+}
+
+
+/* v4.3 ------------------------------------------------------------ */
+
+/* Smartphone public PC LIST: keep No. + individual share link readable. */
+body.public-online-database .db-no-tools{
+  gap:4px;
+}
+body.public-online-database .db-no-share{
+  font-size:11px;
+  padding:2px 3px;
 }
 
 </style>
@@ -3688,7 +3706,7 @@ body.public-online-database .database-table-wrap .database-empty{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v4.2</p>
+    <p class="public-viewer-version">Viewer v4.3</p>
   </div>
 </div>
 
@@ -3760,7 +3778,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='4.2';
+const PUBLIC_VIEWER_VERSION='4.3';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -6138,6 +6156,16 @@ async function renderDatabaseView(){
    tr.querySelector('.db-no-share').onclick=async e=>{
      e.stopPropagation();
      const id=tr.dataset.id;
+
+     if(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='database'){
+       const u=new URL(location.href);
+       u.search='';
+       u.hash='';
+       u.searchParams.set('pc',id);
+       window.open(u.toString(),'_blank','noopener');
+       return;
+     }
+
      const data=(await all()).find(x=>x.id===id);
      if(data)showCharacterShareDialog(ensureShape(structuredClone(data)));
    };
@@ -6368,7 +6396,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
