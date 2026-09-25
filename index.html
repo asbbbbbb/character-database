@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v4.7</title>
+<title>CHARACTER DATABASE | Shared Viewer v4.9</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3350,6 +3350,40 @@ body.public-online-database .db-no-share{
   background:#fffaf0;
 }
 
+
+/* v4.8 ------------------------------------------------------------ */
+.point-warning-filter{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:7px;
+  padding:6px 8px;
+  border:1px solid #d8e0e5;
+  border-radius:7px;
+  background:#fff;
+  color:#53616b;
+  font-size:10px;
+  cursor:pointer;
+  user-select:none;
+}
+.point-warning-filter input{
+  margin:0;
+}
+.point-mismatch-badge.mini{
+  width:15px;
+  height:15px;
+  flex-basis:15px;
+  font-size:9px;
+  cursor:default;
+}
+
+
+/* v4.9 ------------------------------------------------------------ */
+body.public-online-database .hub-bulk-delete,
+body.public-viewer-only .hub-bulk-delete{
+  display:none!important;
+}
+
 </style>
 </head>
 <body>
@@ -3384,13 +3418,17 @@ body.public-online-database .db-no-share{
         <select class="control" id="listSortKey">
           <option value="no" selected>No順</option>
           <option value="name">あいうえお順</option>
-          <option value="pointMismatch">！のみ表示</option>
         </select>
         <select class="control" id="listSortOrder">
           <option value="asc">昇順</option>
           <option value="desc">降順</option>
         </select>
       </div>
+      <label class="point-warning-filter">
+        <input type="checkbox" id="pointMismatchOnly">
+        <span class="point-mismatch-badge mini" aria-hidden="true">!</span>
+        <span>のみ表示</span>
+      </label>
     </div>
     <div class="side-meta-row">
       <div class="side-meta" id="countLabel">0人</div>
@@ -3660,6 +3698,7 @@ body.public-online-database .db-no-share{
             <input class="control" id="sessionSearchInput" placeholder="シナリオ名・uchi・yoso">
           </label>
           <button type="button" class="btn small" id="sessionFilterResetBtn">解除</button>
+          <button type="button" class="btn small danger hub-bulk-delete" id="sessionDeleteAllBtn">一括削除</button>
           <span class="session-filter-count" id="sessionFilterCount"></span>
         </div>
         <section class="hub-tab-panel active" id="sessionTabPL">
@@ -3695,6 +3734,7 @@ body.public-online-database .db-no-share{
             <input class="control" id="reportSearchInput" placeholder="シナリオ名・uchi・yoso">
           </label>
           <button type="button" class="btn small" id="reportFilterResetBtn">解除</button>
+          <button type="button" class="btn small danger hub-bulk-delete" id="reportDeleteAllBtn">一括削除</button>
           <span id="reportCount" class="report-count"></span>
         </div>
         <div id="reportGrid"></div>
@@ -3715,6 +3755,7 @@ body.public-online-database .db-no-share{
             <input class="control" id="yosoSearchInput" placeholder="かな・名前・URL">
           </label>
           <button type="button" class="btn small" id="yosoFilterResetBtn">解除</button>
+          <button type="button" class="btn small danger hub-bulk-delete" id="yosoDeleteAllBtn">一括削除</button>
           <span class="yoso-filter-count" id="yosoFilterCount"></span>
         </div>
         <div class="session-table-wrap" id="yosoTable"></div>
@@ -3830,7 +3871,7 @@ body.public-online-database .db-no-share{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v4.7</p>
+    <p class="public-viewer-version">Viewer v4.9</p>
   </div>
 </div>
 
@@ -3902,7 +3943,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='4.7';
+const PUBLIC_VIEWER_VERSION='4.9';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -3910,10 +3951,11 @@ function loadAppData(){
    return {
      kpSessions:Array.isArray(raw.kpSessions)?raw.kpSessions:[],
      yosoRecords:Array.isArray(raw.yosoRecords)?raw.yosoRecords:[],
-     plExtraSessions:Array.isArray(raw.plExtraSessions)?raw.plExtraSessions:[]
+     plExtraSessions:Array.isArray(raw.plExtraSessions)?raw.plExtraSessions:[],
+     reportHiddenKeys:Array.isArray(raw.reportHiddenKeys)?raw.reportHiddenKeys:[]
    };
  }catch(_){
-   return {kpSessions:[],yosoRecords:[],plExtraSessions:[]};
+   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[]};
  }
 }
 function saveAppData(){
@@ -3921,6 +3963,7 @@ function saveAppData(){
  schedulePublicSync();
 }
 let appData=loadAppData();
+if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
 const STAT_KEYS=['STR','CON','POW','DEX','APP','SIZ','INT','EDU'];
 const STATUS=['新規','継続','継続不可','ロスト'];
 
@@ -5092,7 +5135,7 @@ function renderTables(){
  current.insanities.forEach((x,i)=>{
    const tr=document.createElement('tr');
    tr.innerHTML=`<td class="insanity-done"><input type="checkbox" ${x.completed?'checked':''}></td>
-     <td><input class="insanity-period" value="${esc(x.duration||'')}"></td>
+     <td><input class="insanity-period" value="${esc(normalizeInsanityDuration(x.duration||''))}"></td>
      <td><input class="insanity-content" list="insanityOptions" value="${esc(x.content||'')}"></td>
      <td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
    const inputs=tr.querySelectorAll('input');
@@ -5417,7 +5460,7 @@ async function renderList(){
  const sortKey=$('listSortKey')?.value||'no';
  const sortOrder=$('listSortOrder')?.value||'asc';
  const dir=sortOrder==='desc'?-1:1;
- if(sortKey==='pointMismatch'){
+ if($('pointMismatchOnly')?.checked){
    list=list.filter(x=>characterPointBalance(x).mismatch);
  }
  const jaCompare=(a,b)=>String(a||'').localeCompare(String(b||''),'ja',{sensitivity:'base',numeric:true});
@@ -5427,7 +5470,7 @@ async function renderList(){
  };
  list.sort((a,b)=>{
    let c=0;
-   if(sortKey==='no'||sortKey==='pointMismatch'){
+   if(sortKey==='no'){
      const an=noValue(a),bn=noValue(b);
      if(an!==bn)c=an-bn;
      else c=jaCompare(a.reading||a.name,b.reading||b.name);
@@ -5854,8 +5897,9 @@ async function collectReportRows(){
    source:'kp',
    sourceId:r.id
  }));
+ const hidden=new Set(appData.reportHiddenKeys||[]);
  return [...pl,...kp]
-   .filter(r=>String(r.title||'').trim())
+   .filter(r=>String(r.title||'').trim()&&!hidden.has(r.reportKey))
    .sort((a,b)=>String(b.date||'0000-00-00').localeCompare(String(a.date||'0000-00-00'))||
                 String(b.no||'').localeCompare(String(a.no||''),undefined,{numeric:true}));
 }
@@ -6095,6 +6139,96 @@ async function renderReport(){
      await shareReportCard(card,row);
    };
  });
+}
+
+
+async function deleteAllSessionRecords(){
+ if(PUBLIC_VIEWER_ONLY)return;
+
+ if(activeSessionTab==='kp'){
+   const count=(appData.kpSessions||[]).length;
+   if(!count){
+     alert('削除するKP記録がありません。');
+     return;
+   }
+   if(!confirm(`KP SESSION ${count}件をすべて削除しますか？`))return;
+   appData.kpSessions=[];
+   editingKPSessionIds.clear();
+   saveAppData();
+   await renderSessionHub();
+   await renderReport();
+   return;
+ }
+
+ const chars=(await all()).map(ensureShape);
+ const scenarioCount=chars.reduce((sum,ch)=>sum+(ch.scenarios?.length||0),0);
+ const extraCount=(appData.plExtraSessions||[]).length;
+ const total=scenarioCount+extraCount;
+ if(!total){
+   alert('削除するPL記録がありません。');
+   return;
+ }
+ if(!confirm(`PL SESSION ${total}件をすべて削除しますか？\n探索者の「通過シナリオ」も削除されます。`))return;
+
+ for(const ch of chars){
+   if(!(ch.scenarios?.length))continue;
+   ch.scenarios=[];
+   ch.updatedAt=new Date().toISOString();
+   await put(structuredClone(ch));
+ }
+ appData.plExtraSessions=[];
+ appData.reportHiddenKeys=[];
+ saveAppData();
+
+ if(current){
+   const fresh=chars.find(ch=>ch.id===current.id);
+   if(fresh){
+     fresh.scenarios=[];
+     current=ensureShape(structuredClone(fresh));
+   }
+ }
+ renderAll();
+ await renderSessionHub();
+ await renderReport();
+}
+
+async function deleteAllReportRecords(){
+ if(PUBLIC_VIEWER_ONLY)return;
+
+ const rows=await collectReportRows();
+ const images=await allReportImages();
+ if(!rows.length&&!images.length){
+   alert('削除するREPORT記録がありません。');
+   return;
+ }
+ if(!confirm(`REPORT ${rows.length}件を一括削除しますか？\nSESSION・通過シナリオの記録は残します。`))return;
+
+ const hidden=new Set(appData.reportHiddenKeys||[]);
+ rows.forEach(r=>hidden.add(r.reportKey));
+ appData.reportHiddenKeys=[...hidden];
+
+ for(const img of images){
+   await removeReportImage(img.id);
+ }
+ saveAppData();
+ closeReportLightbox();
+ await renderReport();
+}
+
+function deleteAllYosoRecords(){
+ if(PUBLIC_VIEWER_ONLY)return;
+
+ const count=(appData.yosoRecords||[]).length;
+ if(!count){
+   alert('削除するYOSONOKO記録がありません。');
+   return;
+ }
+ if(!confirm(`YOSONOKO ${count}件をすべて削除しますか？`))return;
+
+ appData.yosoRecords=[];
+ editingYosoIds.clear();
+ saveAppData();
+ renderYoso();
 }
 
 async function renderSessionHub(){
@@ -6439,7 +6573,7 @@ function showViewer(){
  }).join('');
 
  const insanityRows=current.insanities.map(x=>`<tr>
-   <td>${x.completed?'✓':''}</td><td>${esc(x.duration||'')}</td><td>${esc(x.content||'')}</td>
+   <td>${x.completed?'✓':''}</td><td>${esc(normalizeInsanityDuration(x.duration||''))}</td><td>${esc(x.content||'')}</td>
  </tr>`);
  const weaponRows=current.weapons.map(x=>`<tr>
    <td>${esc(x.name)}</td><td>${esc(x.success)}</td><td>${esc(x.damage)}</td><td>${esc(x.range)}</td>
@@ -6609,7 +6743,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.7',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -6918,6 +7052,37 @@ function importSkills(cells,ch){
  for(const h of headers)importSkillBlock(cells,ch,h,h.col);
  for(const arr of Object.values(ch.skills))for(const s of arr)delete s._importUsed;
 }
+
+function normalizeInsanityDuration(value){
+ const raw=excelClean(value);
+ if(!raw)return '';
+
+ // Excel/Sheets上で 20250613 が 2.0250613E7 のような指数表記になった場合も戻す。
+ const numeric=Number(raw.replace(/,/g,''));
+ if(Number.isFinite(numeric)){
+   const integer=Math.trunc(numeric);
+   const digits=String(integer);
+   if(digits.length===8){
+     const y=digits.slice(0,4),m=digits.slice(4,6),d=digits.slice(6,8);
+     const mi=Number(m),di=Number(d);
+     if(Number(y)>=1000&&mi>=1&&mi<=12&&di>=1&&di<=31){
+       return `${y}-${m}-${d}`;
+     }
+   }
+ }
+
+ // 通常の YYYYMMDD 文字列にも対応。
+ const compact=raw.replace(/[^\d]/g,'');
+ if(compact.length===8){
+   const y=compact.slice(0,4),m=compact.slice(4,6),d=compact.slice(6,8);
+   const mi=Number(m),di=Number(d);
+   if(Number(y)>=1000&&mi>=1&&mi<=12&&di>=1&&di<=31){
+     return `${y}-${m}-${d}`;
+   }
+ }
+
+ return raw;
+}
 function importInsanities(cells,ch){
  const label=xfindValue(cells,'不定の狂気・後遺症')[0];
  if(!label)return;
@@ -6928,7 +7093,8 @@ function importInsanities(cells,ch){
  for(const h of heads){
    let blanks=0;
    for(let r=h.row+1;r<=h.row+10;r++){
-     const duration=excelClean(xget(cells,h.col,r)),content=excelClean(xget(cells,h.col+1,r));
+     const duration=normalizeInsanityDuration(xget(cells,h.col,r));
+     const content=excelClean(xget(cells,h.col+1,r));
      if(!duration&&!content){blanks++;if(blanks>=2)break;continue}
      blanks=0;ch.insanities.push({completed:false,duration,content});
    }
@@ -7583,11 +7749,13 @@ $('reportFilterResetBtn').onclick=()=>{
  $('reportSearchInput').value='';
  renderReport();
 };
+$('reportDeleteAllBtn').onclick=deleteAllReportRecords;
 $('sessionFilterResetBtn').onclick=()=>{
  $('sessionEditionFilter').value='';
  $('sessionSearchInput').value='';
  renderSessionHub();
 };
+$('sessionDeleteAllBtn').onclick=deleteAllSessionRecords;
 $('addKPSessionBtn').onclick=()=>{
  const edition=$('sessionEditionFilter').value||'6';
  const rec={id:uid(),no:nextKPSessionNo(),date:'',title:'',yoso:'',edition,source:'manual',edited:true,draft:true};
@@ -7605,6 +7773,7 @@ $('yosoFilterResetBtn').onclick=()=>{
  $('yosoSearchInput').value='';
  renderYoso();
 };
+$('yosoDeleteAllBtn').onclick=deleteAllYosoRecords;
 $('addYosoBtn').onclick=()=>{
  const rec={id:uid(),pl:'',kana:'',name:'',url:'',source:'manual',draft:true};
  appData.yosoRecords.push(rec);
@@ -7720,7 +7889,7 @@ $('duplicateBtn').onclick=async()=>{syncFormToModel();const x=structuredClone(cu
 $('deleteBtn').onclick=async()=>{if(current&&confirm('この探索者を削除しますか？')){const deletedId=current.id;await remove(deletedId);selectedCharacterIds.delete(deletedId);updateSelectionIndicators();current=null;document.body.classList.remove('viewer-mode');$('editor').classList.add('hidden');$('viewer').classList.add('hidden');$('emptyState').classList.remove('hidden');renderList()}};
 $('backupBtn').onclick=exportBackup;$('restoreBtn').onclick=()=>$('restoreFile').click();$('restoreFile').onchange=e=>e.target.files[0]&&importBackup(e.target.files[0]);
 $('excelImportBtn').onclick=()=>$('excelImportFile').click();$('excelImportFile').onchange=e=>e.target.files[0]&&importExcelWorkbook(e.target.files[0]);
-$('searchInput').oninput=renderList;$('editionFilter').onchange=renderList;$('statusFilter').onchange=renderList;$('listSortKey').onchange=renderList;$('listSortOrder').onchange=renderList;
+$('searchInput').oninput=renderList;$('editionFilter').onchange=renderList;$('statusFilter').onchange=renderList;$('listSortKey').onchange=renderList;$('listSortOrder').onchange=renderList;$('pointMismatchOnly').onchange=renderList;
 $('occFormula').onchange=e=>{current.occFormula=num(e.target.value);renderPoints()};
 $('editor').elements.age.oninput=e=>{current.age=e.target.value;refreshAbilityCalculated();renderPoints()};
 $('editor').elements.number.oninput=e=>{current.number=e.target.value.trim()};
@@ -7786,6 +7955,7 @@ async function initCharacterDatabase(){
      if(viewerToken){
        publicRemoteData=await loadPublicDatabaseByViewerToken(viewerToken);
        appData=structuredClone(publicRemoteData.appData);
+       if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
        publicRemoteMode='database';
        document.body.classList.add('public-online-database');
        await showDatabaseView();
