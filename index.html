@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v5.4</title>
+<title>CHARACTER DATABASE | Shared Viewer v5.5</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3773,8 +3773,13 @@ tr.row-drag-over td{
   height:calc(100vh - 82px);
   max-height:calc(100vh - 82px);
   overflow:hidden!important;
+}
+#reportHub.report-content:not(.hidden){
   display:flex!important;
   flex-direction:column;
+}
+#reportHub.report-content.hidden{
+  display:none!important;
 }
 #reportHub .report-head{
   flex:0 0 auto;
@@ -3900,6 +3905,18 @@ tr.row-drag-over td{
     height:calc(100vh - 64px);
     max-height:calc(100vh - 64px);
   }
+}
+
+
+/* v5.5 ------------------------------------------------------------ */
+/* REPORT must never leak into another hub tab. */
+#reportHub.hidden{
+  display:none!important;
+}
+#yosoHub.hidden,
+#sessionHub.hidden,
+#databaseView.hidden{
+  display:none!important;
 }
 
 </style>
@@ -4393,7 +4410,7 @@ tr.row-drag-over td{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v5.4</p>
+    <p class="public-viewer-version">Viewer v5.5</p>
   </div>
 </div>
 
@@ -4465,7 +4482,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='5.4';
+const PUBLIC_VIEWER_VERSION='5.5';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7664,7 +7681,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.4',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.5',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
