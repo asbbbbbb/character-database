@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v5.2</title>
+<title>CHARACTER DATABASE | Shared Viewer v5.3</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3697,6 +3697,74 @@ body.public-viewer-only #yosoDeduplicateBtn{
   }
 }
 
+
+/* v5.3 ------------------------------------------------------------ */
+
+/* 編集テーブル：ドラッグ並び替え */
+.drag-cell,
+.drag-input-cell{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+}
+.drag-input-cell input{
+  min-width:0;
+  width:100%;
+}
+.row-drag-handle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 16px;
+  width:16px;
+  height:24px;
+  color:#8b969e;
+  font-size:12px;
+  line-height:1;
+  cursor:grab;
+  user-select:none;
+}
+.row-drag-handle:active{
+  cursor:grabbing;
+}
+tr.row-dragging{
+  opacity:.45;
+}
+tr.row-drag-over td{
+  box-shadow:inset 0 2px 0 #8497a5;
+}
+
+/* 不定の狂気：ハンドル＋チェックを左端セルに収める */
+.insanity-done .drag-cell{
+  justify-content:center;
+}
+
+/* 閲覧用 呪文・AF：名称を狭め、効果を広げる */
+.viewer-magic-table-wrap table{
+  table-layout:fixed;
+  width:100%;
+}
+.viewer-magic-table-wrap th:nth-child(1),
+.viewer-magic-table-wrap td:nth-child(1){
+  width:38%;
+}
+.viewer-magic-table-wrap th:nth-child(2),
+.viewer-magic-table-wrap td:nth-child(2){
+  width:9%;
+}
+.viewer-magic-table-wrap th:nth-child(3),
+.viewer-magic-table-wrap td:nth-child(3){
+  width:53%;
+}
+
+/* PC LIST：最多同卓PL */
+.database-table .db-top-pl{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
 </style>
 </head>
 <body>
@@ -4185,7 +4253,7 @@ body.public-viewer-only #yosoDeduplicateBtn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v5.2</p>
+    <p class="public-viewer-version">Viewer v5.3</p>
   </div>
 </div>
 
@@ -4257,7 +4325,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='5.2';
+const PUBLIC_VIEWER_VERSION='5.3';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -5444,11 +5512,57 @@ function makeRow(body,arr,idx,fields){
  tr.querySelector('button').onclick=()=>{arr.splice(idx,1);renderTables()};
  body.appendChild(tr);
 }
+
+function bindRowDragSort(tbody,arr){
+ let from=-1;
+
+ tbody.querySelectorAll('tr').forEach((tr,index)=>{
+   tr.dataset.dragIndex=String(index);
+   const handle=tr.querySelector('.row-drag-handle');
+   if(!handle)return;
+
+   handle.draggable=true;
+   handle.ondragstart=e=>{
+     from=Number(tr.dataset.dragIndex);
+     tr.classList.add('row-dragging');
+     try{
+       e.dataTransfer.effectAllowed='move';
+       e.dataTransfer.setData('text/plain',String(from));
+     }catch(_){}
+   };
+   handle.ondragend=()=>{
+     from=-1;
+     tbody.querySelectorAll('tr').forEach(r=>r.classList.remove('row-dragging','row-drag-over'));
+   };
+
+   tr.ondragover=e=>{
+     if(from<0)return;
+     e.preventDefault();
+     tr.classList.add('row-drag-over');
+     try{e.dataTransfer.dropEffect='move'}catch(_){}
+   };
+   tr.ondragleave=()=>tr.classList.remove('row-drag-over');
+   tr.ondrop=e=>{
+     if(from<0)return;
+     e.preventDefault();
+     const to=Number(tr.dataset.dragIndex);
+     tbody.querySelectorAll('tr').forEach(r=>r.classList.remove('row-drag-over'));
+     if(!Number.isInteger(to)||to===from)return;
+     const [moved]=arr.splice(from,1);
+     arr.splice(to,0,moved);
+     renderTables();
+   };
+ });
+}
+function rowDragHandle(){
+ return `<span class="row-drag-handle" title="ドラッグして並べ替え" aria-label="ドラッグして並べ替え">☰</span>`;
+}
+
 function renderTables(){
  $('insanityBody').innerHTML='';
  current.insanities.forEach((x,i)=>{
    const tr=document.createElement('tr');
-   tr.innerHTML=`<td class="insanity-done"><input type="checkbox" ${x.completed?'checked':''}></td>
+   tr.innerHTML=`<td class="insanity-done"><div class="drag-cell">${rowDragHandle()}<input type="checkbox" ${x.completed?'checked':''}></div></td>
      <td><input class="insanity-period" value="${esc(normalizeInsanityDuration(x.duration||''))}"></td>
      <td><input class="insanity-content" list="insanityOptions" value="${esc(x.content||'')}"></td>
      <td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
@@ -5464,7 +5578,7 @@ function renderTables(){
  current.weapons.forEach((x,i)=>{
    const tr=document.createElement('tr');
    const fields=['name','success','damage','range','attacks','ammo','durability','other'];
-   tr.innerHTML=fields.map(k=>`<td><input data-k="${k}" value="${esc(x[k]||'')}"></td>`).join('')+`<td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
+   tr.innerHTML=fields.map((k,fieldIndex)=>`<td>${fieldIndex===0?`<div class="drag-input-cell">${rowDragHandle()}<input data-k="${k}" value="${esc(x[k]||'')}"></div>`:`<input data-k="${k}" value="${esc(x[k]||'')}">`}</td>`).join('')+`<td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
    tr.querySelectorAll('[data-k]').forEach(e=>e.oninput=()=>x[e.dataset.k]=e.value);
    tr.querySelector('button').onclick=()=>{current.weapons.splice(i,1);renderTables()};
    $('weaponBody').appendChild(tr);
@@ -5474,7 +5588,7 @@ function renderTables(){
  current.items.forEach((x,i)=>{
    const tr=document.createElement('tr');
    const fields=['name','unitPrice','qty','price','note'];
-   tr.innerHTML=fields.map(k=>`<td><input data-k="${k}" value="${esc(x[k]||'')}"></td>`).join('')+`<td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
+   tr.innerHTML=fields.map((k,fieldIndex)=>`<td>${fieldIndex===0?`<div class="drag-input-cell">${rowDragHandle()}<input data-k="${k}" value="${esc(x[k]||'')}"></div>`:`<input data-k="${k}" value="${esc(x[k]||'')}">`}</td>`).join('')+`<td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
    tr.querySelectorAll('[data-k]').forEach(e=>e.oninput=()=>x[e.dataset.k]=e.value);
    tr.querySelector('button').onclick=()=>{current.items.splice(i,1);renderTables()};
    $('itemBody').appendChild(tr);
@@ -5484,11 +5598,17 @@ function renderTables(){
  current.magic.forEach((x,i)=>{
    const tr=document.createElement('tr');
    const fields=['name','pages','effect'];
-   tr.innerHTML=fields.map(k=>`<td><input data-k="${k}" value="${esc(x[k]||'')}"></td>`).join('')+`<td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
+   tr.innerHTML=fields.map((k,fieldIndex)=>`<td>${fieldIndex===0?`<div class="drag-input-cell">${rowDragHandle()}<input data-k="${k}" value="${esc(x[k]||'')}"></div>`:`<input data-k="${k}" value="${esc(x[k]||'')}">`}</td>`).join('')+`<td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
    tr.querySelectorAll('[data-k]').forEach(e=>e.oninput=()=>x[e.dataset.k]=e.value);
    tr.querySelector('button').onclick=()=>{current.magic.splice(i,1);renderTables()};
    $('magicBody').appendChild(tr);
  });
+
+ bindRowDragSort($('insanityBody'),current.insanities);
+ bindRowDragSort($('weaponBody'),current.weapons);
+ bindRowDragSort($('itemBody'),current.items);
+ bindRowDragSort($('magicBody'),current.magic);
+
  renderScenarios();
 }
 function normalizeScenarioDate(value){
@@ -6872,6 +6992,40 @@ function openDbFilterPopover(button,key){
  pop.style.top=Math.max(8,Math.min(window.innerHeight-445,r.bottom+4))+'px';
  pop.classList.remove('hidden');
 }
+
+function normalizePcLinkName(value){
+ return String(value??'').normalize('NFKC').trim().replace(/\s+/g,' ').toLowerCase();
+}
+function buildYosoPlLookup(){
+ const map=new Map();
+ for(const r of appData.yosoRecords||[]){
+   const nameKey=normalizePcLinkName(r.name);
+   const pl=String(r.pl||'').trim();
+   if(!nameKey||!pl)continue;
+   if(!map.has(nameKey))map.set(nameKey,new Set());
+   map.get(nameKey).add(pl);
+ }
+ return map;
+}
+function mostFrequentScenarioPl(character,lookup){
+ const counts=new Map();
+ for(const sc of character.scenarios||[]){
+   for(const pcName of scenarioPcNames(sc.pcs)){
+     const pls=lookup.get(normalizePcLinkName(pcName));
+     if(!pls)continue;
+     for(const pl of pls)counts.set(pl,(counts.get(pl)||0)+1);
+   }
+ }
+ if(!counts.size)return '';
+ const max=Math.max(...counts.values());
+ // 同数最多が複数いる場合は情報を落とさず併記。
+ return [...counts.entries()]
+   .filter(([,n])=>n===max)
+   .map(([pl])=>pl)
+   .sort((a,b)=>compareText(a,b))
+   .join(' / ');
+}
+
 async function renderDatabaseView(){
  if(!db && !(PUBLIC_VIEWER_ONLY&&publicRemoteData))return;
  let list=(await all()).map(ensureShape);
@@ -6881,6 +7035,7 @@ async function renderDatabaseView(){
  }
 
  const edition=$('databaseEditionFilter')?.value||'6';
+ const yosoPlLookup=buildYosoPlLookup();
  const derivedCols=edition==='6'
    ? [['HP','HP'],['MP','MP'],['IDEA','IDEA'],['幸運','幸運'],['知識','知識'],['DB','DB']]
    : [['HP','HP'],['MP','MP'],['幸運','幸運'],['DB','DB'],['BLD','BLD'],['MOV','MOV']];
@@ -6894,6 +7049,7 @@ async function renderDatabaseView(){
    ...derivedCols.map(([label,key])=>({key:`d_${key}`,label}))
  ];
  if(edition==='6')columns.push({key:'feature1',label:'特徴表1'},{key:'feature2',label:'特徴表2'});
+ columns.push({key:'topPl',label:'最多同卓PL'});
 
  let rows=list.filter(x=>x.edition===edition).map((x,i)=>{
    const c=computedCharacterSnapshot(x),s=c.stats,d=c.derived;
@@ -6903,7 +7059,8 @@ async function renderDatabaseView(){
      name:x.name||'名前未設定',gender:x.gender||'',age:String(x.age||''),birthday:x.birthday||'',
      height:String(x.height||''),weight:String(x.weight||''),occupation:x.occupation||'',
      total:String(STAT_KEYS.reduce((a,k)=>a+num(s[k]),0)),
-     feature1:x.feature1||'—',feature2:x.feature2||'—'
+     feature1:x.feature1||'—',feature2:x.feature2||'—',
+     topPl:mostFrequentScenarioPl(x,yosoPlLookup)
    };
    STAT_KEYS.forEach(k=>values[k]=String(s[k]??''));
    derivedCols.forEach(([label,key])=>values[`d_${key}`]=String(d[key]??''));
@@ -6948,7 +7105,8 @@ async function renderDatabaseView(){
    if(key==='name')return Math.min(13.2,Math.max(8.0,len*.72));
    if(key==='gender')return Math.min(4.0,Math.max(3.0,len*.62));
    if(key==='age')return 3.0;
-   if(key==='birthday')return Math.min(6.3,Math.max(5.0,len*.54));
+   if(key==='birthday')return Math.min(5.2,Math.max(4.2,len*.48));
+   if(key==='topPl')return Math.min(8.0,Math.max(5.0,len*.62));
    if(key==='height'||key==='weight')return Math.min(4.2,Math.max(3.4,len*.56));
    if(key==='occupation')return Math.min(14.0,Math.max(8.0,len*.70));
    if(key==='feature1'||key==='feature2')return Math.min(13.0,Math.max(8.3,len*.67));
@@ -6977,6 +7135,7 @@ async function renderDatabaseView(){
      <td class="db-num">${esc(values.total)}</td>
      ${derivedCols.map(([label,key])=>`<td class="db-num">${esc(values[`d_${key}`])}</td>`).join('')}
      ${featureCells}
+     <td class="db-top-pl" title="${esc(values.topPl)}">${esc(values.topPl)}</td>
    </tr>`;
  }).join('');
 
@@ -7221,7 +7380,7 @@ function showViewer(){
      <details>
        <summary>呪文・AF</summary>
        <div class="viewer-accordion-content">
-         ${simpleViewTable(['名称','頁数','効果'],magicRows)}
+         <div class="viewer-magic-table-wrap">${simpleViewTable(['名称','頁数','効果'],magicRows)}</div>
        </div>
      </details>
 
@@ -7295,7 +7454,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
