@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v5.3</title>
+<title>CHARACTER DATABASE | Shared Viewer v5.4</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3765,6 +3765,143 @@ tr.row-drag-over td{
   text-overflow:ellipsis;
 }
 
+
+/* v5.4 ------------------------------------------------------------ */
+
+/* REPORT: title/filter area stays fixed; only the gallery below scrolls. */
+#reportHub.report-content{
+  height:calc(100vh - 82px);
+  max-height:calc(100vh - 82px);
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column;
+}
+#reportHub .report-head{
+  flex:0 0 auto;
+}
+#reportHub .report-filter-bar{
+  flex:0 0 auto;
+  position:relative;
+  z-index:20;
+  margin-bottom:8px;
+}
+#reportGrid{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:4px 10px 28px 2px;
+  overscroll-behavior:contain;
+}
+
+/* REPORT: year open/close */
+.report-year-title{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  width:100%;
+  border:0;
+  border-bottom:1px solid #89939b;
+  background:transparent;
+  padding:0 4px 10px;
+  margin:0 0 12px;
+  color:inherit;
+  text-align:left;
+  font:inherit;
+  font-size:19px;
+  font-weight:800;
+  cursor:pointer;
+}
+.report-year-title:hover{
+  background:rgba(255,255,255,.35);
+}
+.report-year-arrow{
+  flex:0 0 18px;
+  font-size:16px;
+}
+.report-year-count{
+  margin-left:2px;
+  color:#96a0a8;
+  font-size:10px;
+  font-weight:500;
+}
+.report-year.collapsed{
+  margin-bottom:8px;
+}
+.report-year.collapsed .report-year-title{
+  margin-bottom:0;
+}
+
+/* REPORT PC autocomplete */
+.report-pc-autocomplete{
+  position:relative;
+  min-width:0;
+}
+.report-pc-autocomplete input{
+  width:100%;
+}
+.report-pc-suggestions{
+  position:absolute;
+  z-index:120;
+  left:0;
+  right:0;
+  top:calc(100% + 3px);
+  max-height:230px;
+  overflow-y:auto;
+  border:1px solid #cfd9e0;
+  border-radius:7px;
+  background:#fff;
+  box-shadow:0 10px 28px rgba(38,52,62,.16);
+  padding:3px;
+}
+.report-pc-suggestion{
+  display:block;
+  width:100%;
+  border:0;
+  border-radius:5px;
+  background:transparent;
+  padding:7px 8px;
+  color:#33424d;
+  text-align:left;
+  font-size:10px;
+  cursor:pointer;
+}
+.report-pc-suggestion:hover,
+.report-pc-suggestion:focus{
+  background:#eef4f7;
+}
+
+/* 通過シナリオ：サジェストをテーブル内スクロールに閉じ込めない */
+#tab-scenarios .table-wrap{
+  max-height:none!important;
+  overflow:visible!important;
+}
+#tab-scenarios .scenario-table{
+  overflow:visible!important;
+}
+#tab-scenarios .scenario-table tbody,
+#tab-scenarios .scenario-table tr{
+  overflow:visible!important;
+}
+#tab-scenarios .scenario-table td:nth-child(4){
+  position:relative;
+  overflow:visible!important;
+}
+#tab-scenarios .scenario-pc-suggestions{
+  z-index:250;
+  max-height:240px;
+}
+#tab-scenarios .card{
+  overflow:visible!important;
+}
+
+@media(max-width:700px){
+  #reportHub.report-content{
+    height:calc(100vh - 64px);
+    max-height:calc(100vh - 64px);
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4108,8 +4245,11 @@ tr.row-drag-over td{
               <option value="7">7版</option>
             </select>
           </label>
-          <label>PC
-            <select class="control" id="reportPcFilter"><option value="">すべてのPC</option></select>
+          <label class="report-pc-field">PC
+            <div class="report-pc-autocomplete">
+              <input class="control" id="reportPcFilter" autocomplete="off" placeholder="すべてのPC">
+              <div class="report-pc-suggestions hidden" id="reportPcSuggestions" role="listbox"></div>
+            </div>
           </label>
           <label class="report-search-field">検索
             <input class="control" id="reportSearchInput" placeholder="シナリオ名・uchi・yoso">
@@ -4253,7 +4393,7 @@ tr.row-drag-over td{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v5.3</p>
+    <p class="public-viewer-version">Viewer v5.4</p>
   </div>
 </div>
 
@@ -4325,7 +4465,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='5.3';
+const PUBLIC_VIEWER_VERSION='5.4';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -5725,12 +5865,12 @@ function renderScenarios(){
      const renderSuggestions=()=>{
        const q=String(acInput.value||'').trim().toLowerCase();
        if(!q){
-         acMatches=selectable.slice(0,8);
+         acMatches=selectable.slice(0,10);
        }else{
          acMatches=selectable.filter(r=>{
            const hay=`${r.name} ${r.kana} ${r.pl}`.toLowerCase();
            return hay.includes(q);
-         }).slice(0,8);
+         }).slice(0,10);
        }
        acIndex=acMatches.length?0:-1;
        acList.innerHTML=acMatches.map((r,idx)=>`
@@ -6454,6 +6594,62 @@ function renderYoso(){
 
 let reportRowCache=new Map();
 
+const collapsedReportYears=new Set();
+let reportPcCandidates=[];
+
+function renderReportPcSuggestions(){
+ const input=$('reportPcFilter');
+ const box=$('reportPcSuggestions');
+ if(!input||!box)return;
+
+ const q=String(input.value||'').trim().toLowerCase();
+ const matches=reportPcCandidates
+   .filter(n=>!q||String(n).toLowerCase().includes(q))
+   .slice(0,10);
+
+ box.innerHTML=matches.map((name,idx)=>`
+   <button type="button" class="report-pc-suggestion" data-name="${esc(name)}" role="option">
+     ${esc(name)}
+   </button>`).join('');
+ box.classList.toggle('hidden',!matches.length);
+
+ box.querySelectorAll('.report-pc-suggestion').forEach(btn=>{
+   btn.onmousedown=e=>e.preventDefault();
+   btn.onclick=()=>{
+     input.value=btn.dataset.name||'';
+     box.classList.add('hidden');
+     renderReport();
+   };
+ });
+}
+function setupReportPcAutocomplete(){
+ const input=$('reportPcFilter');
+ const box=$('reportPcSuggestions');
+ if(!input||!box||input.dataset.bound==='1')return;
+ input.dataset.bound='1';
+
+ input.onfocus=renderReportPcSuggestions;
+ input.oninput=()=>{
+   renderReportPcSuggestions();
+   renderReport();
+ };
+ input.onkeydown=e=>{
+   if(e.key==='Escape')box.classList.add('hidden');
+   if(e.key==='Enter'){
+     const first=box.querySelector('.report-pc-suggestion');
+     if(first){
+       e.preventDefault();
+       input.value=first.dataset.name||'';
+       box.classList.add('hidden');
+       renderReport();
+     }
+   }
+ };
+ input.onblur=()=>setTimeout(()=>box.classList.add('hidden'),120);
+}
+
+
+
 function reportDateParts(date){
  const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(date||''));
  if(!m)return {year:'日付未設定',month:'',day:''};
@@ -6608,20 +6804,18 @@ async function renderReport(){
  const imageRows=await allReportImages();
  const imageMap=new Map(imageRows.map(x=>[x.id,x.data]));
 
- const pcSel=$('reportPcFilter');
- const keepPc=pcSel?.value||'';
- const pcs=[...new Set(allRows.map(x=>x.uchi).filter(x=>x&&x!=='—'))].sort((a,b)=>a.localeCompare(b,'ja'));
- if(pcSel){
-   pcSel.innerHTML='<option value="">すべてのPC</option>'+pcs.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-   pcSel.value=pcs.includes(keepPc)?keepPc:'';
- }
+ const pcInput=$('reportPcFilter');
+ reportPcCandidates=[...new Set(allRows.map(x=>x.uchi).filter(x=>x&&x!=='—'))].sort((a,b)=>a.localeCompare(b,'ja'));
+ setupReportPcAutocomplete();
+
  const edition=$('reportEditionFilter')?.value||'';
- const pc=pcSel?.value||'';
+ const pcQuery=String(pcInput?.value||'').trim().toLowerCase();
  const q=($('reportSearchInput')?.value||'').trim().toLowerCase();
 
  const rows=allRows.filter(r=>{
    const hay=`${r.title||''} ${r.uchi||''} ${r.yoso||''}`.toLowerCase();
-   return (!edition||r.edition===edition)&&(!pc||r.uchi===pc)&&(!q||hay.includes(q));
+   const uchi=String(r.uchi||'').toLowerCase();
+   return (!edition||r.edition===edition)&&(!pcQuery||uchi.includes(pcQuery))&&(!q||hay.includes(q));
  });
  $('reportCount').textContent=`${rows.length} / ${allRows.length}件`;
  reportRowCache=new Map(rows.map(r=>[r.reportKey,r]));
@@ -6646,8 +6840,14 @@ async function renderReport(){
 
  grid.innerHTML=[...years.entries()].map(([year,months])=>{
    const count=months.reduce((a,m)=>a+m.rows.length,0);
-   return `<section class="report-year">
-     <h3 class="report-year-title">▼ ${esc(year)}${year==='日付未設定'?'':'年'} <span>${count}件</span></h3>
+   const collapsed=collapsedReportYears.has(year);
+   return `<section class="report-year${collapsed?' collapsed':''}" data-report-year="${esc(year)}">
+     <button type="button" class="report-year-title" data-year-toggle="${esc(year)}" aria-expanded="${collapsed?'false':'true'}">
+       <span class="report-year-arrow">${collapsed?'▶':'▼'}</span>
+       <span>${esc(year)}${year==='日付未設定'?'':'年'}</span>
+       <span class="report-year-count">${count}件</span>
+     </button>
+     <div class="report-year-body${collapsed?' hidden':''}">
      ${months.map(g=>`<div class="report-month">
        <h4>${g.month?`${esc(g.month)}月`:'日付未設定'} <span>${g.rows.length}件</span></h4>
        <div class="report-cards">${g.rows.map(r=>{
@@ -6673,8 +6873,18 @@ async function renderReport(){
          </article>`;
        }).join('')}</div>
      </div>`).join('')}
+     </div>
    </section>`;
  }).join('');
+
+ grid.querySelectorAll('[data-year-toggle]').forEach(btn=>{
+   btn.onclick=()=>{
+     const year=btn.dataset.yearToggle||'';
+     if(collapsedReportYears.has(year))collapsedReportYears.delete(year);
+     else collapsedReportYears.add(year);
+     renderReport();
+   };
+ });
 
  grid.querySelectorAll('.report-image-button img').forEach(img=>{
    const sources=[
@@ -7454,7 +7664,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.4',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -8452,12 +8662,13 @@ $('reportLightbox').onclick=e=>{if(e.target===$('reportLightbox'))closeReportLig
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('reportLightbox').classList.contains('hidden'))closeReportLightbox()});
 
 $('reportEditionFilter').onchange=renderReport;
-$('reportPcFilter').onchange=renderReport;
+
 $('reportSearchInput').oninput=renderReport;
 $('reportFilterResetBtn').onclick=()=>{
  $('reportEditionFilter').value='';
  $('reportPcFilter').value='';
  $('reportSearchInput').value='';
+ $('reportPcSuggestions')?.classList.add('hidden');
  renderReport();
 };
 $('reportDeleteAllBtn').onclick=deleteAllReportRecords;
