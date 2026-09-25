@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v5.5</title>
+<title>CHARACTER DATABASE | Shared Viewer v5.6</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3919,6 +3919,86 @@ tr.row-drag-over td{
   display:none!important;
 }
 
+
+/* v5.6 ------------------------------------------------------------ */
+
+/* REPORT-only fixed share page */
+body.public-online-report{
+  min-width:0!important;
+}
+body.public-online-report .sidebar,
+body.public-online-report .right-rail,
+body.public-online-report #workspaceTools,
+body.public-online-report #editor,
+body.public-online-report #viewer,
+body.public-online-report #emptyState,
+body.public-online-report #databaseView,
+body.public-online-report .app-nav,
+body.public-online-report .header-utilities{
+  display:none!important;
+}
+body.public-online-report .app-header{
+  position:sticky;
+  top:0;
+  z-index:90;
+}
+body.public-online-report .brand{
+  pointer-events:none;
+}
+body.public-online-report .brand p{
+  display:none;
+}
+body.public-online-report .brand h1{
+  font-size:14px;
+}
+body.public-online-report .layout{
+  display:block!important;
+  width:100%!important;
+  min-height:calc(100vh - 52px);
+}
+body.public-online-report .workspace{
+  width:100%!important;
+  max-width:none!important;
+  padding:12px!important;
+  grid-column:auto!important;
+}
+body.public-online-report #hubView{
+  display:block!important;
+  width:100%!important;
+}
+body.public-online-report #sessionHub,
+body.public-online-report #yosoHub{
+  display:none!important;
+}
+body.public-online-report #reportHub{
+  display:flex!important;
+}
+body.public-online-report .report-content{
+  width:min(1500px,96%)!important;
+  margin:0 auto!important;
+}
+body.public-online-report .report-card-actions,
+body.public-online-report #reportDeleteAllBtn,
+body.public-online-report #reportPageShareBtn,
+body.public-online-report .report-image-editor-modal{
+  display:none!important;
+}
+body.public-online-report .report-image-button{
+  cursor:zoom-in;
+}
+body.public-online-report .report-image-button:not(:has(img)){
+  cursor:default;
+}
+@media(max-width:700px){
+  body.public-online-report .workspace{
+    padding:7px!important;
+  }
+  body.public-online-report .report-content{
+    width:100%!important;
+    min-width:0!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4272,6 +4352,7 @@ tr.row-drag-over td{
             <input class="control" id="reportSearchInput" placeholder="シナリオ名・uchi・yoso">
           </label>
           <button type="button" class="btn small" id="reportFilterResetBtn">解除</button>
+          <button type="button" class="btn small report-page-share-btn" id="reportPageShareBtn">🔗 共有リンク</button>
           <button type="button" class="btn small danger hub-bulk-delete" id="reportDeleteAllBtn">一括削除</button>
           <span id="reportCount" class="report-count"></span>
         </div>
@@ -4410,7 +4491,7 @@ tr.row-drag-over td{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v5.5</p>
+    <p class="public-viewer-version">Viewer v5.6</p>
   </div>
 </div>
 
@@ -4482,7 +4563,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='5.5';
+const PUBLIC_VIEWER_VERSION='5.6';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -4907,6 +4988,14 @@ function mobileViewerUrl(cfg=loadOnlineSyncConfig()){
  u.searchParams.set('database',cfg.viewerSecret);
  return u.toString();
 }
+function reportViewerUrl(cfg=loadOnlineSyncConfig()){
+ const base=normalizeShareBaseUrl(getSavedShareBaseUrl());
+ if(!base||!cfg.viewerSecret)return '';
+ const u=new URL(base);
+ u.searchParams.set('report',cfg.viewerSecret);
+ return u.toString();
+}
+
 function fillOnlineSyncForm(){
  const cfg=loadOnlineSyncConfig();
  $('onlineShareBaseUrl').value=getSavedShareBaseUrl();
@@ -6930,15 +7019,23 @@ async function renderReport(){
    const imageBtn=card.querySelector('.report-image-button');
    imageBtn.onclick=()=>{
      const liveImg=imageBtn.querySelector('img');
-     if(liveImg && liveImg.complete && liveImg.naturalWidth>0)openReportLightbox(liveImg,row);
-     else chooseReportImage(key);
-   };
-   card.querySelector('.report-edit-image-btn').onclick=e=>{
-     e.stopPropagation();
+     if(liveImg && liveImg.complete && liveImg.naturalWidth>0){
+       openReportLightbox(liveImg,row);
+       return;
+     }
+     if(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='report')return;
      chooseReportImage(key);
    };
-   card.querySelector('.report-share-btn').onclick=async e=>{
+   const editBtn=card.querySelector('.report-edit-image-btn');
+   const shareBtn=card.querySelector('.report-share-btn');
+   if(editBtn)editBtn.onclick=e=>{
      e.stopPropagation();
+     if(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='report')return;
+     chooseReportImage(key);
+   };
+   if(shareBtn)shareBtn.onclick=async e=>{
+     e.stopPropagation();
+     if(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='report')return;
      await shareReportCard(card,row);
    };
  });
@@ -7681,7 +7778,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.5',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -8689,6 +8786,21 @@ $('reportFilterResetBtn').onclick=()=>{
  renderReport();
 };
 $('reportDeleteAllBtn').onclick=deleteAllReportRecords;
+
+$('reportPageShareBtn').onclick=async()=>{
+ const cfg=loadOnlineSyncConfig();
+ const url=reportViewerUrl(cfg);
+ if(!onlineSyncConfigured(cfg)||!url){
+   alert('公開同期のGitHub Pages URL・Supabase設定を先に保存してください。');
+   return;
+ }
+ const ok=await copyTextPortable(url);
+ const btn=$('reportPageShareBtn');
+ const original='🔗 共有リンク';
+ btn.textContent=ok?'✓ コピーしました':'URLをコピーできませんでした';
+ setTimeout(()=>{btn.textContent=original},1500);
+};
+
 $('sessionFilterResetBtn').onclick=()=>{
  $('sessionEditionFilter').value='';
  $('sessionSearchInput').value='';
@@ -8877,8 +8989,10 @@ async function initCharacterDatabase(){
      const params=new URLSearchParams(location.search);
      const queryPc=params.get('pc')||'';
      const queryDatabase=params.get('database')||'';
+     const queryReport=params.get('report')||'';
      const legacyPc=location.hash.startsWith('#pc=')?decodeURIComponent(location.hash.slice(4)):'';
      const legacyDatabase=location.hash.startsWith('#database=')?decodeURIComponent(location.hash.slice('#database='.length)):'';
+     const legacyReport=location.hash.startsWith('#report=')?decodeURIComponent(location.hash.slice('#report='.length)):'';
 
      const characterId=queryPc||legacyPc;
      if(characterId){
@@ -8888,6 +9002,18 @@ async function initCharacterDatabase(){
        renderAll();
        showViewer();
        document.title=`${current.name||'探索者'} | CHARACTER DATABASE`;
+       return;
+     }
+
+     const reportToken=queryReport||legacyReport;
+     if(reportToken){
+       publicRemoteData=await loadPublicDatabaseByViewerToken(reportToken);
+       appData=structuredClone(publicRemoteData.appData);
+       if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
+       publicRemoteMode='report';
+       document.body.classList.add('public-online-report');
+       await showHubView('report');
+       document.title='REPORT | CHARACTER DATABASE';
        return;
      }
 
