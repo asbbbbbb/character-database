@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v5.1</title>
+<title>CHARACTER DATABASE | Shared Viewer v5.2</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3390,7 +3390,9 @@ body.public-online-database .db-no-share{
 
 /* v4.9 ------------------------------------------------------------ */
 body.public-online-database .hub-bulk-delete,
-body.public-viewer-only .hub-bulk-delete{
+body.public-viewer-only .hub-bulk-delete,
+body.public-online-database #yosoDeduplicateBtn,
+body.public-viewer-only #yosoDeduplicateBtn{
   display:none!important;
 }
 
@@ -3615,6 +3617,83 @@ body.public-viewer-only .hub-bulk-delete{
   }
   .viewer-skills-tools{
     align-items:flex-end;
+  }
+}
+
+
+/* v5.2 ------------------------------------------------------------ */
+
+/* 通過シナリオ：同卓PC名サジェスト */
+.scenario-chip-autocomplete{
+  position:relative;
+  width:100%;
+  min-width:0;
+}
+.scenario-pc-autocomplete-input{
+  width:100%;
+  min-width:0;
+}
+.scenario-pc-suggestions{
+  position:absolute;
+  z-index:80;
+  left:0;
+  right:0;
+  top:calc(100% + 3px);
+  max-height:190px;
+  overflow:auto;
+  padding:3px;
+  border:1px solid #cfd9e0;
+  border-radius:7px;
+  background:#fff;
+  box-shadow:0 8px 24px rgba(38,52,62,.16);
+}
+.scenario-pc-suggestion{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  align-items:center;
+  width:100%;
+  border:0;
+  border-radius:5px;
+  background:transparent;
+  padding:6px 7px;
+  color:#33424d;
+  text-align:left;
+  cursor:pointer;
+}
+.scenario-pc-suggestion:hover,
+.scenario-pc-suggestion.active{
+  background:#eef4f7;
+}
+.scenario-pc-suggestion-name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:10px;
+  font-weight:700;
+}
+.scenario-pc-suggestion-sub{
+  color:#87939c;
+  font-size:8px;
+  white-space:nowrap;
+}
+
+/* v4.4 の2カラム入力を1カラムへ上書き */
+.scenario-chip-add-row{
+  grid-template-columns:1fr!important;
+}
+
+/* YOSONOKO: フィルタ操作が増えたため自動幅に */
+.yoso-filter-bar{
+  grid-template-columns:120px minmax(180px,1fr) auto auto auto auto!important;
+}
+@media(max-width:900px){
+  .yoso-filter-bar{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .yoso-filter-count{
+    justify-self:start;
   }
 }
 
@@ -3989,6 +4068,7 @@ body.public-viewer-only .hub-bulk-delete{
             <input class="control" id="yosoSearchInput" placeholder="かな・名前・URL">
           </label>
           <button type="button" class="btn small" id="yosoFilterResetBtn">解除</button>
+          <button type="button" class="btn small" id="yosoDeduplicateBtn">重複を削除</button>
           <button type="button" class="btn small danger hub-bulk-delete" id="yosoDeleteAllBtn">一括削除</button>
           <span class="yoso-filter-count" id="yosoFilterCount"></span>
         </div>
@@ -4105,7 +4185,7 @@ body.public-viewer-only .hub-bulk-delete{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v5.1</p>
+    <p class="public-viewer-version">Viewer v5.2</p>
   </div>
 </div>
 
@@ -4177,7 +4257,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='5.1';
+const PUBLIC_VIEWER_VERSION='5.2';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -5459,8 +5539,15 @@ function renderScenarios(){
 
    if(editing){
      const selected=scenarioPcNames(sc.pcs);
-     const selectable=yosoNames.filter(n=>!selected.includes(n));
-     const yosoOptions=selectable.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+     const selectable=(appData.yosoRecords||[])
+       .filter(r=>String(r.name||'').trim()&&!selected.includes(String(r.name||'').trim()))
+       .map(r=>({
+         name:String(r.name||'').trim(),
+         kana:String(r.kana||'').trim(),
+         pl:String(r.pl||'').trim()
+       }))
+       .filter((r,i,a)=>a.findIndex(x=>x.name===r.name&&x.kana===r.kana&&x.pl===r.pl)===i)
+       .sort((a,b)=>compareText(a.kana||a.name,b.kana||b.name)||compareText(a.name,b.name));
      tr.className='scenario-editing';
      tr.innerHTML=`<td><input class="scenario-url" data-k="url" value="${esc(sc.url||'')}" placeholder="https://..."></td>
      <td><input class="scenario-date-input" type="date" min="1000-01-01" max="9999-12-31" data-k="date" value="${esc(sc.date||'')}"></td>
@@ -5468,11 +5555,9 @@ function renderScenarios(){
      <td>
        <div class="scenario-pcs-editor chip-editor">
          <div class="scenario-selected-chips">${scenarioPcChips(sc.pcs,true)}</div>
-         <div class="scenario-chip-add-row">
-           <select class="scenario-yoso-pick" title="YOSONOKOから追加">
-             <option value="">＋ YOSONOKOから選択</option>${yosoOptions}
-           </select>
-           <input class="scenario-pc-custom" placeholder="直接入力してEnter">
+         <div class="scenario-chip-autocomplete">
+           <input class="scenario-pc-autocomplete-input" autocomplete="off" placeholder="同卓PC名を入力">
+           <div class="scenario-pc-suggestions hidden" role="listbox"></div>
          </div>
        </div>
      </td>
@@ -5512,14 +5597,69 @@ function renderScenarios(){
        renderScenarios();
      };
 
-     const picker=tr.querySelector('.scenario-yoso-pick');
-     picker.onchange=()=>addPc(picker.value);
+     const acInput=tr.querySelector('.scenario-pc-autocomplete-input');
+     const acList=tr.querySelector('.scenario-pc-suggestions');
+     let acMatches=[];
+     let acIndex=-1;
 
-     const custom=tr.querySelector('.scenario-pc-custom');
-     custom.onkeydown=e=>{
+     const renderSuggestions=()=>{
+       const q=String(acInput.value||'').trim().toLowerCase();
+       if(!q){
+         acMatches=selectable.slice(0,8);
+       }else{
+         acMatches=selectable.filter(r=>{
+           const hay=`${r.name} ${r.kana} ${r.pl}`.toLowerCase();
+           return hay.includes(q);
+         }).slice(0,8);
+       }
+       acIndex=acMatches.length?0:-1;
+       acList.innerHTML=acMatches.map((r,idx)=>`
+         <button type="button" class="scenario-pc-suggestion${idx===acIndex?' active':''}" data-index="${idx}" role="option" aria-selected="${idx===acIndex?'true':'false'}">
+           <span class="scenario-pc-suggestion-name">${esc(r.name)}</span>
+           <span class="scenario-pc-suggestion-sub">${esc([r.kana,r.pl?`PL:${r.pl}`:''].filter(Boolean).join(' / '))}</span>
+         </button>`).join('');
+       acList.classList.toggle('hidden',!acMatches.length);
+       acList.querySelectorAll('.scenario-pc-suggestion').forEach(btn=>{
+         btn.onmousedown=e=>e.preventDefault();
+         btn.onclick=()=>{
+           const pick=acMatches[Number(btn.dataset.index)];
+           if(pick)addPc(pick.name);
+         };
+       });
+     };
+     const updateActiveSuggestion=()=>{
+       acList.querySelectorAll('.scenario-pc-suggestion').forEach((btn,idx)=>{
+         const active=idx===acIndex;
+         btn.classList.toggle('active',active);
+         btn.setAttribute('aria-selected',active?'true':'false');
+         if(active)btn.scrollIntoView({block:'nearest'});
+       });
+     };
+
+     acInput.onfocus=renderSuggestions;
+     acInput.oninput=renderSuggestions;
+     acInput.onblur=()=>setTimeout(()=>acList.classList.add('hidden'),120);
+     acInput.onkeydown=e=>{
+       if(e.key==='ArrowDown'&&acMatches.length){
+         e.preventDefault();
+         acIndex=(acIndex+1)%acMatches.length;
+         updateActiveSuggestion();
+         return;
+       }
+       if(e.key==='ArrowUp'&&acMatches.length){
+         e.preventDefault();
+         acIndex=(acIndex-1+acMatches.length)%acMatches.length;
+         updateActiveSuggestion();
+         return;
+       }
+       if(e.key==='Escape'){
+         acList.classList.add('hidden');
+         return;
+       }
        if(e.key==='Enter'){
          e.preventDefault();
-         addPc(custom.value);
+         const pick=acIndex>=0?acMatches[acIndex]:null;
+         addPc(pick?.name||acInput.value);
        }
      };
 
@@ -6531,6 +6671,64 @@ async function deleteAllReportRecords(){
  await renderReport();
 }
 
+
+function normalizeYosoDuplicateText(value){
+ return String(value??'')
+   .normalize('NFKC')
+   .trim()
+   .replace(/\s+/g,' ')
+   .toLowerCase();
+}
+function normalizeYosoDuplicateUrl(value){
+ let s=String(value??'').trim();
+ if(!s)return '';
+ try{
+   const u=new URL(s);
+   u.hash='';
+   if(u.pathname.length>1)u.pathname=u.pathname.replace(/\/+$/,'');
+   return u.toString().replace(/\/$/,'').toLowerCase();
+ }catch(_){
+   return normalizeYosoDuplicateText(s).replace(/\/+$/,'');
+ }
+}
+function yosoDuplicateKey(rec){
+ return [
+   normalizeYosoDuplicateText(rec.pl),
+   normalizeYosoDuplicateText(rec.kana),
+   normalizeYosoDuplicateText(rec.name),
+   normalizeYosoDuplicateUrl(rec.url)
+ ].join('\u241f');
+}
+function deleteDuplicateYosoRecords(){
+ if(PUBLIC_VIEWER_ONLY)return;
+
+ const rows=appData.yosoRecords||[];
+ const seen=new Set();
+ const keep=[];
+ const duplicateIds=[];
+
+ for(const rec of rows){
+   const key=yosoDuplicateKey(rec);
+   if(seen.has(key)){
+     duplicateIds.push(rec.id);
+   }else{
+     seen.add(key);
+     keep.push(rec);
+   }
+ }
+
+ if(!duplicateIds.length){
+   alert('重複しているYOSONOKO記録はありません。');
+   return;
+ }
+ if(!confirm(`YOSONOKOの重複 ${duplicateIds.length}件 を削除しますか？\nPL・かな・名前・URLが同じ記録を重複として判定します。`))return;
+
+ appData.yosoRecords=keep;
+ duplicateIds.forEach(id=>editingYosoIds.delete(id));
+ saveAppData();
+ renderYoso();
+}
+
 function deleteAllYosoRecords(){
  if(PUBLIC_VIEWER_ONLY)return;
 
@@ -7097,7 +7295,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -8127,6 +8325,7 @@ $('yosoFilterResetBtn').onclick=()=>{
  $('yosoSearchInput').value='';
  renderYoso();
 };
+$('yosoDeduplicateBtn').onclick=deleteDuplicateYosoRecords;
 $('yosoDeleteAllBtn').onclick=deleteAllYosoRecords;
 $('addYosoBtn').onclick=()=>{
  const rec={id:uid(),pl:'',kana:'',name:'',url:'',source:'manual',draft:true};
