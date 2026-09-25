@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v4.3</title>
+<title>CHARACTER DATABASE | Shared Viewer v4.4</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3227,6 +3227,89 @@ body.public-online-database .db-no-share{
   padding:2px 3px;
 }
 
+
+/* v4.4 ------------------------------------------------------------ */
+
+/* 同卓PC名：複数人をチップ表示 */
+.scenario-pcs-editor.chip-editor{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:5px;
+}
+.scenario-chip-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  align-items:center;
+}
+.scenario-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  max-width:100%;
+  padding:2px 7px;
+  border:1px solid #cbd6de;
+  border-radius:999px;
+  background:#f2f6f8;
+  color:#35434e;
+  font-size:9px;
+  line-height:1.4;
+  white-space:nowrap;
+}
+.scenario-chip-remove{
+  width:14px;
+  height:14px;
+  min-width:14px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:transparent;
+  color:#77838d;
+  font-size:11px;
+  line-height:13px;
+  cursor:pointer;
+}
+.scenario-chip-remove:hover{
+  background:#dde6eb;
+  color:#283640;
+}
+.scenario-chip-empty{
+  color:#9aa4ac;
+  font-size:9px;
+}
+.scenario-chip-add-row{
+  display:grid;
+  grid-template-columns:minmax(120px,1fr) minmax(90px,.75fr);
+  gap:4px;
+}
+.scenario-chip-add-row select,
+.scenario-chip-add-row input{
+  width:100%;
+  min-width:0;
+}
+.scenario-read-pcs .scenario-chip-list,
+.viewer-scenario-table .scenario-chip-list{
+  justify-content:flex-start;
+}
+
+/* 公開個別ページはリンク列を持たない3列表示 */
+.public-character-scenarios th:nth-child(1),
+.public-character-scenarios td:nth-child(1){width:18%!important}
+.public-character-scenarios th:nth-child(2),
+.public-character-scenarios td:nth-child(2){width:47%!important}
+.public-character-scenarios th:nth-child(3),
+.public-character-scenarios td:nth-child(3){width:35%!important}
+
+@media(max-width:700px){
+  .scenario-chip-add-row{
+    grid-template-columns:1fr;
+  }
+  .scenario-chip{
+    font-size:8px;
+    padding:2px 6px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -3706,7 +3789,7 @@ body.public-online-database .db-no-share{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v4.3</p>
+    <p class="public-viewer-version">Viewer v4.4</p>
   </div>
 </div>
 
@@ -3778,7 +3861,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='4.3';
+const PUBLIC_VIEWER_VERSION='4.4';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -5025,12 +5108,24 @@ async function persistCurrentScenarioChanges(){
  renderHeader();
  renderList();
 }
+function scenarioPcNames(value){
+ return [...new Set(String(value||'')
+   .split(/\s*(?:\/|／|,|、|，|\n)\s*/)
+   .map(x=>x.trim())
+   .filter(Boolean))];
+}
+function scenarioPcText(names){
+ return [...new Set((names||[]).map(x=>String(x||'').trim()).filter(Boolean))].join(' / ');
+}
+function scenarioPcChips(value,removable=false){
+ const names=scenarioPcNames(value);
+ if(!names.length)return removable?'<span class="scenario-chip-empty">未選択</span>':'—';
+ return `<div class="scenario-chip-list">${names.map((name,i)=>`<span class="scenario-chip">${esc(name)}${removable?`<button type="button" class="scenario-chip-remove" data-chip-index="${i}" aria-label="${esc(name)}を外す">×</button>`:''}</span>`).join('')}</div>`;
+}
 function renderScenarios(){
  const body=$('scenarioBody'); body.innerHTML='';
  const yosoNames=[...new Set((appData.yosoRecords||[]).map(x=>String(x.name||'').trim()).filter(Boolean))]
    .sort((a,b)=>a.localeCompare(b,'ja'));
- const dl=$('scenarioYosoOptions');
- if(dl)dl.innerHTML=yosoNames.map(n=>`<option value="${esc(n)}"></option>`).join('');
 
  current.scenarios.forEach((sc,i)=>{
    if(!sc.id)sc.id=uid();
@@ -5040,17 +5135,22 @@ function renderScenarios(){
    const editing=editingScenarioIds.has(sc.id);
 
    if(editing){
-     const yosoOptions=yosoNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+     const selected=scenarioPcNames(sc.pcs);
+     const selectable=yosoNames.filter(n=>!selected.includes(n));
+     const yosoOptions=selectable.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
      tr.className='scenario-editing';
      tr.innerHTML=`<td><input class="scenario-url" data-k="url" value="${esc(sc.url||'')}" placeholder="https://..."></td>
      <td><input class="scenario-date-input" type="date" min="1000-01-01" max="9999-12-31" data-k="date" value="${esc(sc.date||'')}"></td>
      <td><input data-k="title" value="${esc(sc.title||'')}" placeholder="シナリオ名"></td>
      <td>
-       <div class="scenario-pcs-editor">
-         <input data-k="pcs" list="scenarioYosoOptions" value="${esc(sc.pcs||'')}" placeholder="同卓PC名">
-         <select class="scenario-yoso-pick" title="YOSONOKOから追加">
-           <option value="">＋ 選択</option>${yosoOptions}
-         </select>
+       <div class="scenario-pcs-editor chip-editor">
+         <div class="scenario-selected-chips">${scenarioPcChips(sc.pcs,true)}</div>
+         <div class="scenario-chip-add-row">
+           <select class="scenario-yoso-pick" title="YOSONOKOから追加">
+             <option value="">＋ YOSONOKOから選択</option>${yosoOptions}
+           </select>
+           <input class="scenario-pc-custom" placeholder="直接入力してEnter">
+         </div>
        </div>
      </td>
      <td class="row-actions"><div class="scenario-row-actions">
@@ -5071,14 +5171,33 @@ function renderScenarios(){
        }
      });
 
+     tr.querySelectorAll('.scenario-chip-remove').forEach(btn=>{
+       btn.onclick=()=>{
+         const names=scenarioPcNames(sc.pcs);
+         names.splice(Number(btn.dataset.chipIndex),1);
+         sc.pcs=scenarioPcText(names);
+         renderScenarios();
+       };
+     });
+
+     const addPc=name=>{
+       const value=String(name||'').trim();
+       if(!value)return;
+       const names=scenarioPcNames(sc.pcs);
+       if(!names.includes(value))names.push(value);
+       sc.pcs=scenarioPcText(names);
+       renderScenarios();
+     };
+
      const picker=tr.querySelector('.scenario-yoso-pick');
-     picker.onchange=()=>{
-       if(!picker.value)return;
-       const names=String(sc.pcs||'').split(/[／/,、，]+/).map(x=>x.trim()).filter(Boolean);
-       if(!names.includes(picker.value))names.push(picker.value);
-       sc.pcs=names.join(' / ');
-       tr.querySelector('[data-k="pcs"]').value=sc.pcs;
-       picker.value='';
+     picker.onchange=()=>addPc(picker.value);
+
+     const custom=tr.querySelector('.scenario-pc-custom');
+     custom.onkeydown=e=>{
+       if(e.key==='Enter'){
+         e.preventDefault();
+         addPc(custom.value);
+       }
      };
 
      tr.querySelector('.scenario-confirm').onclick=async()=>{
@@ -5100,7 +5219,7 @@ function renderScenarios(){
      tr.innerHTML=`<td class="scenario-read-link">${sc.url?`<a class="link-icon" href="${esc(sc.url)}" target="_blank" rel="noopener noreferrer" title="リンクを開く">🔗</a>`:'—'}</td>
      <td class="scenario-read-date">${esc(sc.date||'—')}</td>
      <td class="scenario-read-title">${esc(sc.title||'—')}</td>
-     <td class="scenario-read-pcs">${esc(sc.pcs||'—')}</td>
+     <td class="scenario-read-pcs">${scenarioPcChips(sc.pcs,false)}</td>
      <td class="row-actions"><div class="scenario-row-actions">
        <button type="button" class="record-icon-btn scenario-edit" title="編集" aria-label="編集">✎</button>
        <button type="button" class="record-icon-btn danger scenario-delete" title="削除" aria-label="削除">×</button>
@@ -5322,9 +5441,17 @@ async function renderList(){
 }
 function scenarioTableView(){
  if(!current.scenarios.length)return '<p class="note">記録なし</p>';
- return `<div class="table-wrap"><table class="scenario-table viewer-scenario-table"><thead><tr><th>リンク</th><th>日時</th><th>シナリオ名</th><th>同卓PC名</th></tr></thead><tbody>`+
- current.scenarios.map(s=>`<tr><td class="link-cell">${s.url?`<a class="link-icon" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer" title="リンクを開く">🔗</a>`:''}</td><td>${esc(s.date||'')}</td><td>${esc(s.title||'')}</td><td>${esc(s.pcs||'')}</td></tr>`).join('')+
- '</tbody></table></div>';
+ const hideLink=PUBLIC_VIEWER_ONLY&&publicRemoteMode==='character';
+ const head=hideLink
+   ? '<tr><th>日時</th><th>シナリオ名</th><th>同卓PC名</th></tr>'
+   : '<tr><th>リンク</th><th>日時</th><th>シナリオ名</th><th>同卓PC名</th></tr>';
+ const rows=current.scenarios.map(s=>{
+   const common=`<td>${esc(s.date||'')}</td><td>${esc(s.title||'')}</td><td>${scenarioPcChips(s.pcs,false)}</td>`;
+   return hideLink
+     ? `<tr>${common}</tr>`
+     : `<tr><td class="link-cell">${s.url?`<a class="link-icon" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer" title="リンクを開く">🔗</a>`:''}</td>${common}</tr>`;
+ }).join('');
+ return `<div class="table-wrap"><table class="scenario-table viewer-scenario-table ${hideLink?'public-character-scenarios':''}"><thead>${head}</thead><tbody>${rows}</tbody></table></div>`;
 }
 function simpleViewTable(headers,rows){
  if(!rows.length)return '<p class="note">記録なし</p>';
@@ -6206,14 +6333,18 @@ function showViewer(){
    abilitySecond=[['HP',d.HP],['MP',d.MP],['幸運',d['幸運']],['DB',d.DB],['BLD',d.BLD],['MOV',d.MOV]];
  }
 
+ const viewerSkillPoint=v=>{
+   const n=Number(v)||0;
+   return n===0?'':n;
+ };
  const skillHtml=Object.entries(skillsByCategory).map(([cat,arr])=>{
    const rows=arr.map(s=>`<tr>
      <td>${esc(s.name+(s.detail?' '+s.detail:''))}</td>
-     <td>${baseValue(s)}</td>
-     <td>${num(s.occupation)}</td>
-     <td>${num(s.interest)}</td>
-     <td>${num(s.growth)}</td>
-     <td>${num(s.other)}</td>
+     <td>${viewerSkillPoint(baseValue(s))}</td>
+     <td>${viewerSkillPoint(s.occupation)}</td>
+     <td>${viewerSkillPoint(s.interest)}</td>
+     <td>${viewerSkillPoint(s.growth)}</td>
+     <td>${viewerSkillPoint(s.other)}</td>
      <td><b>${skillTotal(s)}</b></td>
    </tr>`).join('');
    return `<div class="viewer-skill-category">
@@ -6396,7 +6527,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.4',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -6611,7 +6742,7 @@ function importedFeatureSkillBase(ch,name,base){
 }
 function importSkillBlock(cells,ch,header,nameCol){
  const detailCol=nameCol+1,baseCol=nameCol+2;
- const sectionNames=new Set(['信用','戦闘技能','探索技能','行動技能','交渉技能','知識技能','追加技能']);
+ const sectionNames=new Set(['戦闘技能','探索技能','行動技能','交渉技能','知識技能','追加技能']);
  const stopNames=new Set(['所持品・所持金','戦闘・武器・防具','その他メモ','呪文・AF','不定の狂気・後遺症']);
  let end=header.row+35;
  for(let r=header.row+1;r<=header.row+35;r++){
@@ -6665,9 +6796,15 @@ function importSkillBlock(cells,ch,header,nameCol){
  }
 }
 function importSkills(cells,ch){
+ // 6版/7版とも、Excel上の「信用」は交渉技能内の技能行。
+ // 「信用」をセクション見出しとして扱うと、その行以降の説得・母国語・
+ // 威圧・魅力・言語などが別カテゴリへ誤取込されるため、見出し候補から除外する。
  const valid=new Set(['戦闘技能','探索技能','行動技能','交渉技能','知識技能','追加技能']);
- if(ch.edition==='7')valid.add('信用');
- const headers=xfind(cells,(v,p)=>valid.has(excelClean(v))&&(p.col===2||p.col===11));
+ const headers=xfind(cells,(v,p)=>{
+   const name=excelClean(v);
+   if(!valid.has(name)||(p.col!==2&&p.col!==11))return false;
+   return excelClean(xget(cells,p.col+2,p.row))==='初期値';
+ });
  headers.sort((a,b)=>a.row-b.row||a.col-b.col);
  for(const h of headers)importSkillBlock(cells,ch,h,h.col);
  for(const arr of Object.values(ch.skills))for(const s of arr)delete s._importUsed;
