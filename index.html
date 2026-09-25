@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v4.9</title>
+<title>CHARACTER DATABASE | Shared Viewer v5.1</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3355,9 +3355,11 @@ body.public-online-database .db-no-share{
 .point-warning-filter{
   display:flex;
   align-items:center;
-  gap:6px;
+  justify-content:center;
+  gap:7px;
+  min-height:38px;
   margin-top:7px;
-  padding:6px 8px;
+  padding:6px 10px;
   border:1px solid #d8e0e5;
   border-radius:7px;
   background:#fff;
@@ -3365,14 +3367,22 @@ body.public-online-database .db-no-share{
   font-size:10px;
   cursor:pointer;
   user-select:none;
+  white-space:nowrap;
 }
 .point-warning-filter input{
+  flex:0 0 auto;
+  width:14px;
+  height:14px;
   margin:0;
+}
+.point-warning-filter > span:last-child{
+  flex:0 0 auto;
+  line-height:1;
 }
 .point-mismatch-badge.mini{
   width:15px;
   height:15px;
-  flex-basis:15px;
+  flex:0 0 15px;
   font-size:9px;
   cursor:default;
 }
@@ -3382,6 +3392,230 @@ body.public-online-database .db-no-share{
 body.public-online-database .hub-bulk-delete,
 body.public-viewer-only .hub-bulk-delete{
   display:none!important;
+}
+
+
+/* v5.0 ------------------------------------------------------------ */
+.hub-sort-head{
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  font-weight:700;
+  padding:0;
+  margin:0;
+  width:100%;
+  text-align:left;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.hub-sort-head span{
+  margin-left:3px;
+  color:#9aa5ad;
+  font-size:9px;
+}
+.hub-sort-head.active span{
+  color:#52616b;
+}
+.session-table th.col-no .hub-sort-head,
+.session-table th.col-date .hub-sort-head,
+.yoso-table th.col-pl .hub-sort-head,
+.yoso-table th.col-kana .hub-sort-head{
+  text-align:center;
+}
+
+
+/* v5.1 ------------------------------------------------------------ */
+
+/* SESSION No. is a display number calculated from chronological order. */
+.session-auto-no{
+  min-width:44px;
+  padding:4px 6px;
+  border-radius:5px;
+  background:#f2f5f7;
+  text-align:center;
+  font-size:10px;
+  font-weight:700;
+}
+
+/* Viewer top card */
+.viewer-profile-grid{
+  grid-template-columns:minmax(260px,32%) minmax(0,1fr)!important;
+  align-items:stretch!important;
+  gap:22px!important;
+}
+.viewer-portrait{
+  width:100%;
+  height:100%;
+  align-items:stretch!important;
+  justify-content:flex-start;
+}
+.viewer-thumb-square{
+  width:100%;
+  aspect-ratio:1/1;
+  flex:0 0 auto;
+  overflow:hidden;
+  border-radius:9px;
+  background:#eef1f4;
+}
+.viewer-thumb-square img,
+.viewer-thumb-square .noimg{
+  display:block;
+  width:100%!important;
+  height:100%!important;
+  aspect-ratio:1/1!important;
+  max-width:none!important;
+  object-fit:cover;
+  border-radius:0!important;
+}
+.viewer-name-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 76px;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+}
+.viewer-name{
+  min-width:0;
+  margin-top:0!important;
+  text-align:left!important;
+}
+.viewer-name h2{
+  overflow-wrap:anywhere;
+}
+.viewer-san-square{
+  width:76px;
+  height:76px;
+  border-radius:8px;
+  background:#f5f5f4;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1.05;
+}
+.viewer-san-square b{
+  color:#7b858f;
+  font-size:8px;
+  font-weight:700;
+}
+.viewer-san-square strong{
+  margin-top:3px;
+  font-size:24px;
+  line-height:1;
+}
+.viewer-san-square span{
+  margin-top:4px;
+  color:#7b858f;
+  font-size:7px;
+}
+.viewer-profile-main{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  height:100%;
+}
+.viewer-status-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-bottom:9px;
+}
+.viewer-profile-main > .viewer-kicker{
+  margin-top:0;
+}
+
+/* Skills: explicit two-column layout where requested. */
+.viewer-skill-columns-fixed{
+  columns:auto!important;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:18px;
+  align-items:start;
+}
+.viewer-skill-column{
+  min-width:0;
+}
+.viewer-skill-category.no-heading{
+  margin-top:0;
+}
+.viewer-skills-tools{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.viewer-skill-sort{
+  display:inline-flex;
+  padding:2px;
+  border:1px solid #d7dfe4;
+  border-radius:999px;
+  background:#f5f7f8;
+}
+.viewer-skill-sort button{
+  border:0;
+  border-radius:999px;
+  background:transparent;
+  padding:4px 8px;
+  color:#65727c;
+  font-size:9px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.viewer-skill-sort button.active{
+  background:#fff;
+  color:#283640;
+  font-weight:800;
+  box-shadow:0 1px 3px rgba(31,45,56,.12);
+}
+
+@media(max-width:820px){
+  .viewer-profile-grid{
+    grid-template-columns:minmax(210px,34%) minmax(0,1fr)!important;
+    gap:14px!important;
+  }
+  .viewer-name-row{
+    grid-template-columns:minmax(0,1fr) 64px;
+    gap:7px;
+  }
+  .viewer-san-square{
+    width:64px;
+    height:64px;
+  }
+  .viewer-san-square strong{font-size:20px}
+}
+
+@media(max-width:700px){
+  body.share-mode .viewer-profile-grid,
+  .viewer-profile-grid{
+    grid-template-columns:1fr!important;
+  }
+  body.share-mode .viewer-portrait,
+  .viewer-portrait{
+    max-width:none!important;
+    margin:0!important;
+  }
+  .viewer-thumb-square{
+    width:min(100%,360px);
+    margin:0 auto;
+  }
+  .viewer-name-row{
+    width:min(100%,360px);
+    margin:10px auto 0;
+  }
+  .viewer-skill-columns-fixed{
+    grid-template-columns:1fr;
+    gap:0;
+  }
+  .viewer-skills-head{
+    align-items:flex-start;
+  }
+  .viewer-skills-tools{
+    align-items:flex-end;
+  }
 }
 
 </style>
@@ -3871,7 +4105,7 @@ body.public-viewer-only .hub-bulk-delete{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v4.9</p>
+    <p class="public-viewer-version">Viewer v5.1</p>
   </div>
 </div>
 
@@ -3943,7 +4177,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='4.9';
+const PUBLIC_VIEWER_VERSION='5.1';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -5624,6 +5858,78 @@ function showHomeWorkspace(){
 }
 let activeSessionTab='pl';
 const editingKPSessionIds=new Set();
+let viewerSkillSortMode='category';
+const sessionSortState={key:'date',dir:'desc'};
+const yosoSortState={key:'pl',dir:'asc'};
+
+function compareText(a,b){
+ return String(a??'').localeCompare(String(b??''),'ja',{numeric:true,sensitivity:'base'});
+}
+function compareSessionRows(a,b,key){
+ if(key==='date'){
+   return compareText(a.date||'',b.date||'')||compareText(a.no||'',b.no||'');
+ }
+ if(key==='no')return compareText(a.no||'',b.no||'');
+ if(key==='title')return compareText(a.title||'',b.title||'');
+ if(key==='uchi')return compareText(a.uchi||'',b.uchi||'');
+ if(key==='yoso')return compareText(a.yoso||'',b.yoso||'');
+ return 0;
+}
+function sortSessionRows(rows){
+ const dir=sessionSortState.dir==='desc'?-1:1;
+ return [...rows].sort((a,b)=>compareSessionRows(a,b,sessionSortState.key)*dir);
+}
+function sessionSortHead(label,key,className=''){
+ const active=sessionSortState.key===key;
+ const arrow=active?(sessionSortState.dir==='asc'?'▲':'▼'):'↕';
+ return `<button type="button" class="hub-sort-head${active?' active':''}" data-session-sort="${esc(key)}" title="${esc(label)}を昇順／降順で並び替え">${esc(label)} <span>${arrow}</span></button>`;
+}
+function bindSessionSortHeaders(container){
+ container?.querySelectorAll('[data-session-sort]').forEach(btn=>{
+   btn.onclick=()=>{
+     const key=btn.dataset.sessionSort;
+     if(sessionSortState.key===key)sessionSortState.dir=sessionSortState.dir==='asc'?'desc':'asc';
+     else{
+       sessionSortState.key=key;
+       sessionSortState.dir=key==='date'?'desc':'asc';
+     }
+     if(activeSessionTab==='pl')renderSessionPL();else renderSessionKP();
+   };
+ });
+}
+
+function compareYosoRows(a,b,key){
+ if(key==='pl'){
+   return compareText(a.pl||'',b.pl||'')||compareText(a.kana||'',b.kana||'')||compareText(a.name||'',b.name||'');
+ }
+ if(key==='kana')return compareText(a.kana||'',b.kana||'')||compareText(a.name||'',b.name||'');
+ if(key==='name')return compareText(a.name||'',b.name||'');
+ if(key==='url')return compareText(a.url||'',b.url||'');
+ return 0;
+}
+function sortYosoRows(rows){
+ const dir=yosoSortState.dir==='desc'?-1:1;
+ return [...rows].sort((a,b)=>compareYosoRows(a,b,yosoSortState.key)*dir);
+}
+function yosoSortHead(label,key){
+ const active=yosoSortState.key===key;
+ const arrow=active?(yosoSortState.dir==='asc'?'▲':'▼'):'↕';
+ return `<button type="button" class="hub-sort-head${active?' active':''}" data-yoso-sort="${esc(key)}" title="${esc(label)}を昇順／降順で並び替え">${esc(label)} <span>${arrow}</span></button>`;
+}
+function bindYosoSortHeaders(){
+ $('yosoTable')?.querySelectorAll('[data-yoso-sort]').forEach(btn=>{
+   btn.onclick=()=>{
+     const key=btn.dataset.yosoSort;
+     if(yosoSortState.key===key)yosoSortState.dir=yosoSortState.dir==='asc'?'desc':'asc';
+     else{
+       yosoSortState.key=key;
+       yosoSortState.dir='asc';
+     }
+     renderYoso();
+   };
+ });
+}
+
 const editingYosoIds=new Set();
 const editingScenarioIds=new Set();
 function sessionFilterValues(){
@@ -5643,7 +5949,14 @@ function filterSessionRows(rows){
 
 function sessionDateSort(a,b){
  return String(a.date||'9999-99-99').localeCompare(String(b.date||'9999-99-99')) ||
-        String(a.no||'').localeCompare(String(b.no||''),undefined,{numeric:true});
+        compareText(a.title||'',b.title||'') ||
+        compareText(a.uchi||'',b.uchi||'') ||
+        compareText(a.id||a.scenarioId||a.reportKey||'',b.id||b.scenarioId||b.reportKey||'');
+}
+function assignSessionDisplayNos(rows){
+ const ordered=[...rows].sort(sessionDateSort);
+ ordered.forEach((r,i)=>{r.no=String(i+1).padStart(4,'0')});
+ return rows;
 }
 function sessionLinkCell(url){
  return url
@@ -5692,18 +6005,17 @@ async function collectPLSessions(){
      source:'extra'
    });
  }
- rows.sort(sessionDateSort);
- rows.forEach((r,i)=>{if(!r.no)r.no=String(i+1).padStart(4,'0')});
+ assignSessionDisplayNos(rows);
  return rows;
 }
 async function renderSessionPL(){
  const allRows=await collectPLSessions();
- const rows=filterSessionRows(allRows);
+ const rows=sortSessionRows(filterSessionRows(allRows));
  $('sessionFilterCount').textContent=`${rows.length} / ${allRows.length}件`;
  $('sessionPLTable').innerHTML=rows.length?`<table class="session-table">
    <thead><tr>
-     <th class="col-no">No.</th><th class="col-date">日付</th><th class="col-link">🔗</th>
-     <th class="col-title">シナリオ名</th><th class="col-uchi">uchi</th><th class="col-yoso">yoso</th>
+     <th class="col-no">${sessionSortHead('No.','no')}</th><th class="col-date">${sessionSortHead('日付','date')}</th><th class="col-link">🔗</th>
+     <th class="col-title">${sessionSortHead('シナリオ名','title')}</th><th class="col-uchi">${sessionSortHead('uchi','uchi')}</th><th class="col-yoso">${sessionSortHead('yoso','yoso')}</th>
    </tr></thead>
    <tbody>${rows.map(r=>`<tr>
      <td class="col-no"><span class="session-edition-badge">${esc(r.edition||'6')}版</span>${esc(r.no)}</td>
@@ -5714,6 +6026,7 @@ async function renderSessionPL(){
      <td class="col-yoso">${esc(r.yoso||'—')}</td>
    </tr>`).join('')}</tbody>
  </table>`:'<div class="database-empty">条件に合うPL記録はありません。</div>';
+ bindSessionSortHeaders($('sessionPLTable'));
 }
 function nextKPSessionNo(){
  const used=new Set(appData.kpSessions.map(x=>Number(String(x.no||'').replace(/\D/g,''))).filter(Boolean));
@@ -5721,14 +6034,15 @@ function nextKPSessionNo(){
  return String(n).padStart(4,'0');
 }
 function renderSessionKP(){
- const allRows=[...appData.kpSessions].map(r=>({...r,edition:String(r.edition||'6')})).sort(sessionDateSort);
- const rows=filterSessionRows(allRows);
+ const allRows=[...appData.kpSessions].map(r=>({...r,edition:String(r.edition||'6')}));
+ assignSessionDisplayNos(allRows);
+ const rows=sortSessionRows(filterSessionRows(allRows));
  $('sessionFilterCount').textContent=`${rows.length} / ${allRows.length}件`;
 
  $('sessionKPTable').innerHTML=rows.length?`<table class="session-table">
    <thead><tr>
-     <th class="col-no">No.</th><th class="col-date">日付</th><th class="col-link">🔗</th>
-     <th class="col-title">シナリオ名</th><th class="col-uchi">uchi</th><th class="col-yoso">yoso</th><th class="col-action"></th>
+     <th class="col-no">${sessionSortHead('No.','no')}</th><th class="col-date">${sessionSortHead('日付','date')}</th><th class="col-link">🔗</th>
+     <th class="col-title">${sessionSortHead('シナリオ名','title')}</th><th class="col-uchi">${sessionSortHead('uchi','uchi')}</th><th class="col-yoso">${sessionSortHead('yoso','yoso')}</th><th class="col-action"></th>
    </tr></thead>
    <tbody>${rows.map(r=>{
      const editing=editingKPSessionIds.has(r.id)||!!r.draft;
@@ -5736,7 +6050,7 @@ function renderSessionKP(){
        return `<tr data-id="${esc(r.id)}" class="record-editing">
          <td class="col-no"><div class="record-edition-edit">
            <select data-field="edition"><option value="6" ${r.edition==='6'?'selected':''}>6版</option><option value="7" ${r.edition==='7'?'selected':''}>7版</option></select>
-           <input data-field="no" value="${esc(r.no||'')}">
+           <span class="session-auto-no">${esc(r.no||'—')}</span>
          </div></td>
          <td class="col-date"><input data-field="date" type="date" value="${esc(r.date||'')}"></td>
          <td class="col-link"><span class="session-link disabled">—</span></td>
@@ -5764,6 +6078,7 @@ function renderSessionKP(){
    }).join('')}</tbody>
  </table>`:'<div class="database-empty">条件に合うKP記録はありません。</div>';
 
+ bindSessionSortHeaders($('sessionKPTable'));
  $('sessionKPTable').querySelectorAll('tbody tr').forEach(tr=>{
    const rec=appData.kpSessions.find(x=>x.id===tr.dataset.id);
    if(!rec)return;
@@ -5812,17 +6127,17 @@ function renderYoso(){
 
  const pl=plSel?.value||'';
  const q=($('yosoSearchInput')?.value||'').trim().toLowerCase();
- const rows=allRows.filter(r=>{
+ const rows=sortYosoRows(allRows.filter(r=>{
    const hay=`${r.kana||''} ${r.name||''} ${r.url||''}`.toLowerCase();
    return (!pl||String(r.pl||'')===pl)&&(!q||hay.includes(q));
- });
+ }));
  if($('yosoFilterCount'))$('yosoFilterCount').textContent=`${rows.length} / ${allRows.length}件`;
 
  const maxKanaChars=Math.max(2,...rows.map(r=>[...String(r.kana||'')].length));
  const kanaWidth=Math.min(190,Math.max(105,maxKanaChars*13+28));
 
  $('yosoTable').innerHTML=rows.length?`<table class="session-table yoso-table" style="--yoso-kana-width:${kanaWidth}px">
-   <thead><tr><th class="col-pl">PL</th><th class="col-kana">かな</th><th>名前</th><th class="col-url">URL</th><th class="col-action"></th></tr></thead>
+   <thead><tr><th class="col-pl">${yosoSortHead('PL','pl')}</th><th class="col-kana">${yosoSortHead('かな','kana')}</th><th>${yosoSortHead('名前','name')}</th><th class="col-url">${yosoSortHead('URL','url')}</th><th class="col-action"></th></tr></thead>
    <tbody>${rows.map(r=>{
      const editing=editingYosoIds.has(r.id)||!!r.draft;
      if(editing){
@@ -5850,6 +6165,7 @@ function renderYoso(){
    }).join('')}</tbody>
  </table>`:'<div class="database-empty">条件に合うYOSONOKOはありません。</div>';
 
+ bindYosoSortHeaders();
  $('yosoTable').querySelectorAll('tbody tr').forEach(tr=>{
    const rec=appData.yosoRecords.find(x=>x.id===tr.dataset.id);
    if(!rec)return;
@@ -6537,7 +6853,6 @@ function showViewer(){
    ['性別',current.gender],
    ['身長 (m)',current.height],
    ['体重 (kg)',current.weight],
-   ['出身',current.birthplace],
    ['誕生日',current.birthday]
  ];
 
@@ -6553,8 +6868,7 @@ function showViewer(){
    const n=Number(v)||0;
    return n===0?'':n;
  };
- const skillHtml=Object.entries(skillsByCategory).map(([cat,arr])=>{
-   const rows=arr.map(s=>`<tr>
+ const skillRowHtml=s=>`<tr>
      <td>${esc(s.name+(s.detail?' '+s.detail:''))}</td>
      <td>${viewerSkillPoint(baseValue(s))}</td>
      <td>${viewerSkillPoint(s.occupation)}</td>
@@ -6562,16 +6876,41 @@ function showViewer(){
      <td>${viewerSkillPoint(s.growth)}</td>
      <td>${viewerSkillPoint(s.other)}</td>
      <td><b>${skillTotal(s)}</b></td>
-   </tr>`).join('');
-   return `<div class="viewer-skill-category">
-     <h4>${esc(cat)}</h4>
+   </tr>`;
+ const skillTableHtml=(rows,title='')=>`<div class="viewer-skill-category${title?'':' no-heading'}">
+     ${title?`<h4>${esc(title)}</h4>`:''}
      <table class="viewer-skill-table">
        <thead><tr><th>技能名</th><th>初期</th><th>職業</th><th>興味</th><th>成長</th><th>その他</th><th>合計</th></tr></thead>
-       <tbody>${rows}</tbody>
+       <tbody>${rows.map(skillRowHtml).join('')}</tbody>
      </table>
    </div>`;
- }).join('');
 
+ let skillHtml='';
+ if(viewerSkillSortMode==='kana'){
+   const flat=Object.values(skillsByCategory).flat()
+     .slice()
+     .sort((a,b)=>compareText(
+       `${a.name||''}${a.detail||''}`,
+       `${b.name||''}${b.detail||''}`
+     ));
+   const split=Math.ceil(flat.length/2);
+   const left=flat.slice(0,split);
+   const right=flat.slice(split);
+   skillHtml=`<div class="viewer-skill-columns viewer-skill-columns-fixed viewer-skill-kana">
+     <div class="viewer-skill-column">${skillTableHtml(left)}</div>
+     <div class="viewer-skill-column">${skillTableHtml(right)}</div>
+   </div>`;
+ }else if(current.edition==='6'){
+   const leftCats=['戦闘技能','探索技能','行動技能'];
+   const rightCats=['交渉技能','知識技能'];
+   skillHtml=`<div class="viewer-skill-columns viewer-skill-columns-fixed viewer-skill-six">
+     <div class="viewer-skill-column">${leftCats.map(cat=>skillTableHtml(skillsByCategory[cat]||[],cat)).join('')}</div>
+     <div class="viewer-skill-column">${rightCats.map(cat=>skillTableHtml(skillsByCategory[cat]||[],cat)).join('')}</div>
+   </div>`;
+ }else{
+   skillHtml=`<div class="viewer-skill-columns">${Object.entries(skillsByCategory)
+     .map(([cat,arr])=>skillTableHtml(arr,cat)).join('')}</div>`;
+ }
  const insanityRows=current.insanities.map(x=>`<tr>
    <td>${x.completed?'✓':''}</td><td>${esc(normalizeInsanityDuration(x.duration||''))}</td><td>${esc(x.content||'')}</td>
  </tr>`);
@@ -6603,22 +6942,25 @@ function showViewer(){
    <section class="viewer-profile">
      <div class="viewer-profile-grid">
        <div class="viewer-portrait">
-         ${thumb}
-         <div class="viewer-name">
-           <h2>${esc(current.name||'名前未設定')}</h2>
-           <div class="reading">${esc(current.reading||'')}</div>
-           <div class="viewer-name-meta">
-             <div class="viewer-cell"><b>状態</b><span>${esc(current.status||'')}</span></div>
-             <div class="viewer-cell"><b>CC</b><span>${esc(current.cc||'')}</span></div>
+         <div class="viewer-thumb-square">${thumb}</div>
+         <div class="viewer-name-row">
+           <div class="viewer-name">
+             <h2>${esc(current.name||'名前未設定')}</h2>
+             <div class="reading">${esc(current.reading||'')}</div>
            </div>
-           <div class="viewer-name-san">
+           <div class="viewer-san-square" title="不定 ${sanIndef()} / 最大 ${sanMax()}">
              <b>現在SAN</b>
-             <span>${esc(current.sanCurrent)}（不定 ${sanIndef()} / 最大 ${sanMax()}）</span>
+             <strong>${esc(current.sanCurrent)}</strong>
+             <span>${sanIndef()} / ${sanMax()}</span>
            </div>
          </div>
        </div>
 
-       <div>
+       <div class="viewer-profile-main">
+         <div class="viewer-status-row">
+           <div class="viewer-cell"><b>状態</b><span>${esc(current.status||'')}</span></div>
+           <div class="viewer-cell"><b>CC</b><span>${esc(current.cc||'')}</span></div>
+         </div>
          <div class="viewer-kicker">PERSONAL DATA</div>
          <div class="viewer-personal-grid">
            ${personal.map(([k,val])=>`<div class="viewer-cell"><b>${esc(k)}</b><span>${esc(val||'')}</span></div>`).join('')}
@@ -6643,11 +6985,17 @@ function showViewer(){
    <section class="viewer-skills">
      <div class="viewer-skills-head">
        <div class="viewer-skills-title">技能値</div>
-       <div class="viewer-skill-meta">
-         職業P ${$('occPointText')?.textContent||''}　/　興味P ${$('interestPointText')?.textContent||''}
+       <div class="viewer-skills-tools">
+         <div class="viewer-skill-sort no-print" role="group" aria-label="技能の表示順">
+           <button type="button" class="${viewerSkillSortMode==='category'?'active':''}" data-viewer-skill-sort="category">区分順</button>
+           <button type="button" class="${viewerSkillSortMode==='kana'?'active':''}" data-viewer-skill-sort="kana">あいうえお順</button>
+         </div>
+         <div class="viewer-skill-meta">
+           職業P ${$('occPointText')?.textContent||''}　/　興味P ${$('interestPointText')?.textContent||''}
+         </div>
        </div>
      </div>
-     <div class="viewer-skill-columns">${skillHtml}</div>
+     ${skillHtml}
    </section>
 
    <section class="viewer-accordion">
@@ -6714,6 +7062,12 @@ function showViewer(){
      </details>
    </section>
  `;
+ v.querySelectorAll('[data-viewer-skill-sort]').forEach(btn=>{
+   btn.onclick=()=>{
+     viewerSkillSortMode=btn.dataset.viewerSkillSort==='kana'?'kana':'category';
+     showViewer();
+   };
+ });
  if(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='database'){
    $('backEditBtn').textContent='← PC LISTに戻る';
    $('viewerShareBtn').classList.add('hidden');
@@ -6743,7 +7097,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
