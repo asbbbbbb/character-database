@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v4.6</title>
+<title>CHARACTER DATABASE | Shared Viewer v4.7</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3830,7 +3830,7 @@ body.public-online-database .db-no-share{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v4.6</p>
+    <p class="public-viewer-version">Viewer v4.7</p>
   </div>
 </div>
 
@@ -3902,7 +3902,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='4.6';
+const PUBLIC_VIEWER_VERSION='4.7';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -6609,7 +6609,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.7',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -6826,14 +6826,15 @@ function importSkillBlock(cells,ch,header,nameCol){
  const detailCol=nameCol+1,baseCol=nameCol+2;
  const sectionNames=new Set(['信用','戦闘技能','探索技能','行動技能','交渉技能','知識技能']);
  const stopNames=new Set(['所持品・所持金','戦闘・武器・防具','その他メモ','呪文・AF','不定の狂気・後遺症']);
- let end=header.row+35;
- for(let r=header.row+1;r<=header.row+35;r++){
+ let end=header.row+45;
+ for(let r=header.row+1;r<=header.row+45;r++){
    const v=excelClean(xget(cells,nameCol,r));
+   const isRealSectionHeader=sectionNames.has(v)&&excelClean(xget(cells,nameCol+2,r))==='初期値';
    let adjacentStop=false;
    for(let c=Math.max(1,nameCol-1);c<=nameCol+7;c++){
      if(stopNames.has(excelClean(xget(cells,c,r)))){adjacentStop=true;break}
    }
-   if((sectionNames.has(v)||stopNames.has(v)||adjacentStop)&&r>header.row+1){end=r-1;break}
+   if((isRealSectionHeader||stopNames.has(v)||adjacentStop)&&r>header.row+1){end=r-1;break}
  }
  for(let r=header.row+1;r<=end;r++){
    let name=excelClean(xget(cells,nameCol,r));
@@ -6853,15 +6854,40 @@ function importSkillBlock(cells,ch,header,nameCol){
 
    if(name==='その他'){
      if(!detail)continue;
-     ch.skills[targetCat].push({id:uid(),name:detail,base,detail:'',special:false,occupation,interest,growth,other,custom:true});
+     ch.skills[targetCat].push({
+       id:uid(),name:detail,base,detail:'',special:false,
+       occupation,interest,growth,other,custom:true,_importUsed:true
+     });
      continue;
    }
 
    let candidates=ch.skills[targetCat].filter(x=>x.name===name&&!x._importUsed);
-   let sk=candidates[0];
+   let sk=null;
+
+   // 特殊技能（言語・芸術・製作など）は詳細名まで一致する既存行を優先。
+   if(detail){
+     sk=candidates.find(x=>x.special&&excelClean(x.detail)===detail)||
+        candidates.find(x=>x.special&&!excelClean(x.detail))||
+        candidates[0]||null;
+   }else{
+     sk=candidates[0]||null;
+   }
+
    if(!sk){
-     const displayName=detail?`${name}｜${detail}`:name;
-     ch.skills[targetCat].push({id:uid(),name:displayName,base,detail:'',special:false,occupation,interest,growth,other,custom:true});
+     // 区分内の追加技能は、その区分のカスタム技能としてそのまま保持。
+     ch.skills[targetCat].push({
+       id:uid(),
+       name,
+       base,
+       detail:detail||'',
+       special:!!detail,
+       occupation,
+       interest,
+       growth,
+       other,
+       custom:true,
+       _importUsed:true
+     });
      continue;
    }
    sk._importUsed=true;
@@ -7426,31 +7452,37 @@ async function importExcelWorkbook(file){
  try{
    await ensureDbReady();
    const book=await readXlsxStructure(file);
-   const has6=book.sheets.some(s=>/^\d{3}$/.test(s.name));
-   const has7=book.sheets.some(s=>/^(0[1-9]|10)$/.test(s.name));
-   const edition=has6?'6':has7?'7':'';
-   if(!edition)throw new Error('6版の001〜形式、または7版の01〜10形式のシートが見つかりません');
-   const reSheet=edition==='6'?/^\d{3}$/:/^(0[1-9]|10)$/;
-   const targets=book.sheets.filter(s=>reSheet.test(s.name));
+
+   // 探索者シートはすべて3桁数字。
+   // 500～599（5XX）を7版、それ以外の3桁数字を6版としてシート単位で判定する。
+   const targets=book.sheets.filter(s=>/^\d{3}$/.test(s.name));
+   if(!targets.length)throw new Error('3桁数字の探索者シートが見つかりません');
+
+   const editionForSheet=name=>/^5\d{2}$/.test(String(name||''))?'7':'6';
    const chars=[];
    for(const s of targets){
+     const edition=editionForSheet(s.name);
      const cells=await book.readSheet(s);
      const ch=importCharacterSheet(cells,edition,file.name,s.name);
      if(ch)chars.push(ch);
    }
-   if(!chars.length)throw new Error('探索者名が入力されたシートが見つかりません');
+   if(!chars.length)throw new Error('探索者名が入力された3桁数字シートが見つかりません');
+
+   const editionsInFile=new Set(chars.map(x=>x.edition));
+   const workbookEdition=editionsInFile.size===1?[...editionsInFile][0]:'6';
 
    const thumbnailMap=await readExcelThumbnailMap(book);
    const thumbnailCount=applyExcelThumbnails(chars,thumbnailMap);
-   const importedKP=await readKPSessionSheet(book,file.name,edition);
+   const importedKP=await readKPSessionSheet(book,file.name,workbookEdition);
    const importedYoso=await readYosoSheet(book,file.name);
 
    let plResult={recordCount:0,characterCount:0,unmatched:[]};
-   if(edition==='6'){
+   const sixChars=chars.filter(x=>x.edition==='6');
+   if(sixChars.length){
      const plSheet=book.sheets.find(s=>s.name==='PL記録');
      if(plSheet){
        const plCells=await book.readSheet(plSheet);
-       plResult=applyPLRecordScenarios(plCells,chars,file.name);
+       plResult=applyPLRecordScenarios(plCells,sixChars,file.name);
      }
    }
 
@@ -7469,7 +7501,10 @@ async function importExcelWorkbook(file){
      ? `\nPL記録：${plResult.recordCount}件（${plResult.characterCount}人分）`
      : '';
    const skipLine=(plReview.sessionAdded?`\nSESSIONのみ追加：${plReview.sessionAdded}件`:'')+(plReview.skipped?`\n未照合スキップ：${plReview.skipped}件`:'');
-   if(!confirm(`${file.name} から ${chars.length} 人の探索者を取り込みます。${thumbLine}${plLine}${skipLine}\n同じ取込元、または同じ名前・ふりがなの探索者は更新します。`))return;
+   const sixCount=chars.filter(x=>x.edition==='6').length;
+   const sevenCount=chars.filter(x=>x.edition==='7').length;
+   const editionLine=`\n6版：${sixCount}人 / 7版：${sevenCount}人`;
+   if(!confirm(`${file.name} から ${chars.length} 人の探索者を取り込みます。${editionLine}${thumbLine}${plLine}${skipLine}\n同じ取込元、または同じ名前・ふりがなの探索者は更新します。`))return;
 
    const existing=await all();
    let added=0,updated=0;
@@ -7492,7 +7527,7 @@ async function importExcelWorkbook(file){
    }
 
    if(plReview.sessionExtras?.length){
-     plReview.sessionExtras.forEach(x=>{if(!x.edition)x.edition=edition});
+     plReview.sessionExtras.forEach(x=>{if(!x.edition)x.edition=workbookEdition});
      const keys=new Set(plReview.sessionExtras.map(x=>`${x.sourceFile}|${x.sourceRow}`));
      appData.plExtraSessions=appData.plExtraSessions.filter(x=>!keys.has(`${x.sourceFile}|${x.sourceRow}`));
      appData.plExtraSessions.push(...plReview.sessionExtras);
