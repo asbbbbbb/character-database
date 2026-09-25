@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v4.4</title>
+<title>CHARACTER DATABASE | Shared Viewer v4.6</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -3310,6 +3310,46 @@ body.public-online-database .db-no-share{
   }
 }
 
+
+/* v4.5 ------------------------------------------------------------ */
+.skill-add-btn{
+  white-space:nowrap;
+}
+
+
+/* v4.6 ------------------------------------------------------------ */
+.char-name-with-warning{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+.char-name-with-warning > span:first-child{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.point-mismatch-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 17px;
+  width:17px;
+  height:17px;
+  border:1.5px solid #b45b5b;
+  border-radius:50%;
+  background:#fff7f7;
+  color:#a33e3e;
+  font-size:11px;
+  font-weight:800;
+  line-height:1;
+  cursor:help;
+}
+.pointbar.mismatch:not(.over){
+  border-color:#d7ad62;
+  background:#fffaf0;
+}
+
 </style>
 </head>
 <body>
@@ -3344,6 +3384,7 @@ body.public-online-database .db-no-share{
         <select class="control" id="listSortKey">
           <option value="no" selected>No順</option>
           <option value="name">あいうえお順</option>
+          <option value="pointMismatch">！のみ表示</option>
         </select>
         <select class="control" id="listSortOrder">
           <option value="asc">昇順</option>
@@ -3789,7 +3830,7 @@ body.public-online-database .db-no-share{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v4.4</p>
+    <p class="public-viewer-version">Viewer v4.6</p>
   </div>
 </div>
 
@@ -3861,7 +3902,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='4.4';
+const PUBLIC_VIEWER_VERSION='4.6';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -4956,7 +4997,10 @@ function renderPoints(){
  $('interestPointText').textContent=dBonus>0
    ? `${usedInt}P / ${maxInt}P（追加分：${dBonus}P）`
    : `${usedInt}P / ${maxInt}P`;
- $('occPointBar').classList.toggle('over',usedOcc>maxOcc); $('interestPointBar').classList.toggle('over',usedInt>maxInt);
+ $('occPointBar').classList.toggle('over',usedOcc>maxOcc);
+ $('interestPointBar').classList.toggle('over',usedInt>maxInt);
+ $('occPointBar').classList.toggle('mismatch',usedOcc!==maxOcc);
+ $('interestPointBar').classList.toggle('mismatch',usedInt!==maxInt);
 
  const dCount=dFeatureCount(), row=$('dFeaturePointsRow');
  row.classList.toggle('hidden',dCount===0);
@@ -4981,10 +5025,12 @@ function renderSkills(){
 
  Object.entries(current.skills).forEach(([cat,arr])=>{
    const card=document.createElement('div');card.className='card';
-   card.innerHTML=`<div class="section-head"><h3>【${esc(cat)}】</h3><button type="button" class="btn small">＋ 技能を追加</button></div>
+   const addSkillButton=cat==='信用'?'':`<button type="button" class="btn small skill-add-btn">＋ 追加技能</button>`;
+   card.innerHTML=`<div class="section-head"><h3>【${esc(cat)}】</h3>${addSkillButton}</div>
    <div class="table-wrap"><table><thead><tr><th>技能</th><th>初期</th><th>職業</th><th>興味</th><th>成長</th><th>他</th><th>合計</th><th></th></tr></thead><tbody></tbody></table></div>`;
    const body=card.querySelector('tbody');
-   card.querySelector('button').onclick=()=>{
+   const addBtn=card.querySelector('.skill-add-btn');
+   if(addBtn)addBtn.onclick=()=>{
      arr.push({id:uid(),name:'',base:0,special:true,detail:'',occupation:0,interest:0,growth:0,other:0,custom:true});
      renderSkills();
    };
@@ -5327,6 +5373,39 @@ function rollAll(){
  }
  renderAll();
 }
+
+function characterPointBalance(character){
+ const savedCurrent=current;
+ try{
+   current=ensureShape(structuredClone(character));
+   const fs=formulas();
+   const formulaIndex=Math.min(Math.max(0,num(current.occFormula)),fs.length-1);
+   const usedOcc=Object.values(current.skills||{}).flat().reduce((a,s)=>a+num(s.occupation),0);
+   const usedInt=Object.values(current.skills||{}).flat().reduce((a,s)=>a+num(s.interest),0);
+   const cs=currentStats();
+   const maxOcc=fs[formulaIndex][1](cs);
+   const baseInterest=num(cs.INT)*(current.edition==='6'?10:2);
+   const dBonus=current.edition==='6'?Math.max(0,num(current.dFeaturePoints)):0;
+   const maxInt=baseInterest+dBonus;
+   return {
+     usedOcc,maxOcc,usedInt,maxInt,
+     occMismatch:usedOcc!==maxOcc,
+     interestMismatch:usedInt!==maxInt,
+     mismatch:usedOcc!==maxOcc||usedInt!==maxInt
+   };
+ }finally{
+   current=savedCurrent;
+ }
+}
+function characterPointWarningHtml(character){
+ const p=characterPointBalance(character);
+ if(!p.mismatch)return '';
+ const reasons=[];
+ if(p.occMismatch)reasons.push(`職業P ${p.usedOcc}/${p.maxOcc}`);
+ if(p.interestMismatch)reasons.push(`興味P ${p.usedInt}/${p.maxInt}`);
+ return `<span class="point-mismatch-badge" title="${esc(reasons.join(' / '))}" aria-label="${esc(reasons.join(' / '))}">!</span>`;
+}
+
 async function renderList(){
  if(!db)return; let list=await all();
  const q=$('searchInput').value.trim().toLowerCase(), ed=$('editionFilter').value, st=$('statusFilter').value;
@@ -5338,6 +5417,9 @@ async function renderList(){
  const sortKey=$('listSortKey')?.value||'no';
  const sortOrder=$('listSortOrder')?.value||'asc';
  const dir=sortOrder==='desc'?-1:1;
+ if(sortKey==='pointMismatch'){
+   list=list.filter(x=>characterPointBalance(x).mismatch);
+ }
  const jaCompare=(a,b)=>String(a||'').localeCompare(String(b||''),'ja',{sensitivity:'base',numeric:true});
  const noValue=x=>{
    const raw=String(x.number||x.importSource?.sheetName||'').trim();
@@ -5345,7 +5427,7 @@ async function renderList(){
  };
  list.sort((a,b)=>{
    let c=0;
-   if(sortKey==='no'){
+   if(sortKey==='no'||sortKey==='pointMismatch'){
      const an=noValue(a),bn=noValue(b);
      if(an!==bn)c=an-bn;
      else c=jaCompare(a.reading||a.name,b.reading||b.name);
@@ -5365,7 +5447,7 @@ async function renderList(){
      <button type="button" data-action="duplicate">複製</button>
      <button type="button" class="danger" data-action="delete">削除</button>
    </div>
-   <div class="name">${esc(x.name||'名前未設定')}</div>
+   <div class="name char-name-with-warning"><span>${esc(x.name||'名前未設定')}</span>${characterPointWarningHtml(x)}</div>
    <div class="sub">${esc(x.edition)}版 / ${esc(x.status||'新規')}<br>${esc(x.occupation||'職業未設定')} ・ SAN ${esc(x.sanCurrent??0)}</div>
  </div>`).join('');
 
@@ -6527,7 +6609,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.4',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'4.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -6742,7 +6824,7 @@ function importedFeatureSkillBase(ch,name,base){
 }
 function importSkillBlock(cells,ch,header,nameCol){
  const detailCol=nameCol+1,baseCol=nameCol+2;
- const sectionNames=new Set(['戦闘技能','探索技能','行動技能','交渉技能','知識技能','追加技能']);
+ const sectionNames=new Set(['信用','戦闘技能','探索技能','行動技能','交渉技能','知識技能']);
  const stopNames=new Set(['所持品・所持金','戦闘・武器・防具','その他メモ','呪文・AF','不定の狂気・後遺症']);
  let end=header.row+35;
  for(let r=header.row+1;r<=header.row+35;r++){
@@ -6766,8 +6848,7 @@ function importSkillBlock(cells,ch,header,nameCol){
    const total=excelNum(xget(cells,baseCol+5,r));
    if(name==='その他'&&!detail&&!occupation&&!interest&&!growth&&!other&&!total)continue;
 
-   let targetCat=header.value;
-   if(ch.edition==='7'&&targetCat==='交渉技能'&&name==='信用')targetCat='信用';
+   const targetCat=header.value;
    if(!ch.skills[targetCat])ch.skills[targetCat]=[];
 
    if(name==='その他'){
@@ -6796,10 +6877,12 @@ function importSkillBlock(cells,ch,header,nameCol){
  }
 }
 function importSkills(cells,ch){
- // 6版/7版とも、Excel上の「信用」は交渉技能内の技能行。
- // 「信用」をセクション見出しとして扱うと、その行以降の説得・母国語・
- // 威圧・魅力・言語などが別カテゴリへ誤取込されるため、見出し候補から除外する。
- const valid=new Set(['戦闘技能','探索技能','行動技能','交渉技能','知識技能','追加技能']);
+ // 技能区分は版ごとに固定。
+ // 6版：戦闘 / 探索 / 行動 / 交渉 / 知識
+ // 7版：信用 / 戦闘 / 探索 / 行動 / 交渉 / 知識
+ const valid6=new Set(['戦闘技能','探索技能','行動技能','交渉技能','知識技能']);
+ const valid7=new Set(['信用','戦闘技能','探索技能','行動技能','交渉技能','知識技能']);
+ const valid=ch.edition==='7'?valid7:valid6;
  const headers=xfind(cells,(v,p)=>{
    const name=excelClean(v);
    if(!valid.has(name)||(p.col!==2&&p.col!==11))return false;
