@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v6.6</title>
+<title>CHARACTER DATABASE | Shared Viewer v6.7</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -4606,6 +4606,65 @@ body:not(.database-mode):not(.hub-mode):not(.choice-mode):not(.share-mode):not(.
   white-space:nowrap;
 }
 
+
+/* v6.7 ------------------------------------------------------------ */
+
+/* SESSION -> individual PC mutual PL record addition */
+.session-pl-add-box{
+  margin-top:10px;
+  padding:10px;
+  border:1px solid #d7dfe5;
+  border-radius:9px;
+  background:#fff;
+}
+.session-pl-add-title{
+  margin-bottom:7px;
+  color:#43515c;
+  font-size:11px;
+  font-weight:800;
+}
+.session-pl-add-grid{
+  display:grid;
+  grid-template-columns:135px minmax(180px,1fr) minmax(160px,.8fr) minmax(190px,1fr) auto;
+  gap:7px;
+  align-items:end;
+}
+.session-pl-add-grid label{
+  display:grid;
+  gap:3px;
+  min-width:0;
+  color:#6c7882;
+  font-size:9px;
+  font-weight:700;
+}
+.session-pl-add-message{
+  min-height:14px;
+  margin-top:6px;
+  color:#607080;
+  font-size:9px;
+  font-weight:600;
+}
+.session-pl-add-message.error{
+  color:#a63d3d;
+}
+
+body.public-online-database #sessionPlAddBox,
+body.public-online-report #sessionPlAddBox,
+body.public-viewer-only #sessionPlAddBox{
+  display:none!important;
+}
+
+@media(max-width:1000px){
+  .session-pl-add-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+@media(max-width:700px){
+  .session-pl-add-grid{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4975,8 +5034,29 @@ body:not(.database-mode):not(.hub-mode):not(.choice-mode):not(.share-mode):not(.
           <span class="session-filter-count" id="sessionFilterCount"></span>
         </div>
         <section class="hub-tab-panel active" id="sessionTabPL">
-          <div class="session-note">探索者の「通過シナリオ」を参照して表示します。6版PCは6版、7版PCは7版として分類し、日付順で固定表示します。</div>
+          <div class="session-note">探索者の「通過シナリオ」を参照して表示します。ここから追加した記録も、uchiで指定したPCの「通過シナリオ」へ反映されます。</div>
           <div class="session-table-wrap" id="sessionPLTable"></div>
+
+          <div class="session-pl-add-box" id="sessionPlAddBox">
+            <div class="session-pl-add-title">＋ PL SESSIONを追加</div>
+            <div class="session-pl-add-grid">
+              <label>日時
+                <input class="control" id="sessionPlAddDate" type="date" min="1000-01-01" max="9999-12-31">
+              </label>
+              <label>シナリオ名
+                <input class="control" id="sessionPlAddTitle" placeholder="シナリオ名">
+              </label>
+              <label>uchi
+                <input class="control" id="sessionPlAddUchi" list="sessionPlUchiOptions" autocomplete="off" placeholder="PC名を入力・選択">
+                <datalist id="sessionPlUchiOptions"></datalist>
+              </label>
+              <label>yoso
+                <input class="control" id="sessionPlAddYoso" placeholder="同卓PC名（複数は / 区切り）">
+              </label>
+              <button type="button" class="btn primary" id="sessionPlAddBtn">＋ 追加</button>
+            </div>
+            <div class="session-pl-add-message" id="sessionPlAddMessage"></div>
+          </div>
         </section>
         <section class="hub-tab-panel" id="sessionTabKP">
           <div class="session-note">KP記録はExcel取込に加えて、この画面から追加できます。確定後は読み取り表示になり、必要な時だけ「編集」を押します。</div>
@@ -5033,7 +5113,7 @@ body:not(.database-mode):not(.hub-mode):not(.choice-mode):not(.share-mode):not(.
             <select class="control" id="yosoPlFilter"><option value="">すべて</option></select>
           </label>
           <label class="yoso-filter-search">検索
-            <input class="control" id="yosoSearchInput" placeholder="かな・名前・URL">
+            <input class="control" id="yosoSearchInput" placeholder="PL・かな・名前・URL">
           </label>
           <button type="button" class="btn small" id="yosoFilterResetBtn">解除</button>
           <button type="button" class="btn small" id="yosoDeduplicateBtn">重複を削除</button>
@@ -5182,7 +5262,7 @@ body:not(.database-mode):not(.hub-mode):not(.choice-mode):not(.share-mode):not(.
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v6.6</p>
+    <p class="public-viewer-version">Viewer v6.7</p>
   </div>
 </div>
 
@@ -5254,7 +5334,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='6.6';
+const PUBLIC_VIEWER_VERSION='6.7';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7231,6 +7311,15 @@ async function collectPLSessions(){
  return rows;
 }
 async function renderSessionPL(){
+ const chars=(await all()).map(ensureShape);
+ const uchiOptions=$('sessionPlUchiOptions');
+ if(uchiOptions){
+   uchiOptions.innerHTML=chars
+     .slice()
+     .sort((a,b)=>compareText(a.name||'',b.name||'')||compareText(a.number||'',b.number||''))
+     .map(ch=>`<option value="${esc(ch.name||'名前未設定')}" label="${esc([ch.edition+'版',ch.number?`No.${ch.number}`:''].filter(Boolean).join(' / '))}"></option>`)
+     .join('');
+ }
  const allRows=await collectPLSessions();
  const rows=sortSessionRows(filterSessionRows(allRows));
  $('sessionFilterCount').textContent=`${rows.length} / ${allRows.length}件`;
@@ -7259,6 +7348,75 @@ async function renderSessionPL(){
    };
  });
 }
+
+async function addPlSessionToCharacter(){
+ if(PUBLIC_VIEWER_ONLY)return;
+
+ const date=normalizeScenarioDate($('sessionPlAddDate')?.value||'');
+ const title=String($('sessionPlAddTitle')?.value||'').trim();
+ const uchi=String($('sessionPlAddUchi')?.value||'').trim();
+ const yoso=String($('sessionPlAddYoso')?.value||'').trim();
+ const msg=$('sessionPlAddMessage');
+
+ const setMsg=(s,error=false)=>{
+   if(!msg)return;
+   msg.textContent=s||'';
+   msg.classList.toggle('error',!!error);
+ };
+
+ if(!title){
+   setMsg('シナリオ名を入力してください。',true);
+   $('sessionPlAddTitle')?.focus();
+   return;
+ }
+ if(!uchi){
+   setMsg('uchi（反映先PC）を入力してください。',true);
+   $('sessionPlAddUchi')?.focus();
+   return;
+ }
+
+ const chars=(await all()).map(ensureShape);
+ const key=normalizePcLinkName(uchi);
+ const matched=chars.filter(ch=>normalizePcLinkName(ch.name||'')===key);
+
+ if(!matched.length){
+   setMsg('一致するPCが見つかりません。uchiはPC名の候補から選択してください。',true);
+   return;
+ }
+ if(matched.length>1){
+   setMsg('同じPC名が複数あります。PC名を一意にしてから追加してください。',true);
+   return;
+ }
+
+ const ch=matched[0];
+ const scenario={
+   id:uid(),
+   url:'',
+   date,
+   title,
+   pcs:scenarioPcText(scenarioPcNames(yoso)),
+   reportImage:''
+ };
+
+ ch.scenarios=Array.isArray(ch.scenarios)?ch.scenarios:[];
+ ch.scenarios.push(scenario);
+ ch.updatedAt=new Date().toISOString();
+ await put(structuredClone(ch));
+
+ if(current?.id===ch.id){
+   current=ensureShape(structuredClone(ch));
+ }
+
+ $('sessionPlAddDate').value='';
+ $('sessionPlAddTitle').value='';
+ $('sessionPlAddUchi').value='';
+ $('sessionPlAddYoso').value='';
+
+ setMsg(`「${ch.name||'名前未設定'}」の通過シナリオへ追加しました。`);
+ await renderSessionPL();
+ await renderReport();
+}
+
 function nextKPSessionNo(){
  const used=new Set(appData.kpSessions.map(x=>Number(String(x.no||'').replace(/\D/g,''))).filter(Boolean));
  let n=1;while(used.has(n))n++;
@@ -7485,7 +7643,7 @@ function renderYoso(){
  const pl=plSel?.value||'';
  const q=($('yosoSearchInput')?.value||'').trim().toLowerCase();
  const rows=sortYosoRows(allRows.filter(r=>{
-   const hay=`${r.kana||''} ${r.name||''} ${r.url||''}`.toLowerCase();
+   const hay=`${r.pl||''} ${r.kana||''} ${r.name||''} ${r.url||''}`.toLowerCase();
    return (!pl||String(r.pl||'')===pl)&&(!q||hay.includes(q));
  }));
  if($('yosoFilterCount'))$('yosoFilterCount').textContent=`${rows.length} / ${allRows.length}件`;
@@ -9058,7 +9216,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.7',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -10123,6 +10281,8 @@ $('sessionFilterResetBtn').onclick=()=>{
  renderSessionHub();
 };
 $('sessionDeduplicateBtn').onclick=deleteDuplicateSessionRecords;
+$('sessionPlAddBtn').onclick=addPlSessionToCharacter;
+$('sessionPlAddYoso').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addPlSessionToCharacter()}};
 $('sessionDeleteAllBtn').onclick=deleteAllSessionRecords;
 $('addKPSessionBtn').onclick=()=>{
  const edition=$('sessionEditionFilter').value||'6';
