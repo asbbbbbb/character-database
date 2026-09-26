@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v6.4</title>
+<title>CHARACTER DATABASE | Shared Viewer v6.6</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -4565,6 +4565,47 @@ body:not(.database-mode):not(.hub-mode):not(.choice-mode):not(.share-mode):not(.
   }
 }
 
+
+/* v6.5 ------------------------------------------------------------ */
+
+/* 技能表：初期値欄だけ少し暗め。0Pの職業/興味/成長/他はJS側で空欄表示。 */
+#skillsArea .skill-base-input{
+  background:#eef1f3!important;
+  border-color:#c5cdd4!important;
+}
+#skillsArea .skill-base-input:focus{
+  background:#e8edf0!important;
+}
+
+/* 右側プロフィール：画面下端で最後の操作部が切れないようにする。 */
+@media(min-width:1181px){
+  #sheetHead{
+    height:calc(100dvh - 78px)!important;
+    max-height:calc(100dvh - 78px)!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    padding-bottom:24px!important;
+    scrollbar-gutter:stable;
+  }
+  #sheetHead .profile-shell{
+    padding-bottom:8px;
+  }
+}
+
+
+/* v6.6 ------------------------------------------------------------ */
+
+/* PC LIST: visible-PC share link batch copy */
+.database-bulk-actions{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+#databaseCopyVisibleShareLinksBtn{
+  white-space:nowrap;
+}
+
 </style>
 </head>
 <body>
@@ -4866,6 +4907,7 @@ body:not(.database-mode):not(.hub-mode):not(.choice-mode):not(.share-mode):not(.
         <span class="database-filter-summary" id="databaseFilterSummary"></span>
       </div>
       <div class="database-bulk-actions">
+        <button type="button" class="btn small" id="databaseCopyVisibleShareLinksBtn">表示しているPCの共有リンクを一括コピー</button>
         <button type="button" class="btn small danger" id="databaseDeleteAllBtn">一括削除</button>
       </div>
       <div class="database-table-wrap" id="databaseTableWrap"></div>
@@ -5140,7 +5182,7 @@ body:not(.database-mode):not(.hub-mode):not(.choice-mode):not(.share-mode):not(.
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v6.4</p>
+    <p class="public-viewer-version">Viewer v6.6</p>
   </div>
 </div>
 
@@ -5212,7 +5254,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='6.4';
+const PUBLIC_VIEWER_VERSION='6.6';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -6388,11 +6430,11 @@ function renderSkills(){
      }
 
      tr.innerHTML=`<td>${skillCell}</td>
-       <td><input class="num b" type="number" value="${baseValue(sk)}"></td>
-       <td><input class="num o" type="number" value="${num(sk.occupation)}"></td>
-       <td><input class="num i" type="number" value="${num(sk.interest)}"></td>
-       <td><input class="num g" type="number" value="${num(sk.growth)}"></td>
-       <td><input class="num x" type="number" value="${num(sk.other)}"></td>
+       <td><input class="num b skill-base-input" type="number" value="${baseValue(sk)}"></td>
+       <td><input class="num o" type="number" value="${num(sk.occupation)||''}"></td>
+       <td><input class="num i" type="number" value="${num(sk.interest)||''}"></td>
+       <td><input class="num g" type="number" value="${num(sk.growth)||''}"></td>
+       <td><input class="num x" type="number" value="${num(sk.other)||''}"></td>
        <td><input class="num total" readonly value="${skillTotal(sk)}"></td>
        <td class="row-actions">${sk.custom?'<button type="button" class="btn small danger">×</button>':''}</td>`;
 
@@ -8427,6 +8469,64 @@ async function showChoiceView(){
 
 const dbFilterState={filters:{},sortKey:'no',sortDir:'asc'};
 let dbFilterContext={columns:[],sourceRows:[],activeKey:''};
+let databaseVisibleRows=[];
+
+
+function fixedPcShareUrlForList(character){
+ if(!character?.id)return '';
+
+ if(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='database'){
+   const u=new URL(location.href);
+   u.search='';
+   u.hash='';
+   u.searchParams.set('pc',character.id);
+   return u.toString();
+ }
+
+ const base=normalizeShareBaseUrl(getSavedShareBaseUrl());
+ const cfg=loadOnlineSyncConfig();
+ if(!base||!onlineSyncConfigured(cfg))return '';
+
+ const u=new URL(base);
+ u.searchParams.set('pc',character.id);
+ return u.toString();
+}
+async function copyVisiblePcShareLinks(){
+ if(!databaseVisibleRows.length){
+   alert('現在表示しているPCがありません。');
+   return;
+ }
+
+ if(!(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='database')){
+   const base=normalizeShareBaseUrl(getSavedShareBaseUrl());
+   const cfg=loadOnlineSyncConfig();
+   if(!base||!onlineSyncConfigured(cfg)){
+     alert('固定共有リンクを作るには、公開同期のGitHub Pages URLとSupabase設定が必要です。');
+     return;
+   }
+ }
+
+ const lines=databaseVisibleRows.map(({x})=>{
+   const name=String(x?.name||'名前未設定').replace(/\r?\n/g,' ').trim()||'名前未設定';
+   const url=fixedPcShareUrlForList(x);
+   return url?`[${name}](${url})`:'';
+ }).filter(Boolean);
+
+ if(!lines.length){
+   alert('共有リンクを作成できるPCがありません。');
+   return;
+ }
+
+ const text=lines.join('\n');
+ const ok=await copyPlainText(text,`${lines.length}人分の共有リンクをコピーしました`);
+
+ const btn=$('databaseCopyVisibleShareLinksBtn');
+ if(btn){
+   const normal='表示しているPCの共有リンクを一括コピー';
+   btn.textContent=ok?`✓ ${lines.length}人分コピーしました`:'コピーできませんでした';
+   setTimeout(()=>{btn.textContent=normal},1700);
+ }
+}
 
 function dbHeader(label,key){
  const active=dbFilterState.filters[key]?.size;
@@ -8575,6 +8675,7 @@ async function renderDatabaseView(){
    rows=rows.filter(r=>selected.has(String(r.values[key]??'')));
  }
  rows.sort((a,b)=>dbCompare(a,b,dbFilterState.sortKey)*(dbFilterState.sortDir==='desc'?-1:1));
+ databaseVisibleRows=[...rows];
 
  $('databaseCount').textContent=`${edition}版 / ${rows.length}人`;
  $('databaseFilterSummary').textContent=Object.keys(dbFilterState.filters).length
@@ -8957,7 +9058,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.4',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -9934,6 +10035,7 @@ async function importExcelWorkbook(file){
 
 $('deleteSelectedListBtn').onclick=deleteSelectedCharacters;
 $('deleteAllListBtn').onclick=deleteAllCharacters;
+$('databaseCopyVisibleShareLinksBtn').onclick=copyVisiblePcShareLinks;
 $('databaseDeleteAllBtn').onclick=deleteAllCharacters;
 $('dFeatureRollBtn').onclick=rollDFeaturePoints;
 $('dFeaturePointsInput').oninput=e=>{
