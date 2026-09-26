@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v6.7</title>
+<title>CHARACTER DATABASE | Shared Viewer v6.8</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -4665,6 +4665,27 @@ body.public-viewer-only #sessionPlAddBox{
   }
 }
 
+
+/* v6.8 ------------------------------------------------------------ */
+
+/* SESSION PL existing rows: inline edit/delete, synchronized to PC scenarios */
+#sessionPLTable .session-pl-edit-url,
+#sessionPLTable .session-pl-edit-date,
+#sessionPLTable .session-pl-edit-title,
+#sessionPLTable .session-pl-edit-uchi,
+#sessionPLTable .session-pl-edit-yoso{
+  width:100%;
+  min-width:0;
+  padding:5px 6px;
+  border:1px solid #cbd4db;
+  border-radius:5px;
+  background:#fff;
+  font-size:9px;
+}
+#sessionPLTable tr:has(.session-pl-confirm) td{
+  overflow:visible;
+}
+
 </style>
 </head>
 <body>
@@ -5262,7 +5283,7 @@ body.public-viewer-only #sessionPlAddBox{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v6.7</p>
+    <p class="public-viewer-version">Viewer v6.8</p>
   </div>
 </div>
 
@@ -5334,7 +5355,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='6.7';
+const PUBLIC_VIEWER_VERSION='6.8';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7159,6 +7180,7 @@ function showHomeWorkspace(){
  document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
 }
 let activeSessionTab='pl';
+const editingPLSessionKeys=new Set();
 const editingKPSessionIds=new Set();
 let viewerSkillSortMode='category';
 const sessionSortState={key:'date',dir:'desc'};
@@ -7320,24 +7342,55 @@ async function renderSessionPL(){
      .map(ch=>`<option value="${esc(ch.name||'名前未設定')}" label="${esc([ch.edition+'版',ch.number?`No.${ch.number}`:''].filter(Boolean).join(' / '))}"></option>`)
      .join('');
  }
+
  const allRows=await collectPLSessions();
  const rows=sortSessionRows(filterSessionRows(allRows));
  $('sessionFilterCount').textContent=`${rows.length} / ${allRows.length}件`;
+
  $('sessionPLTable').innerHTML=rows.length?`<table class="session-table">
    <thead><tr>
-     <th class="col-no">${sessionSortHead('No.','no')}</th><th class="col-date">${sessionSortHead('日付','date')}</th><th class="col-link">🔗</th>
-     <th class="col-title">${sessionSortHead('シナリオ名','title')}</th><th class="col-uchi">${sessionSortHead('uchi','uchi')}</th><th class="col-yoso">${sessionSortHead('yoso','yoso')}</th>
+     <th class="col-no">${sessionSortHead('No.','no')}</th>
+     <th class="col-date">${sessionSortHead('日付','date')}</th>
+     <th class="col-link">🔗</th>
+     <th class="col-title">${sessionSortHead('シナリオ名','title')}</th>
+     <th class="col-uchi">${sessionSortHead('uchi','uchi')}</th>
+     <th class="col-yoso">${sessionSortHead('yoso','yoso')}</th>
+     <th class="col-action"></th>
    </tr></thead>
-   <tbody>${rows.map(r=>`<tr data-char-id="${esc(r.charId||'')}">
-     <td class="col-no"><span class="session-edition-badge">${esc(r.edition||'6')}版</span>${esc(r.no)}</td>
-     <td class="col-date">${esc(r.date||'—')}</td>
-     <td class="col-link">${sessionLinkCell(r.url)}</td>
-     <td class="col-title">${esc(r.title)}</td>
-     <td class="col-uchi">${r.charId?`<button type="button" class="session-uchi-open" data-char-id="${esc(r.charId)}" title="このPCの編集画面を開く">${esc(r.uchi||'—')}</button>`:esc(r.uchi||'—')}</td>
-     <td class="col-yoso">${esc(r.yoso||'—')}</td>
-   </tr>`).join('')}</tbody>
+   <tbody>${rows.map(r=>{
+     const editing=editingPLSessionKeys.has(r.reportKey);
+     if(editing){
+       return `<tr data-report-key="${esc(r.reportKey)}" data-source="${esc(r.source)}" data-char-id="${esc(r.charId||'')}" data-scenario-id="${esc(r.scenarioId||'')}">
+         <td class="col-no"><span class="session-edition-badge">${esc(r.edition||'6')}版</span>${esc(r.no)}</td>
+         <td class="col-date"><input class="session-pl-edit-date" type="date" min="1000-01-01" max="9999-12-31" value="${esc(normalizeScenarioDate(r.date||''))}"></td>
+         <td class="col-link"><input class="session-pl-edit-url" value="${esc(r.url||'')}" placeholder="https://"></td>
+         <td class="col-title"><input class="session-pl-edit-title" value="${esc(r.title||'')}" placeholder="シナリオ名"></td>
+         <td class="col-uchi"><input class="session-pl-edit-uchi" list="sessionPlUchiOptions" value="${esc(r.uchi||'')}" autocomplete="off"></td>
+         <td class="col-yoso"><input class="session-pl-edit-yoso" value="${esc(r.yoso||'')}" placeholder="同卓PC名"></td>
+         <td class="col-action"><div class="record-actions">
+           <button type="button" class="record-icon-btn confirm session-pl-confirm" title="確定" aria-label="確定">✓</button>
+           <button type="button" class="record-icon-btn danger session-pl-delete" title="削除" aria-label="削除">×</button>
+         </div></td>
+       </tr>`;
+     }
+
+     return `<tr data-report-key="${esc(r.reportKey)}" data-source="${esc(r.source)}" data-char-id="${esc(r.charId||'')}" data-scenario-id="${esc(r.scenarioId||'')}">
+       <td class="col-no"><span class="session-edition-badge">${esc(r.edition||'6')}版</span>${esc(r.no)}</td>
+       <td class="col-date">${esc(r.date||'—')}</td>
+       <td class="col-link">${sessionLinkCell(r.url)}</td>
+       <td class="col-title">${esc(r.title)}</td>
+       <td class="col-uchi">${r.charId?`<button type="button" class="session-uchi-open" data-char-id="${esc(r.charId)}" title="このPCの編集画面を開く">${esc(r.uchi||'—')}</button>`:esc(r.uchi||'—')}</td>
+       <td class="col-yoso">${esc(r.yoso||'—')}</td>
+       <td class="col-action"><div class="record-actions">
+         <button type="button" class="record-icon-btn session-pl-edit" title="編集" aria-label="編集">✎</button>
+         <button type="button" class="record-icon-btn danger session-pl-delete" title="削除" aria-label="削除">×</button>
+       </div></td>
+     </tr>`;
+   }).join('')}</tbody>
  </table>`:'<div class="database-empty">条件に合うPL記録はありません。</div>';
+
  bindSessionSortHeaders($('sessionPLTable'));
+
  $('sessionPLTable').querySelectorAll('.session-uchi-open').forEach(btn=>{
    btn.onclick=async()=>{
      const data=(await all()).find(x=>x.id===btn.dataset.charId);
@@ -7347,6 +7400,130 @@ async function renderSessionPL(){
      window.scrollTo(0,0);
    };
  });
+
+ $('sessionPLTable').querySelectorAll('tbody tr[data-report-key]').forEach(tr=>{
+   const row=allRows.find(r=>r.reportKey===tr.dataset.reportKey);
+   if(!row)return;
+
+   tr.querySelector('.session-pl-edit')?.addEventListener('click',()=>{
+     editingPLSessionKeys.add(row.reportKey);
+     renderSessionPL();
+   });
+
+   tr.querySelector('.session-pl-confirm')?.addEventListener('click',async()=>{
+     const values={
+       date:normalizeScenarioDate(tr.querySelector('.session-pl-edit-date')?.value||''),
+       url:String(tr.querySelector('.session-pl-edit-url')?.value||'').trim(),
+       title:String(tr.querySelector('.session-pl-edit-title')?.value||'').trim(),
+       uchi:String(tr.querySelector('.session-pl-edit-uchi')?.value||'').trim(),
+       yoso:scenarioPcText(scenarioPcNames(tr.querySelector('.session-pl-edit-yoso')?.value||''))
+     };
+     const result=await updatePlSessionRecord(row,values);
+     if(!result.ok){
+       alert(result.message||'更新できませんでした。');
+       return;
+     }
+     editingPLSessionKeys.delete(row.reportKey);
+     await renderSessionHub();
+     await renderReport();
+   });
+
+   tr.querySelector('.session-pl-delete')?.addEventListener('click',async()=>{
+     if(!confirm('このPL SESSIONを削除しますか？\n個別PCの「通過シナリオ」にも反映されます。'))return;
+     await deletePlSessionRecord(row);
+     editingPLSessionKeys.delete(row.reportKey);
+     await renderSessionHub();
+     await renderReport();
+   });
+ });
+}
+
+async function refreshCurrentFromStoredCharacter(id){
+ if(!current||current.id!==id)return;
+ const fresh=(await all()).find(x=>x.id===id);
+ if(fresh){
+   current=ensureShape(structuredClone(fresh));
+   renderAll();
+ }
+}
+async function updatePlSessionRecord(row,values){
+ if(!values.title)return {ok:false,message:'シナリオ名を入力してください。'};
+
+ if(row.source==='character'){
+   const chars=(await all()).map(ensureShape);
+   const sourceChar=chars.find(ch=>ch.id===row.charId);
+   if(!sourceChar)return {ok:false,message:'元のPCが見つかりません。'};
+
+   const scenarioIndex=(sourceChar.scenarios||[]).findIndex(sc=>sc.id===row.scenarioId);
+   if(scenarioIndex<0)return {ok:false,message:'元の通過シナリオが見つかりません。'};
+
+   const targetKey=normalizePcLinkName(values.uchi);
+   const targets=chars.filter(ch=>normalizePcLinkName(ch.name||'')===targetKey);
+   if(!targets.length)return {ok:false,message:'uchiに一致するPCが見つかりません。'};
+   if(targets.length>1)return {ok:false,message:'同じPC名が複数あります。PC名を一意にしてから変更してください。'};
+
+   const targetChar=targets[0];
+   const scenario={...sourceChar.scenarios[scenarioIndex]};
+   scenario.date=values.date;
+   scenario.url=values.url;
+   scenario.title=values.title;
+   scenario.pcs=values.yoso;
+
+   if(targetChar.id===sourceChar.id){
+     sourceChar.scenarios[scenarioIndex]=scenario;
+     sourceChar.updatedAt=new Date().toISOString();
+     await put(structuredClone(sourceChar));
+     await refreshCurrentFromStoredCharacter(sourceChar.id);
+   }else{
+     sourceChar.scenarios.splice(scenarioIndex,1);
+     sourceChar.updatedAt=new Date().toISOString();
+
+     targetChar.scenarios=Array.isArray(targetChar.scenarios)?targetChar.scenarios:[];
+     targetChar.scenarios.push(scenario);
+     targetChar.updatedAt=new Date().toISOString();
+
+     await put(structuredClone(sourceChar));
+     await put(structuredClone(targetChar));
+
+     await refreshCurrentFromStoredCharacter(sourceChar.id);
+     await refreshCurrentFromStoredCharacter(targetChar.id);
+   }
+   return {ok:true};
+ }
+
+ if(row.source==='extra'){
+   const extraId=String(row.reportKey||'').replace(/^extra:/,'');
+   const rec=(appData.plExtraSessions||[]).find(x=>x.id===extraId);
+   if(!rec)return {ok:false,message:'SESSIONのみの記録が見つかりません。'};
+   rec.date=values.date;
+   rec.url=values.url;
+   rec.title=values.title;
+   rec.uchi=values.uchi;
+   rec.yoso=values.yoso;
+   rec.edited=true;
+   saveAppData();
+   return {ok:true};
+ }
+
+ return {ok:false,message:'更新対象を確認できませんでした。'};
+}
+async function deletePlSessionRecord(row){
+ if(row.source==='character'){
+   const chars=(await all()).map(ensureShape);
+   const ch=chars.find(x=>x.id===row.charId);
+   if(!ch)return;
+   ch.scenarios=(ch.scenarios||[]).filter(sc=>sc.id!==row.scenarioId);
+   ch.updatedAt=new Date().toISOString();
+   await put(structuredClone(ch));
+   await refreshCurrentFromStoredCharacter(ch.id);
+   return;
+ }
+
+ if(row.source==='extra'){
+   const extraId=String(row.reportKey||'').replace(/^extra:/,'');
+   appData.plExtraSessions=(appData.plExtraSessions||[]).filter(x=>x.id!==extraId);
+   saveAppData();
+ }
 }
 
 async function addPlSessionToCharacter(){
@@ -9216,7 +9393,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.7',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.8',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
