@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v5.6</title>
+<title>CHARACTER DATABASE | Shared Viewer v6.0</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -2189,7 +2189,7 @@ body.database-mode .database-table td.db-feature{
 }
 .report-filter-bar{
   display:grid;
-  grid-template-columns:110px 210px minmax(240px,1fr) 72px auto;
+  grid-template-columns:110px 210px minmax(170px,420px) 72px auto auto;
   gap:7px;
   align-items:end;
   margin:0 0 15px;
@@ -3999,6 +3999,283 @@ body.public-online-report .report-image-button:not(:has(img)){
   }
 }
 
+
+/* v5.7 ------------------------------------------------------------ */
+
+/* 通過シナリオ総数 */
+.scenario-total-count{
+  margin-left:5px;
+  color:#87939c;
+  font-size:.72em;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+/* REPORT filter controls stay on one row on desktop. */
+.report-filter-bar{
+  grid-template-columns:110px 210px minmax(170px,420px) 72px auto auto!important;
+  align-items:end;
+}
+.report-search-field{
+  min-width:170px;
+  max-width:420px;
+}
+.report-filter-bar > *{
+  min-width:0;
+}
+.report-filter-bar .btn{
+  white-space:nowrap;
+}
+@media(max-width:980px){
+  .report-filter-bar{
+    grid-template-columns:110px 180px minmax(150px,1fr) 68px auto auto!important;
+  }
+}
+@media(max-width:760px){
+  .report-filter-bar{
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+
+/* v5.8 ------------------------------------------------------------ */
+.report-head{
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:space-between!important;
+  gap:16px;
+}
+.report-head-count{
+  flex:0 0 auto;
+  margin:0 2px 2px 0;
+  padding:5px 9px;
+  border:1px solid #d9e0e5;
+  border-radius:999px;
+  background:#fff;
+  color:#66737d;
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+
+/* v5.9 ------------------------------------------------------------ */
+
+/* REPORT editor-only NO IMAGE filter */
+.report-no-image-filter{
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  height:30px;
+  padding:0 8px;
+  border:1px solid #d6dde2;
+  border-radius:6px;
+  background:#fff;
+  color:#5f6b74!important;
+  font-size:9px!important;
+  font-weight:700!important;
+  line-height:1;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.report-no-image-filter input{
+  width:13px;
+  height:13px;
+  margin:0;
+  flex:0 0 auto;
+}
+
+/* 版 / PC / 検索 / NO IMAGE / 解除 / 共有 / 削除 を1行に */
+.report-filter-bar{
+  grid-template-columns:105px 190px minmax(150px,330px) auto 68px auto auto!important;
+}
+.report-search-field{
+  max-width:330px!important;
+}
+
+/* 公開側では編集用フィルターを出さない */
+body.public-online-database #reportNoImageFilterWrap,
+body.public-online-report #reportNoImageFilterWrap,
+body.public-viewer-only #reportNoImageFilterWrap{
+  display:none!important;
+}
+
+@media(max-width:1040px){
+  .report-filter-bar{
+    grid-template-columns:95px 170px minmax(130px,1fr) auto 64px auto auto!important;
+  }
+}
+@media(max-width:760px){
+  .report-filter-bar{
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+
+/* v6.0 ------------------------------------------------------------ */
+
+/* LINK hub */
+.link-content{
+  width:90%;
+  max-width:1500px;
+  min-width:720px;
+  margin:0 auto;
+}
+.link-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+}
+.link-count{
+  padding:5px 9px;
+  border:1px solid #d9e0e5;
+  border-radius:999px;
+  background:#fff;
+  color:#66737d;
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.link-toolbar{
+  display:grid;
+  grid-template-columns:minmax(220px,520px) 72px;
+  gap:7px;
+  align-items:end;
+  margin-bottom:10px;
+  padding:8px;
+  border:1px solid #dbe2e7;
+  border-radius:8px;
+  background:#fff;
+}
+.link-toolbar label,
+.link-editor label{
+  display:grid;
+  gap:3px;
+  min-width:0;
+  color:#6c7882;
+  font-size:9px;
+  font-weight:700;
+}
+.link-editor{
+  display:grid;
+  grid-template-columns:minmax(180px,280px) minmax(260px,1fr) auto;
+  gap:8px;
+  align-items:end;
+  margin-bottom:14px;
+  padding:10px;
+  border:1px solid #dbe2e7;
+  border-radius:8px;
+  background:#fff;
+}
+.link-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:12px;
+  padding-bottom:28px;
+}
+.link-card{
+  position:relative;
+  min-width:0;
+  overflow:hidden;
+  border:1px solid #d4dbe1;
+  border-radius:12px;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(25,38,48,.05);
+}
+.link-card-open{
+  display:block;
+  color:inherit;
+  text-decoration:none;
+}
+.link-thumb{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  aspect-ratio:16/9;
+  overflow:hidden;
+  background:#eef1f3;
+  color:#9aa4ab;
+  font-size:10px;
+  font-weight:700;
+}
+.link-thumb > img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.link-thumb-favicon{
+  flex-direction:column;
+  gap:8px;
+  background:linear-gradient(145deg,#f6f8f9,#e9eef1);
+}
+.link-thumb-favicon > img{
+  width:54px;
+  height:54px;
+  object-fit:contain;
+}
+.link-thumb-favicon > span{
+  max-width:85%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#71808a;
+  font-size:10px;
+}
+.link-card-body{
+  padding:10px 11px 11px;
+}
+.link-card-title{
+  min-height:2.7em;
+  font-size:13px;
+  font-weight:800;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+}
+.link-card-domain{
+  margin-top:5px;
+  color:#89949c;
+  font-size:9px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.link-card-actions{
+  position:absolute;
+  top:7px;
+  right:7px;
+  display:flex;
+  gap:4px;
+  z-index:5;
+}
+.link-card-actions .record-icon-btn{
+  background:rgba(255,255,255,.94);
+  box-shadow:0 1px 5px rgba(20,30,40,.12);
+}
+body.public-online-database #linkEditor,
+body.public-online-database .link-card-actions,
+body.public-viewer-only #linkEditor,
+body.public-viewer-only .link-card-actions,
+body.public-online-report #linkViewBtn{
+  display:none!important;
+}
+@media(max-width:760px){
+  .link-content{
+    width:100%;
+    min-width:0;
+  }
+  .link-toolbar,
+  .link-editor{
+    grid-template-columns:1fr;
+  }
+  .link-grid{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4009,6 +4286,7 @@ body.public-online-report .report-image-button:not(:has(img)){
     <button type="button" class="app-nav-btn" id="sessionViewBtn">SESSION</button>
     <button type="button" class="app-nav-btn" id="reportViewBtn">REPORT</button>
     <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSONOKO</button>
+    <button type="button" class="app-nav-btn" id="linkViewBtn">LINK</button>
   </nav>
   <div class="header-actions header-utilities">
     <button class="btn dark" id="backupBtn">バックアップ</button>
@@ -4248,7 +4526,7 @@ body.public-online-report .report-image-button:not(:has(img)){
       <section class="tab-panel" id="tab-scenarios">
         <div class="card">
           <div class="section-head">
-            <div><h3>通過シナリオ</h3><div class="note">リンク → 日時 → シナリオ名 → 同卓PC名</div></div>
+            <div><h3>通過シナリオ <span class="scenario-total-count" id="scenarioTotalCount">0件</span></h3><div class="note">リンク → 日時 → シナリオ名 → 同卓PC名</div></div>
             <button type="button" class="btn small" data-add="scenario">＋ 通過シナリオを追加</button>
           </div>
           <div class="table-wrap">
@@ -4333,6 +4611,7 @@ body.public-online-report .report-image-button:not(:has(img)){
             <div class="hub-kicker">CHARACTER DATABASE</div>
             <h2>REPORT</h2>
           </div>
+          <div class="report-head-count" id="reportCount">0 / 0件</div>
         </div>
         <div class="report-filter-bar">
           <label>版
@@ -4351,10 +4630,13 @@ body.public-online-report .report-image-button:not(:has(img)){
           <label class="report-search-field">検索
             <input class="control" id="reportSearchInput" placeholder="シナリオ名・uchi・yoso">
           </label>
+          <label class="report-no-image-filter" id="reportNoImageFilterWrap">
+            <input type="checkbox" id="reportNoImageOnly">
+            <span>NO IMAGE</span>
+          </label>
           <button type="button" class="btn small" id="reportFilterResetBtn">解除</button>
           <button type="button" class="btn small report-page-share-btn" id="reportPageShareBtn">🔗 共有リンク</button>
           <button type="button" class="btn small danger hub-bulk-delete" id="reportDeleteAllBtn">一括削除</button>
-          <span id="reportCount" class="report-count"></span>
         </div>
         <div id="reportGrid"></div>
       </div>
@@ -4380,6 +4662,35 @@ body.public-online-report .report-image-button:not(:has(img)){
         </div>
         <div class="session-table-wrap" id="yosoTable"></div>
         <div class="hub-add-bottom"><button type="button" class="btn primary" id="addYosoBtn">＋ 追加</button></div>
+      </div>
+
+      <div id="linkHub" class="hub-content link-content hidden">
+        <div class="hub-view-head link-head">
+          <div>
+            <div class="hub-kicker">CHARACTER DATABASE</div>
+            <h2>LINK</h2>
+          </div>
+          <div class="link-count" id="linkCount">0件</div>
+        </div>
+
+        <div class="link-toolbar">
+          <label class="link-search-field">検索
+            <input class="control" id="linkSearchInput" placeholder="タイトル・URLを検索">
+          </label>
+          <button type="button" class="btn small" id="linkSearchResetBtn">解除</button>
+        </div>
+
+        <div class="link-editor" id="linkEditor">
+          <label>タイトル
+            <input class="control" id="linkTitleInput" placeholder="例：キャラクターシート保管庫">
+          </label>
+          <label>LINK
+            <input class="control" id="linkUrlInput" placeholder="https://...">
+          </label>
+          <button type="button" class="btn primary" id="linkAddBtn">＋ 追加</button>
+        </div>
+
+        <div class="link-grid" id="linkGrid"></div>
       </div>
     </section>
   </main>
@@ -4491,7 +4802,7 @@ body.public-online-report .report-image-button:not(:has(img)){
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v5.6</p>
+    <p class="public-viewer-version">Viewer v6.0</p>
   </div>
 </div>
 
@@ -4563,7 +4874,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='5.6';
+const PUBLIC_VIEWER_VERSION='6.0';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -4572,10 +4883,11 @@ function loadAppData(){
      kpSessions:Array.isArray(raw.kpSessions)?raw.kpSessions:[],
      yosoRecords:Array.isArray(raw.yosoRecords)?raw.yosoRecords:[],
      plExtraSessions:Array.isArray(raw.plExtraSessions)?raw.plExtraSessions:[],
-     reportHiddenKeys:Array.isArray(raw.reportHiddenKeys)?raw.reportHiddenKeys:[]
+     reportHiddenKeys:Array.isArray(raw.reportHiddenKeys)?raw.reportHiddenKeys:[],
+     links:Array.isArray(raw.links)?raw.links:[]
    };
  }catch(_){
-   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[]};
+   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[]};
  }
 }
 function saveAppData(){
@@ -4584,6 +4896,7 @@ function saveAppData(){
 }
 let appData=loadAppData();
 if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
+if(!Array.isArray(appData.links))appData.links=[];
 const STAT_KEYS=['STR','CON','POW','DEX','APP','SIZ','INT','EDU'];
 const STATUS=['新規','継続','継続不可','ロスト'];
 
@@ -5088,7 +5401,9 @@ function normalizePublicPayload(payload){
    appData:{
      kpSessions:Array.isArray(payload.appData?.kpSessions)?payload.appData.kpSessions:[],
      yosoRecords:Array.isArray(payload.appData?.yosoRecords)?payload.appData.yosoRecords:[],
-     plExtraSessions:Array.isArray(payload.appData?.plExtraSessions)?payload.appData.plExtraSessions:[]
+     plExtraSessions:Array.isArray(payload.appData?.plExtraSessions)?payload.appData.plExtraSessions:[],
+     reportHiddenKeys:Array.isArray(payload.appData?.reportHiddenKeys)?payload.appData.reportHiddenKeys:[],
+     links:Array.isArray(payload.appData?.links)?payload.appData.links:[]
    },
    reportImages:Array.isArray(payload.reportImages)?payload.reportImages:[]
  };
@@ -5893,6 +6208,8 @@ function scenarioPcChips(value,removable=false){
 }
 function renderScenarios(){
  const body=$('scenarioBody'); body.innerHTML='';
+ const totalEl=$('scenarioTotalCount');
+ if(totalEl)totalEl.textContent=`${current.scenarios.length}件`;
  const yosoNames=[...new Set((appData.yosoRecords||[]).map(x=>String(x.name||'').trim()).filter(Boolean))]
    .sort((a,b)=>a.localeCompare(b,'ja'));
 
@@ -6358,9 +6675,10 @@ function setTopNav(active){
  if(active==='session')$('sessionViewBtn')?.classList.add('active');
  if(active==='report')$('reportViewBtn')?.classList.add('active');
  if(active==='other')$('otherPcViewBtn')?.classList.add('active');
+ if(active==='link')$('linkViewBtn')?.classList.add('active');
 }
 function showHomeWorkspace(){
- document.body.classList.remove('database-mode','viewer-mode','hub-mode');setTopNav('');$('databaseView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('viewer').classList.add('hidden');if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
+ document.body.classList.remove('database-mode','viewer-mode','hub-mode');setTopNav('');$('databaseView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
 }
 let activeSessionTab='pl';
 const editingKPSessionIds=new Set();
@@ -6617,6 +6935,132 @@ function renderSessionKP(){
      renderSessionKP();
    });
  });
+}
+
+
+function normalizeLinkUrl(value){
+ let s=String(value||'').trim();
+ if(!s)return '';
+ if(!/^https?:\/\//i.test(s))s='https://'+s;
+ try{return new URL(s).toString()}catch(_){return ''}
+}
+function linkDomain(value){
+ try{return new URL(value).hostname.replace(/^www\./,'')}catch(_){return ''}
+}
+function youtubeVideoId(value){
+ try{
+   const u=new URL(value);
+   if(u.hostname==='youtu.be')return u.pathname.split('/').filter(Boolean)[0]||'';
+   if(/(^|\.)youtube\.com$/i.test(u.hostname)){
+     if(u.pathname==='/watch')return u.searchParams.get('v')||'';
+     const m=u.pathname.match(/^\/(?:shorts|embed)\/([^/?#]+)/);
+     return m?m[1]:'';
+   }
+ }catch(_){}
+ return '';
+}
+function linkPreviewInfo(url){
+ const yt=youtubeVideoId(url);
+ if(yt)return {kind:'image',src:`https://i.ytimg.com/vi/${encodeURIComponent(yt)}/hqdefault.jpg`,label:'YouTube'};
+ try{
+   const u=new URL(url);
+   if(/\.(?:png|jpe?g|webp|gif|avif)(?:$|\?)/i.test(u.pathname+u.search)){
+     return {kind:'image',src:url,label:u.hostname};
+   }
+   // General sites: favicon is reliable without needing a CORS metadata proxy.
+   const favicon=`https://www.google.com/s2/favicons?sz=128&domain_url=${encodeURIComponent(u.origin)}`;
+   return {kind:'favicon',src:favicon,label:u.hostname.replace(/^www\./,'')};
+ }catch(_){
+   return {kind:'none',src:'',label:''};
+ }
+}
+function linkPreviewHtml(rec){
+ const info=linkPreviewInfo(rec.url||'');
+ if(info.kind==='image'){
+   return `<div class="link-thumb"><img src="${esc(info.src)}" alt="" loading="lazy" onerror="this.closest('.link-thumb').innerHTML='<span>NO IMAGE</span>'"></div>`;
+ }
+ if(info.kind==='favicon'){
+   return `<div class="link-thumb link-thumb-favicon">
+     <img src="${esc(info.src)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.textContent='NO IMAGE'">
+     <span>${esc(info.label||'NO IMAGE')}</span>
+   </div>`;
+ }
+ return `<div class="link-thumb"><span>NO IMAGE</span></div>`;
+}
+function renderLinks(){
+ const rows=Array.isArray(appData.links)?appData.links:[];
+ const q=String($('linkSearchInput')?.value||'').trim().toLowerCase();
+ const filtered=rows.filter(r=>{
+   const hay=`${r.title||''} ${r.url||''} ${linkDomain(r.url||'')}`.toLowerCase();
+   return !q||hay.includes(q);
+ });
+ if($('linkCount'))$('linkCount').textContent=`${filtered.length} / ${rows.length}件`;
+
+ const grid=$('linkGrid');
+ if(!filtered.length){
+   grid.innerHTML='<div class="database-empty">LINKはまだありません。</div>';
+   return;
+ }
+ grid.innerHTML=filtered.map(rec=>`
+   <article class="link-card" data-id="${esc(rec.id)}">
+     <a class="link-card-open" href="${esc(rec.url||'#')}" target="_blank" rel="noopener noreferrer">
+       ${linkPreviewHtml(rec)}
+       <div class="link-card-body">
+         <div class="link-card-title">${esc(rec.title||linkDomain(rec.url)||'無題')}</div>
+         <div class="link-card-domain">${esc(linkDomain(rec.url)||rec.url||'')}</div>
+       </div>
+     </a>
+     <div class="link-card-actions">
+       <button type="button" class="record-icon-btn link-edit" title="編集" aria-label="編集">✎</button>
+       <button type="button" class="record-icon-btn danger link-delete" title="削除" aria-label="削除">×</button>
+     </div>
+   </article>`).join('');
+
+ grid.querySelectorAll('.link-card').forEach(card=>{
+   const rec=rows.find(x=>x.id===card.dataset.id);
+   if(!rec)return;
+   card.querySelector('.link-edit')?.addEventListener('click',()=>{
+     const title=prompt('タイトル',rec.title||'');
+     if(title===null)return;
+     const url=prompt('LINK',rec.url||'');
+     if(url===null)return;
+     const normalized=normalizeLinkUrl(url);
+     if(!normalized){alert('LINKが正しくありません。');return}
+     rec.title=String(title).trim();
+     rec.url=normalized;
+     rec.updatedAt=new Date().toISOString();
+     saveAppData();
+     renderLinks();
+   });
+   card.querySelector('.link-delete')?.addEventListener('click',()=>{
+     if(!confirm(`「${rec.title||rec.url||'このLINK'}」を削除しますか？`))return;
+     appData.links=rows.filter(x=>x.id!==rec.id);
+     saveAppData();
+     renderLinks();
+   });
+ });
+}
+function addLinkRecord(){
+ if(PUBLIC_VIEWER_ONLY)return;
+ const title=String($('linkTitleInput')?.value||'').trim();
+ const url=normalizeLinkUrl($('linkUrlInput')?.value||'');
+ if(!url){
+   alert('LINKを入力してください。');
+   $('linkUrlInput')?.focus();
+   return;
+ }
+ appData.links.push({
+   id:uid(),
+   title:title||linkDomain(url)||'無題',
+   url,
+   createdAt:new Date().toISOString(),
+   updatedAt:new Date().toISOString()
+ });
+ saveAppData();
+ $('linkTitleInput').value='';
+ $('linkUrlInput').value='';
+ renderLinks();
+ $('linkTitleInput')?.focus();
 }
 
 function renderYoso(){
@@ -6917,11 +7361,16 @@ async function renderReport(){
  const edition=$('reportEditionFilter')?.value||'';
  const pcQuery=String(pcInput?.value||'').trim().toLowerCase();
  const q=($('reportSearchInput')?.value||'').trim().toLowerCase();
+ const noImageOnly=!PUBLIC_VIEWER_ONLY&&!!$('reportNoImageOnly')?.checked;
 
  const rows=allRows.filter(r=>{
    const hay=`${r.title||''} ${r.uchi||''} ${r.yoso||''}`.toLowerCase();
    const uchi=String(r.uchi||'').toLowerCase();
-   return (!edition||r.edition===edition)&&(!pcQuery||uchi.includes(pcQuery))&&(!q||hay.includes(q));
+   const hasImage=!!(imageMap.get(r.reportKey)||r.reportImage||'');
+   return (!edition||r.edition===edition)
+     &&(!pcQuery||uchi.includes(pcQuery))
+     &&(!q||hay.includes(q))
+     &&(!noImageOnly||!hasImage);
  });
  $('reportCount').textContent=`${rows.length} / ${allRows.length}件`;
  reportRowCache=new Map(rows.map(r=>[r.reportKey,r]));
@@ -7213,6 +7662,7 @@ async function showHubView(kind){
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
+ $('linkHub').classList.add('hidden');
 
  if(kind==='session'){
    setTopNav('session');
@@ -7222,10 +7672,14 @@ async function showHubView(kind){
    setTopNav('report');
    $('reportHub').classList.remove('hidden');
    await renderReport();
- }else{
+ }else if(kind==='other'){
    setTopNav('other');
    $('yosoHub').classList.remove('hidden');
    renderYoso();
+ }else{
+   setTopNav('link');
+   $('linkHub').classList.remove('hidden');
+   renderLinks();
  }
  window.scrollTo(0,0);
 }
@@ -7241,6 +7695,7 @@ async function showDatabaseView(){
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
+ $('linkHub').classList.add('hidden');
  $('databaseView').style.display='';
  $('databaseView').classList.remove('hidden');
  await renderDatabaseView();
@@ -7736,7 +8191,7 @@ function showViewer(){
      </details>`:''}
 
      <details>
-       <summary>通過シナリオ</summary>
+       <summary>通過シナリオ <span class="scenario-total-count">${current.scenarios.length}件</span></summary>
        <div class="viewer-accordion-content">
          ${scenarioTableView()}
        </div>
@@ -7778,7 +8233,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'5.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.0',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -7793,7 +8248,9 @@ function importBackup(file){
        appData={
          kpSessions:Array.isArray(j.appData.kpSessions)?j.appData.kpSessions:[],
          yosoRecords:Array.isArray(j.appData.yosoRecords)?j.appData.yosoRecords:[],
-         plExtraSessions:Array.isArray(j.appData.plExtraSessions)?j.appData.plExtraSessions:[]
+         plExtraSessions:Array.isArray(j.appData.plExtraSessions)?j.appData.plExtraSessions:[],
+         reportHiddenKeys:Array.isArray(j.appData.reportHiddenKeys)?j.appData.reportHiddenKeys:[],
+         links:Array.isArray(j.appData.links)?j.appData.links:[]
        };
        saveAppData();
      }
@@ -8761,6 +9218,7 @@ $('databaseViewBtn').onclick=showDatabaseView;
 $('sessionViewBtn').onclick=()=>showHubView('session');
 $('reportViewBtn').onclick=()=>showHubView('report');
 $('otherPcViewBtn').onclick=()=>showHubView('other');
+$('linkViewBtn').onclick=()=>showHubView('link');
 $('backFromDatabaseBtn').onclick=leaveDatabaseView;
 $('databaseEditionFilter').onchange=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
 $('databaseFilterResetBtn').onclick=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
@@ -8776,12 +9234,14 @@ $('reportLightbox').onclick=e=>{if(e.target===$('reportLightbox'))closeReportLig
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('reportLightbox').classList.contains('hidden'))closeReportLightbox()});
 
 $('reportEditionFilter').onchange=renderReport;
+$('reportNoImageOnly').onchange=renderReport;
 
 $('reportSearchInput').oninput=renderReport;
 $('reportFilterResetBtn').onclick=()=>{
  $('reportEditionFilter').value='';
  $('reportPcFilter').value='';
  $('reportSearchInput').value='';
+ if($('reportNoImageOnly'))$('reportNoImageOnly').checked=false;
  $('reportPcSuggestions')?.classList.add('hidden');
  renderReport();
 };
@@ -8819,6 +9279,20 @@ $('addKPSessionBtn').onclick=()=>{
 };
 $('yosoPlFilter').onchange=renderYoso;
 $('yosoSearchInput').oninput=renderYoso;
+
+$('linkSearchInput').oninput=renderLinks;
+$('linkSearchResetBtn').onclick=()=>{
+ $('linkSearchInput').value='';
+ renderLinks();
+};
+$('linkAddBtn').onclick=addLinkRecord;
+$('linkUrlInput').onkeydown=e=>{
+ if(e.key==='Enter'){
+   e.preventDefault();
+   addLinkRecord();
+ }
+};
+
 $('yosoFilterResetBtn').onclick=()=>{
  $('yosoPlFilter').value='';
  $('yosoSearchInput').value='';
@@ -9010,6 +9484,7 @@ async function initCharacterDatabase(){
        publicRemoteData=await loadPublicDatabaseByViewerToken(reportToken);
        appData=structuredClone(publicRemoteData.appData);
        if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
+       if(!Array.isArray(appData.links))appData.links=[];
        publicRemoteMode='report';
        document.body.classList.add('public-online-report');
        await showHubView('report');
@@ -9022,6 +9497,7 @@ async function initCharacterDatabase(){
        publicRemoteData=await loadPublicDatabaseByViewerToken(viewerToken);
        appData=structuredClone(publicRemoteData.appData);
        if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
+       if(!Array.isArray(appData.links))appData.links=[];
        publicRemoteMode='database';
        document.body.classList.add('public-online-database');
        await showDatabaseView();
