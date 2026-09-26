@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v6.1</title>
+<title>CHARACTER DATABASE | Shared Viewer v6.2</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -4328,6 +4328,194 @@ body.public-online-report #linkViewBtn{
   cursor:default;
 }
 
+
+/* v6.2 ------------------------------------------------------------ */
+
+/* CHOICE */
+.choice-screen{
+  width:100%;
+  max-width:1500px;
+  margin:0 auto;
+}
+.choice-view-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:10px;
+}
+.choice-view-head h2{
+  margin:0;
+}
+.choice-result-count{
+  flex:0 0 auto;
+  padding:5px 9px;
+  border:1px solid #d9e0e5;
+  border-radius:999px;
+  background:#fff;
+  color:#66737d;
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.choice-toolbar{
+  display:grid;
+  grid-template-columns:130px 210px auto auto;
+  gap:8px;
+  align-items:end;
+  margin-bottom:10px;
+  padding:9px;
+  border:1px solid #dbe2e7;
+  border-radius:8px;
+  background:#fff;
+}
+.choice-toolbar label{
+  display:grid;
+  gap:3px;
+  min-width:0;
+  color:#6c7882;
+  font-size:9px;
+  font-weight:700;
+}
+.choice-condition-list{
+  display:grid;
+  gap:6px;
+  margin-bottom:12px;
+}
+.choice-condition-row{
+  display:grid;
+  grid-template-columns:28px 110px minmax(150px,1fr) 120px 100px 32px;
+  gap:6px;
+  align-items:center;
+  padding:7px;
+  border:1px solid #dbe2e7;
+  border-radius:8px;
+  background:#fff;
+}
+.choice-condition-no{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  background:#eef3f6;
+  color:#66737d;
+  font-size:9px;
+  font-weight:800;
+}
+.choice-key-static{
+  display:flex;
+  align-items:center;
+  height:32px;
+  padding:0 9px;
+  border:1px solid #d3dae1;
+  border-radius:6px;
+  background:#f5f7f8;
+  color:#384650;
+  font-size:10px;
+  font-weight:700;
+}
+.choice-table-wrap{
+  max-height:calc(100vh - 320px);
+  overflow:auto;
+  border:1px solid #d7dee5;
+  border-radius:8px;
+  background:#fff;
+}
+.choice-table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:auto;
+}
+.choice-table th,
+.choice-table td{
+  padding:7px 9px;
+  border-bottom:1px solid #e0e5e9;
+  border-right:1px solid #edf0f2;
+  text-align:center;
+  white-space:nowrap;
+  font-size:10px;
+}
+.choice-table th{
+  position:sticky;
+  top:0;
+  z-index:5;
+  background:#f3f6f8;
+  font-size:9px;
+}
+.choice-head-rule{
+  display:block;
+  margin-top:2px;
+  color:#849099;
+  font-size:8px;
+  font-weight:500;
+}
+.choice-metric.pass{
+  font-weight:800;
+  background:#f6faf7;
+}
+.choice-name-open{
+  border:0;
+  background:transparent;
+  padding:0;
+  color:#25343e;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+body.choice-mode .sidebar,
+body.choice-mode .right-rail,
+body.choice-mode #workspaceTools{
+  display:none!important;
+}
+body.choice-mode .layout{
+  display:block!important;
+  width:100%!important;
+}
+body.choice-mode .workspace{
+  width:100%!important;
+  max-width:none!important;
+  padding:14px 22px!important;
+  grid-column:auto!important;
+}
+body.public-online-database .choice-screen{
+  width:100%!important;
+  max-width:none!important;
+}
+@media(max-width:900px){
+  .choice-toolbar{
+    grid-template-columns:1fr 1fr;
+  }
+  .choice-condition-row{
+    grid-template-columns:28px 100px minmax(140px,1fr) 105px 90px 32px;
+  }
+}
+@media(max-width:700px){
+  .choice-toolbar{
+    grid-template-columns:1fr;
+  }
+  .choice-condition-row{
+    grid-template-columns:28px 1fr 32px;
+  }
+  .choice-condition-row .choice-type,
+  .choice-condition-row .choice-key,
+  .choice-condition-row .choice-key-static,
+  .choice-condition-row .choice-op,
+  .choice-condition-row .choice-value{
+    grid-column:2;
+  }
+  .choice-condition-row .choice-condition-delete{
+    grid-column:3;
+    grid-row:1;
+  }
+  .choice-table-wrap{
+    max-height:none;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4335,6 +4523,7 @@ body.public-online-report #linkViewBtn{
   <button type="button" class="brand brand-button" id="homeViewBtn" title="通常画面へ戻る"><h1>DATABASE</h1><p>CALL OF CTHULHU INVESTIGATOR ARCHIVE</p></button>
   <nav class="app-nav">
     <button type="button" class="app-nav-btn" id="databaseViewBtn">PC LIST</button>
+    <button type="button" class="app-nav-btn" id="choiceViewBtn">CHOICE</button>
     <button type="button" class="app-nav-btn" id="sessionViewBtn">SESSION</button>
     <button type="button" class="app-nav-btn" id="reportViewBtn">REPORT</button>
     <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSONOKO</button>
@@ -4633,6 +4822,39 @@ body.public-online-report #linkViewBtn{
       <div class="database-table-wrap" id="databaseTableWrap"></div>
     </section>
 
+    <section id="choiceView" class="choice-screen hidden">
+      <div class="choice-view-head">
+        <div>
+          <h2>CHARACTER CHOICE</h2>
+          <div class="database-sub">能力値・技能値・現在SANで探索者を比較</div>
+        </div>
+        <div class="choice-result-count" id="choiceResultCount">0人</div>
+      </div>
+
+      <div class="choice-toolbar">
+        <label>版
+          <select class="control" id="choiceEditionFilter">
+            <option value="">6版＋7版</option>
+            <option value="6">6版</option>
+            <option value="7">7版</option>
+          </select>
+        </label>
+        <label>条件
+          <select class="control" id="choiceLogic">
+            <option value="and">すべて満たす（AND）</option>
+            <option value="or">どれかを満たす（OR）</option>
+          </select>
+        </label>
+        <button type="button" class="btn small primary" id="choiceAddConditionBtn">＋ 条件を追加</button>
+        <button type="button" class="btn small" id="choiceResetBtn">条件をリセット</button>
+      </div>
+
+      <div class="choice-condition-list" id="choiceConditionList"></div>
+      <datalist id="choiceSkillOptions"></datalist>
+
+      <div class="choice-result-wrap" id="choiceResultWrap"></div>
+    </section>
+
     <section id="hubView" class="hub-screen hidden">
       <div id="sessionHub" class="hub-content hidden">
         <div class="hub-view-head">
@@ -4868,7 +5090,7 @@ body.public-online-report #linkViewBtn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v6.1</p>
+    <p class="public-viewer-version">Viewer v6.2</p>
   </div>
 </div>
 
@@ -4940,7 +5162,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='6.1';
+const PUBLIC_VIEWER_VERSION='6.2';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -6743,7 +6965,7 @@ function computedCharacterSnapshot(record){
 function leaveDatabaseView(){
  document.body.classList.remove('database-mode','hub-mode');
  setTopNav('');
- $('databaseView').classList.add('hidden');$('databaseView').style.display='';
+ $('databaseView').classList.add('hidden');$('databaseView').style.display='';$('choiceView').classList.add('hidden');
  if(current){
    $('emptyState').classList.add('hidden');
    $('viewer').classList.add('hidden');
@@ -6757,13 +6979,14 @@ function leaveDatabaseView(){
 function setTopNav(active){
  document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));
  if(active==='pc')$('databaseViewBtn')?.classList.add('active');
+ if(active==='choice')$('choiceViewBtn')?.classList.add('active');
  if(active==='session')$('sessionViewBtn')?.classList.add('active');
  if(active==='report')$('reportViewBtn')?.classList.add('active');
  if(active==='other')$('otherPcViewBtn')?.classList.add('active');
  if(active==='link')$('linkViewBtn')?.classList.add('active');
 }
 function showHomeWorkspace(){
- document.body.classList.remove('database-mode','viewer-mode','hub-mode');setTopNav('');$('databaseView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
+ document.body.classList.remove('database-mode','viewer-mode','hub-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
 }
 let activeSessionTab='pl';
 const editingKPSessionIds=new Set();
@@ -7739,6 +7962,7 @@ async function showHubView(kind){
  // Explicitly hide every other main page so PC LIST / SESSION / REPORT / YOSONOKO never stack.
  $('databaseView').classList.add('hidden');
  $('databaseView').style.display='none';
+ $('choiceView').classList.add('hidden');
  $('editor').classList.add('hidden');
  $('viewer').classList.add('hidden');
  $('emptyState').classList.add('hidden');
@@ -7777,6 +8001,7 @@ async function showDatabaseView(){
  $('viewer').classList.add('hidden');
  $('emptyState').classList.add('hidden');
  $('hubView').classList.add('hidden');
+ $('choiceView').classList.add('hidden');
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
@@ -7786,6 +8011,239 @@ async function showDatabaseView(){
  await renderDatabaseView();
  window.scrollTo(0,0);
 }
+
+let choiceConditions=[{id:uid(),type:'stat',key:'STR',op:'gte',value:''}];
+
+function choiceOpLabel(op){
+ return ({gte:'以上',lte:'以下',gt:'より大きい',lt:'より小さい',eq:'等しい'})[op]||'以上';
+}
+function choiceTest(value,op,target){
+ const v=Number(value),t=Number(target);
+ if(!Number.isFinite(v)||!Number.isFinite(t))return false;
+ if(op==='gte')return v>=t;
+ if(op==='lte')return v<=t;
+ if(op==='gt')return v>t;
+ if(op==='lt')return v<t;
+ if(op==='eq')return v===t;
+ return false;
+}
+function choiceSkillDisplay(skill){
+ const name=String(skill?.name||'').trim();
+ const detail=String(skill?.detail||'').trim();
+ return detail?`${name}（${detail}）`:name;
+}
+function choiceCharacterMetrics(record){
+ const saved=current;
+ try{
+   current=ensureShape(structuredClone(record));
+   const stats=currentStats();
+   const skills=new Map();
+   for(const arr of Object.values(current.skills||{})){
+     for(const sk of arr||[]){
+       const display=choiceSkillDisplay(sk);
+       if(!display)continue;
+       const total=skillTotal(sk);
+       if(!skills.has(display)||total>skills.get(display))skills.set(display,total);
+       // Also expose the base name when it is unique/useful (e.g. 回避).
+       const baseName=String(sk.name||'').trim();
+       if(baseName&&!skills.has(baseName))skills.set(baseName,total);
+       else if(baseName&&total>skills.get(baseName))skills.set(baseName,total);
+     }
+   }
+   return {stats,skills,san:num(current.sanCurrent)};
+ }finally{
+   current=saved;
+ }
+}
+function choiceMetricValue(metrics,cond){
+ if(cond.type==='stat')return Number(metrics.stats?.[cond.key]);
+ if(cond.type==='san')return Number(metrics.san);
+ if(cond.type==='skill')return metrics.skills.has(cond.key)?Number(metrics.skills.get(cond.key)):null;
+ return null;
+}
+function choiceConditionLabel(cond){
+ if(cond.type==='stat')return cond.key||'能力値';
+ if(cond.type==='san')return '現在SAN';
+ return cond.key||'技能値';
+}
+function choiceActiveConditions(){
+ return choiceConditions.filter(c=>String(c.value??'').trim()!=='' && (c.type==='san'||String(c.key||'').trim()!==''));
+}
+function choiceSkillCandidates(list){
+ const names=new Set();
+ for(const record of list){
+   const ch=ensureShape(structuredClone(record));
+   for(const arr of Object.values(ch.skills||{})){
+     for(const sk of arr||[]){
+       const display=choiceSkillDisplay(sk);
+       if(display)names.add(display);
+       if(sk?.name)names.add(String(sk.name).trim());
+     }
+   }
+ }
+ return [...names].filter(Boolean).sort((a,b)=>compareText(a,b));
+}
+function renderChoiceConditions(skillNames=[]){
+ const wrap=$('choiceConditionList');
+ if(!wrap)return;
+
+ $('choiceSkillOptions').innerHTML=skillNames.map(n=>`<option value="${esc(n)}"></option>`).join('');
+
+ wrap.innerHTML=choiceConditions.map((c,index)=>{
+   const keyControl=c.type==='stat'
+     ? `<select class="control choice-key" data-field="key">${STAT_KEYS.map(k=>`<option value="${k}" ${c.key===k?'selected':''}>${k}</option>`).join('')}</select>`
+     : c.type==='skill'
+       ? `<input class="control choice-key choice-skill-key" data-field="key" list="choiceSkillOptions" value="${esc(c.key||'')}" placeholder="技能名を入力">`
+       : `<div class="choice-key-static">現在SAN</div>`;
+
+   return `<div class="choice-condition-row" data-id="${esc(c.id)}">
+     <span class="choice-condition-no">${index+1}</span>
+     <select class="control choice-type" data-field="type">
+       <option value="stat" ${c.type==='stat'?'selected':''}>能力値</option>
+       <option value="skill" ${c.type==='skill'?'selected':''}>技能値</option>
+       <option value="san" ${c.type==='san'?'selected':''}>現在SAN</option>
+     </select>
+     ${keyControl}
+     <select class="control choice-op" data-field="op">
+       <option value="gte" ${c.op==='gte'?'selected':''}>以上</option>
+       <option value="lte" ${c.op==='lte'?'selected':''}>以下</option>
+       <option value="gt" ${c.op==='gt'?'selected':''}>より大きい</option>
+       <option value="lt" ${c.op==='lt'?'selected':''}>より小さい</option>
+       <option value="eq" ${c.op==='eq'?'selected':''}>等しい</option>
+     </select>
+     <input class="control choice-value" data-field="value" type="number" value="${esc(c.value??'')}" placeholder="数値">
+     <button type="button" class="record-icon-btn danger choice-condition-delete" title="条件を削除" aria-label="条件を削除">×</button>
+   </div>`;
+ }).join('');
+
+ wrap.querySelectorAll('.choice-condition-row').forEach(row=>{
+   const cond=choiceConditions.find(c=>c.id===row.dataset.id);
+   if(!cond)return;
+   row.querySelector('[data-field="type"]').onchange=e=>{
+     cond.type=e.target.value;
+     cond.key=cond.type==='stat'?'STR':cond.type==='skill'?'':'';
+     renderChoice();
+   };
+   const key=row.querySelector('[data-field="key"]');
+   if(key){
+     key.oninput=e=>{cond.key=e.target.value;renderChoiceResults()};
+     key.onchange=e=>{cond.key=e.target.value;renderChoiceResults()};
+   }
+   row.querySelector('[data-field="op"]').onchange=e=>{cond.op=e.target.value;renderChoiceResults()};
+   row.querySelector('[data-field="value"]').oninput=e=>{cond.value=e.target.value;renderChoiceResults()};
+   row.querySelector('.choice-condition-delete').onclick=()=>{
+     choiceConditions=choiceConditions.filter(c=>c.id!==cond.id);
+     renderChoice();
+   };
+ });
+}
+async function choiceSourceList(){
+ let list=(await all()).map(ensureShape);
+ if(current){
+   const idx=list.findIndex(x=>x.id===current.id);
+   if(idx>=0)list[idx]=ensureShape(structuredClone(current));
+   else list.push(ensureShape(structuredClone(current)));
+ }
+ return list;
+}
+let choiceCachedList=[];
+
+async function renderChoice(){
+ if(!db && !(PUBLIC_VIEWER_ONLY&&publicRemoteData))return;
+ choiceCachedList=await choiceSourceList();
+ renderChoiceConditions(choiceSkillCandidates(choiceCachedList));
+ renderChoiceResults();
+}
+function renderChoiceResults(){
+ const wrap=$('choiceResultWrap');
+ if(!wrap)return;
+ const edition=$('choiceEditionFilter')?.value||'';
+ const logic=$('choiceLogic')?.value||'and';
+ const active=choiceActiveConditions();
+
+ const evaluated=choiceCachedList
+   .filter(ch=>!edition||ch.edition===edition)
+   .map((ch,index)=>{
+     const metrics=choiceCharacterMetrics(ch);
+     const checks=active.map(c=>{
+       const value=choiceMetricValue(metrics,c);
+       return {condition:c,value,pass:value!==null&&choiceTest(value,c.op,c.value)};
+     });
+     const matched=!active.length?true:(logic==='or'?checks.some(x=>x.pass):checks.every(x=>x.pass));
+     const no=String(ch.number||ch.importSource?.sheetName||formattedCharacterNumber(ch.edition,index+1));
+     return {ch,metrics,checks,matched,no};
+   })
+   .filter(r=>r.matched)
+   .sort((a,b)=>compareText(a.ch.edition,b.ch.edition)||compareText(a.no,b.no));
+
+ $('choiceResultCount').textContent=`${evaluated.length} / ${choiceCachedList.filter(ch=>!edition||ch.edition===edition).length}人`;
+
+ if(!evaluated.length){
+   wrap.innerHTML='<div class="database-empty">条件に合う探索者はいません。</div>';
+   return;
+ }
+
+ const conditionHeads=active.map(c=>
+   `<th title="${esc(choiceConditionLabel(c))} ${esc(choiceOpLabel(c.op))} ${esc(c.value)}">${esc(choiceConditionLabel(c))}<span class="choice-head-rule">${esc(choiceOpLabel(c.op))} ${esc(c.value)}</span></th>`
+ ).join('');
+
+ const rows=evaluated.map(r=>{
+   const values=active.map((c,i)=>{
+     const result=r.checks[i];
+     const display=result?.value===null||result?.value===undefined?'—':String(result.value);
+     return `<td class="choice-metric ${result?.pass?'pass':''}">${esc(display)}</td>`;
+   }).join('');
+   return `<tr data-id="${esc(r.ch.id)}">
+     <td class="choice-no"><button type="button" class="db-no-open choice-open">${esc(r.no)}</button></td>
+     <td class="choice-name"><button type="button" class="choice-name-open choice-open">${esc(r.ch.name||'名前未設定')}</button></td>
+     <td>${esc(r.ch.edition)}版</td>
+     ${values}
+   </tr>`;
+ }).join('');
+
+ wrap.innerHTML=`<div class="choice-table-wrap"><table class="choice-table">
+   <thead><tr><th>No.</th><th>名前</th><th>版</th>${conditionHeads}</tr></thead>
+   <tbody>${rows}</tbody>
+ </table></div>`;
+
+ wrap.querySelectorAll('tr[data-id]').forEach(tr=>{
+   tr.querySelectorAll('.choice-open').forEach(btn=>btn.onclick=async()=>{
+     const data=(await all()).find(x=>x.id===tr.dataset.id);
+     if(!data)return;
+     current=ensureShape(structuredClone(data));
+
+     if(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='database'){
+       document.body.classList.remove('database-mode','hub-mode','choice-mode');
+       $('choiceView').classList.add('hidden');
+       renderAll();
+       showViewer();
+       return;
+     }
+
+     document.body.classList.remove('database-mode','hub-mode','choice-mode');
+     $('choiceView').classList.add('hidden');
+     renderAll();
+   });
+ });
+}
+async function showChoiceView(){
+ if(current)syncFormToModel();
+ document.body.classList.remove('viewer-mode','hub-mode','database-mode');
+ document.body.classList.add('choice-mode');
+ setTopNav('choice');
+
+ $('editor').classList.add('hidden');
+ $('viewer').classList.add('hidden');
+ $('emptyState').classList.add('hidden');
+ $('databaseView').classList.add('hidden');
+ $('databaseView').style.display='none';
+ $('hubView').classList.add('hidden');
+ $('choiceView').classList.remove('hidden');
+
+ await renderChoice();
+ window.scrollTo(0,0);
+}
+
 const dbFilterState={filters:{},sortKey:'no',sortDir:'asc'};
 let dbFilterContext={columns:[],sourceRows:[],activeKey:''};
 
@@ -8318,7 +8776,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -9314,6 +9772,7 @@ $('interestPointAdjustInput').oninput=e=>{
 };
 $('homeViewBtn').onclick=showHomeWorkspace;
 $('databaseViewBtn').onclick=showDatabaseView;
+$('choiceViewBtn').onclick=showChoiceView;
 $('sessionViewBtn').onclick=()=>showHubView('session');
 $('reportViewBtn').onclick=()=>showHubView('report');
 $('otherPcViewBtn').onclick=()=>showHubView('other');
@@ -9321,6 +9780,21 @@ $('linkViewBtn').onclick=()=>showHubView('link');
 $('backFromDatabaseBtn').onclick=leaveDatabaseView;
 $('databaseEditionFilter').onchange=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
 $('databaseFilterResetBtn').onclick=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
+
+$('choiceEditionFilter').onchange=renderChoiceResults;
+$('choiceLogic').onchange=renderChoiceResults;
+$('choiceAddConditionBtn').onclick=()=>{
+ choiceConditions.push({id:uid(),type:'stat',key:'STR',op:'gte',value:''});
+ renderChoice();
+ setTimeout(()=>document.querySelector('.choice-condition-row:last-child .choice-value')?.focus(),0);
+};
+$('choiceResetBtn').onclick=()=>{
+ choiceConditions=[{id:uid(),type:'stat',key:'STR',op:'gte',value:''}];
+ $('choiceEditionFilter').value='';
+ $('choiceLogic').value='and';
+ renderChoice();
+};
+
 
 document.querySelectorAll('.hub-tab').forEach(btn=>btn.onclick=async()=>{
  activeSessionTab=btn.dataset.sessionTab;
