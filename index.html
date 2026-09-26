@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v6.2</title>
+<title>CHARACTER DATABASE | Shared Viewer v6.4</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -4516,6 +4516,55 @@ body.public-online-database .choice-screen{
   }
 }
 
+
+/* v6.3 ------------------------------------------------------------ */
+
+/* SESSION: uchi is a direct shortcut to the PC editor. */
+.session-uchi-open{
+  max-width:100%;
+  border:0;
+  background:transparent;
+  padding:0;
+  color:#1688b7;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+  text-decoration:underline;
+  text-underline-offset:2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.session-uchi-open:hover{
+  color:#0f6589;
+}
+
+/* SESSION filter has one more utility button. */
+.session-filter-bar{
+  grid-template-columns:105px minmax(180px,1fr) 72px auto auto auto!important;
+}
+
+/* Shared/public pages are read-only. */
+body.public-online-database #sessionDeduplicateBtn,
+body.public-online-report #sessionDeduplicateBtn,
+body.public-viewer-only #sessionDeduplicateBtn{
+  display:none!important;
+}
+
+/* Extra safety: an editor screen must always restore its side rails. */
+body:not(.database-mode):not(.hub-mode):not(.choice-mode):not(.share-mode):not(.public-online-database):not(.public-online-report) .sidebar{
+  display:flex!important;
+}
+body:not(.database-mode):not(.hub-mode):not(.choice-mode):not(.share-mode):not(.public-online-database):not(.public-online-report) .right-rail{
+  display:block!important;
+}
+
+@media(max-width:900px){
+  .session-filter-bar{
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4879,6 +4928,7 @@ body.public-online-database .choice-screen{
             <input class="control" id="sessionSearchInput" placeholder="シナリオ名・uchi・yoso">
           </label>
           <button type="button" class="btn small" id="sessionFilterResetBtn">解除</button>
+          <button type="button" class="btn small" id="sessionDeduplicateBtn">重複を削除</button>
           <button type="button" class="btn small danger hub-bulk-delete" id="sessionDeleteAllBtn">一括削除</button>
           <span class="session-filter-count" id="sessionFilterCount"></span>
         </div>
@@ -5090,7 +5140,7 @@ body.public-online-database .choice-screen{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v6.2</p>
+    <p class="public-viewer-version">Viewer v6.4</p>
   </div>
 </div>
 
@@ -5162,7 +5212,7 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='6.2';
+const PUBLIC_VIEWER_VERSION='6.4';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -6119,8 +6169,6 @@ function chatPaletteText(){
    for(const k of STAT_KEYS){
      const v=num(s[k]);
      lines.push(`CC<=${v} 【${k}】`);
-     lines.push(`CC<=${Math.floor(v/2)} 【${k}：ハード】`);
-     lines.push(`CC<=${Math.floor(v/5)} 【${k}：イクストリーム】`);
    }
    lines.push(`CC<=${num(d['幸運'])} 【幸運】`);
  }
@@ -6758,7 +6806,7 @@ function renderBackstory(){
  area.appendChild(grid);
 }
 function renderAll(){
- document.body.classList.remove('viewer-mode','database-mode','hub-mode');
+ document.body.classList.remove('viewer-mode','database-mode','hub-mode','choice-mode');
  setTopNav('');
  $('databaseView').classList.add('hidden');
  $('emptyState').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').classList.remove('hidden');
@@ -6963,7 +7011,7 @@ function computedCharacterSnapshot(record){
  }
 }
 function leaveDatabaseView(){
- document.body.classList.remove('database-mode','hub-mode');
+ document.body.classList.remove('database-mode','hub-mode','choice-mode');
  setTopNav('');
  $('databaseView').classList.add('hidden');$('databaseView').style.display='';$('choiceView').classList.add('hidden');
  if(current){
@@ -6986,7 +7034,7 @@ function setTopNav(active){
  if(active==='link')$('linkViewBtn')?.classList.add('active');
 }
 function showHomeWorkspace(){
- document.body.classList.remove('database-mode','viewer-mode','hub-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
+ document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
 }
 let activeSessionTab='pl';
 const editingKPSessionIds=new Set();
@@ -7149,16 +7197,25 @@ async function renderSessionPL(){
      <th class="col-no">${sessionSortHead('No.','no')}</th><th class="col-date">${sessionSortHead('日付','date')}</th><th class="col-link">🔗</th>
      <th class="col-title">${sessionSortHead('シナリオ名','title')}</th><th class="col-uchi">${sessionSortHead('uchi','uchi')}</th><th class="col-yoso">${sessionSortHead('yoso','yoso')}</th>
    </tr></thead>
-   <tbody>${rows.map(r=>`<tr>
+   <tbody>${rows.map(r=>`<tr data-char-id="${esc(r.charId||'')}">
      <td class="col-no"><span class="session-edition-badge">${esc(r.edition||'6')}版</span>${esc(r.no)}</td>
      <td class="col-date">${esc(r.date||'—')}</td>
      <td class="col-link">${sessionLinkCell(r.url)}</td>
      <td class="col-title">${esc(r.title)}</td>
-     <td class="col-uchi">${esc(r.uchi||'—')}</td>
+     <td class="col-uchi">${r.charId?`<button type="button" class="session-uchi-open" data-char-id="${esc(r.charId)}" title="このPCの編集画面を開く">${esc(r.uchi||'—')}</button>`:esc(r.uchi||'—')}</td>
      <td class="col-yoso">${esc(r.yoso||'—')}</td>
    </tr>`).join('')}</tbody>
  </table>`:'<div class="database-empty">条件に合うPL記録はありません。</div>';
  bindSessionSortHeaders($('sessionPLTable'));
+ $('sessionPLTable').querySelectorAll('.session-uchi-open').forEach(btn=>{
+   btn.onclick=async()=>{
+     const data=(await all()).find(x=>x.id===btn.dataset.charId);
+     if(!data)return;
+     current=ensureShape(structuredClone(data));
+     renderAll();
+     window.scrollTo(0,0);
+   };
+ });
 }
 function nextKPSessionNo(){
  const used=new Set(appData.kpSessions.map(x=>Number(String(x.no||'').replace(/\D/g,''))).filter(Boolean));
@@ -7799,6 +7856,130 @@ async function renderReport(){
 }
 
 
+
+function normalizeSessionDuplicateText(value){
+ return String(value??'')
+   .normalize('NFKC')
+   .trim()
+   .replace(/\s+/g,' ')
+   .toLowerCase();
+}
+function normalizeSessionDuplicateUrl(value){
+ const raw=String(value??'').trim();
+ if(!raw)return '';
+ try{
+   const u=new URL(raw);
+   u.hash='';
+   if(u.pathname.length>1)u.pathname=u.pathname.replace(/\/+$/,'');
+   return u.toString().replace(/\/$/,'').toLowerCase();
+ }catch(_){
+   return normalizeSessionDuplicateText(raw).replace(/\/+$/,'');
+ }
+}
+function sessionPLDuplicateKey(row){
+ return [
+   String(row.edition||'6'),
+   normalizeSessionDuplicateText(row.uchi),
+   String(row.date||''),
+   normalizeSessionDuplicateText(row.title),
+   normalizeSessionDuplicateUrl(row.url),
+   normalizeSessionDuplicateText(row.yoso)
+ ].join('\u241f');
+}
+function sessionKPDuplicateKey(row){
+ return [
+   String(row.edition||'6'),
+   String(row.date||''),
+   normalizeSessionDuplicateText(row.title),
+   normalizeSessionDuplicateText(row.yoso)
+ ].join('\u241f');
+}
+async function deleteDuplicateSessionRecords(){
+ if(PUBLIC_VIEWER_ONLY)return;
+
+ if(activeSessionTab==='kp'){
+   const seen=new Set();
+   const keep=[];
+   const duplicateIds=[];
+
+   for(const rec of appData.kpSessions||[]){
+     const key=sessionKPDuplicateKey(rec);
+     if(seen.has(key))duplicateIds.push(rec.id);
+     else{
+       seen.add(key);
+       keep.push(rec);
+     }
+   }
+
+   if(!duplicateIds.length){
+     alert('KP SESSIONに重複はありません。');
+     return;
+   }
+   if(!confirm(`KP SESSIONの重複 ${duplicateIds.length}件 を削除しますか？\n版・日付・シナリオ名・yosoが同じ記録を重複として判定します。`))return;
+
+   appData.kpSessions=keep;
+   duplicateIds.forEach(id=>editingKPSessionIds.delete(id));
+   saveAppData();
+   await renderSessionHub();
+   await renderReport();
+   return;
+ }
+
+ const rows=await collectPLSessions();
+ const seen=new Set();
+ const duplicates=[];
+
+ for(const row of rows){
+   const key=sessionPLDuplicateKey(row);
+   if(seen.has(key))duplicates.push(row);
+   else seen.add(key);
+ }
+
+ if(!duplicates.length){
+   alert('PL SESSIONに重複はありません。');
+   return;
+ }
+ if(!confirm(`PL SESSIONの重複 ${duplicates.length}件 を削除しますか？\n版・uchi・日付・シナリオ名・リンク・yosoが同じ記録を重複として判定します。\n探索者の「通過シナリオ」にある重複も削除されます。`))return;
+
+ const chars=(await all()).map(ensureShape);
+ const scenarioIdsByChar=new Map();
+ const extraIds=new Set();
+
+ for(const row of duplicates){
+   if(row.source==='character'&&row.charId&&row.scenarioId){
+     if(!scenarioIdsByChar.has(row.charId))scenarioIdsByChar.set(row.charId,new Set());
+     scenarioIdsByChar.get(row.charId).add(row.scenarioId);
+   }else if(row.source==='extra'){
+     const id=String(row.reportKey||'').replace(/^extra:/,'');
+     if(id)extraIds.add(id);
+   }
+ }
+
+ for(const ch of chars){
+   const ids=scenarioIdsByChar.get(ch.id);
+   if(!ids?.size)continue;
+   ch.scenarios=(ch.scenarios||[]).filter(sc=>!ids.has(sc.id));
+   ch.updatedAt=new Date().toISOString();
+   await put(structuredClone(ch));
+ }
+
+ if(extraIds.size){
+   appData.plExtraSessions=(appData.plExtraSessions||[]).filter(x=>!extraIds.has(x.id));
+ }
+ saveAppData();
+
+ if(current){
+   const fresh=chars.find(ch=>ch.id===current.id);
+   if(fresh&&scenarioIdsByChar.has(current.id)){
+     current=ensureShape(structuredClone(fresh));
+     renderAll();
+   }
+ }
+
+ await renderSessionHub();
+ await renderReport();
+}
+
 async function deleteAllSessionRecords(){
  if(PUBLIC_VIEWER_ONLY)return;
 
@@ -7956,7 +8137,7 @@ async function renderSessionHub(){
 }
 async function showHubView(kind){
  if(current)syncFormToModel();
- document.body.classList.remove('database-mode','viewer-mode');
+ document.body.classList.remove('database-mode','viewer-mode','choice-mode');
  document.body.classList.add('hub-mode');
 
  // Explicitly hide every other main page so PC LIST / SESSION / REPORT / YOSONOKO never stack.
@@ -7994,7 +8175,7 @@ async function showHubView(kind){
 }
 async function showDatabaseView(){
  if(current){syncFormToModel();$('databaseEditionFilter').value=current.edition;}
- document.body.classList.remove('viewer-mode','hub-mode');
+ document.body.classList.remove('viewer-mode','hub-mode','choice-mode');
  document.body.classList.add('database-mode');
  setTopNav('pc');
  $('editor').classList.add('hidden');
@@ -8776,7 +8957,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.4',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -9839,6 +10020,7 @@ $('sessionFilterResetBtn').onclick=()=>{
  $('sessionSearchInput').value='';
  renderSessionHub();
 };
+$('sessionDeduplicateBtn').onclick=deleteDuplicateSessionRecords;
 $('sessionDeleteAllBtn').onclick=deleteAllSessionRecords;
 $('addKPSessionBtn').onclick=()=>{
  const edition=$('sessionEditionFilter').value||'6';
