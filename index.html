@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v6.8</title>
+<title>CHARACTER DATABASE | Shared Viewer v6.9</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -4686,6 +4686,228 @@ body.public-viewer-only #sessionPlAddBox{
   overflow:visible;
 }
 
+
+/* v6.9 ------------------------------------------------------------ */
+
+.mobile-editor-only,
+.mobile-editor-sync-status{
+  display:none;
+}
+.online-mobile-editor-note{
+  margin:-4px 0 10px;
+  color:#9a5960;
+  font-size:9px;
+  font-weight:700;
+}
+.mobile-editor-url-box{
+  margin-top:7px;
+}
+
+/* Public mobile editor: same six data tabs, but optimized for phones. */
+body.public-mobile-editor{
+  min-width:0!important;
+  background:#eef1f4;
+}
+body.public-mobile-editor .header-utilities,
+body.public-mobile-editor .sidebar,
+body.public-mobile-editor .right-rail,
+body.public-mobile-editor #workspaceTools{
+  display:none!important;
+}
+body.public-mobile-editor .mobile-editor-only{
+  display:flex!important;
+}
+body.public-mobile-editor .mobile-editor-sync-status{
+  display:block;
+  flex:0 0 auto;
+  padding:4px 7px;
+  border:1px solid #ced7de;
+  border-radius:999px;
+  background:#fff;
+  color:#687681;
+  font-size:8px;
+  font-weight:800;
+  white-space:nowrap;
+}
+body.public-mobile-editor .mobile-editor-sync-status[data-state="ok"]{
+  color:#37754e;
+}
+body.public-mobile-editor .mobile-editor-sync-status[data-state="busy"],
+body.public-mobile-editor .mobile-editor-sync-status[data-state="pending"]{
+  color:#856b2e;
+}
+body.public-mobile-editor .mobile-editor-sync-status[data-state="error"]{
+  color:#a33c3c;
+}
+body.public-mobile-editor .app-header{
+  position:sticky!important;
+  top:0;
+  z-index:100;
+  display:grid!important;
+  grid-template-columns:auto 1fr auto!important;
+  align-items:center!important;
+  gap:5px!important;
+  min-height:48px!important;
+  height:auto!important;
+  padding:5px 7px!important;
+}
+body.public-mobile-editor .brand{
+  min-width:0;
+  padding:3px 5px!important;
+}
+body.public-mobile-editor .brand h1{
+  font-size:12px!important;
+  white-space:nowrap;
+}
+body.public-mobile-editor .brand p{
+  display:none!important;
+}
+body.public-mobile-editor .app-nav{
+  min-width:0;
+  overflow-x:auto;
+  justify-content:flex-start!important;
+  scrollbar-width:none;
+}
+body.public-mobile-editor .app-nav::-webkit-scrollbar{
+  display:none;
+}
+body.public-mobile-editor .app-nav-btn{
+  flex:0 0 auto;
+  min-width:76px!important;
+  padding:7px 8px!important;
+  font-size:9px!important;
+}
+body.public-mobile-editor .layout{
+  display:block!important;
+  width:100%!important;
+  min-height:calc(100dvh - 48px);
+}
+body.public-mobile-editor .workspace{
+  width:100%!important;
+  max-width:none!important;
+  padding:8px!important;
+  grid-column:auto!important;
+}
+body.public-mobile-editor .database-screen,
+body.public-mobile-editor .choice-screen,
+body.public-mobile-editor .hub-screen{
+  width:100%!important;
+  max-width:none!important;
+}
+body.public-mobile-editor .database-view-head,
+body.public-mobile-editor .choice-view-head,
+body.public-mobile-editor .hub-view-head{
+  margin-top:2px;
+}
+body.public-mobile-editor #backFromDatabaseBtn{
+  display:none!important;
+}
+body.public-mobile-editor .database-toolbar{
+  flex-wrap:wrap;
+}
+body.public-mobile-editor .mobile-editor-new-actions{
+  gap:4px;
+}
+body.public-mobile-editor .database-table-wrap,
+body.public-mobile-editor .session-table-wrap,
+body.public-mobile-editor .choice-table-wrap{
+  max-height:none!important;
+  overflow:auto!important;
+}
+body.public-mobile-editor #editor{
+  width:100%!important;
+}
+body.public-mobile-editor #sheetHead{
+  position:static!important;
+  width:auto!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+  margin-bottom:10px!important;
+  border-radius:11px!important;
+  border-top:6px solid var(--cc,#8aa0b6)!important;
+}
+body.public-mobile-editor .profile-shell{
+  grid-template-columns:1fr!important;
+}
+body.public-mobile-editor .profile-left{
+  max-width:260px;
+  margin:0 auto;
+}
+body.public-mobile-editor #mainTabs{
+  position:sticky!important;
+  top:48px!important;
+  z-index:70!important;
+  overflow-x:auto!important;
+  flex-wrap:nowrap!important;
+  background:#eef1f4!important;
+  padding:4px 0!important;
+  scrollbar-width:none;
+}
+body.public-mobile-editor #mainTabs::-webkit-scrollbar{
+  display:none;
+}
+body.public-mobile-editor #mainTabs .tab-btn{
+  flex:0 0 auto!important;
+  white-space:nowrap;
+}
+body.public-mobile-editor .table-wrap{
+  overflow-x:auto;
+}
+body.public-mobile-editor .skill-table{
+  min-width:650px;
+}
+body.public-mobile-editor #tab-scenarios .scenario-table{
+  min-width:720px;
+}
+body.public-mobile-editor .head-actions{
+  position:sticky;
+  bottom:4px;
+  z-index:65;
+  padding:5px;
+  border:1px solid #d7dfe5;
+  border-radius:8px;
+  background:rgba(255,255,255,.96);
+}
+body.public-mobile-editor .link-content{
+  width:100%;
+  min-width:0;
+}
+
+@media(max-width:700px){
+  body.public-mobile-editor .profile-data-grid.v06,
+  body.public-mobile-editor .feature-grid,
+  body.public-mobile-editor .point-summary{
+    grid-template-columns:1fr!important;
+  }
+  body.public-mobile-editor .stats{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  body.public-mobile-editor .derived{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  body.public-mobile-editor .session-filter-bar,
+  body.public-mobile-editor .report-filter-bar,
+  body.public-mobile-editor .yoso-filter-bar{
+    grid-template-columns:1fr 1fr!important;
+  }
+  body.public-mobile-editor .session-pl-add-grid,
+  body.public-mobile-editor .link-editor,
+  body.public-mobile-editor .link-toolbar{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* Mobile editor keeps editing controls visible. */
+body.public-mobile-editor .record-actions,
+body.public-mobile-editor .report-edit-image-btn,
+body.public-mobile-editor .hub-bulk-delete,
+body.public-mobile-editor #sessionDeduplicateBtn,
+body.public-mobile-editor #yosoDeduplicateBtn,
+body.public-mobile-editor #reportNoImageFilterWrap{
+  display:flex!important;
+}
+
 </style>
 </head>
 <body>
@@ -4699,6 +4921,7 @@ body.public-viewer-only #sessionPlAddBox{
     <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSONOKO</button>
     <button type="button" class="app-nav-btn" id="linkViewBtn">LINK</button>
   </nav>
+  <div class="mobile-editor-sync-status" id="mobileEditorSyncStatus">クラウド接続</div>
   <div class="header-actions header-utilities">
     <button class="btn dark" id="backupBtn">バックアップ</button>
     <button class="btn dark" id="restoreBtn">復元</button>
@@ -4978,6 +5201,10 @@ body.public-viewer-only #sessionPlAddBox{
         <button type="button" class="btn" id="backFromDatabaseBtn">← 入力画面へ</button>
       </div>
       <div class="database-toolbar">
+        <div class="mobile-editor-new-actions mobile-editor-only">
+          <button type="button" class="btn small" id="mobileNew6Btn">＋6版</button>
+          <button type="button" class="btn small" id="mobileNew7Btn">＋7版</button>
+        </div>
         <label class="database-edition-field">表示
           <select class="control" id="databaseEditionFilter">
             <option value="6">6版</option><option value="7">7版</option>
@@ -5283,7 +5510,7 @@ body.public-viewer-only #sessionPlAddBox{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v6.8</p>
+    <p class="public-viewer-version">Viewer v6.9</p>
   </div>
 </div>
 
@@ -5341,8 +5568,16 @@ body.public-viewer-only #sessionPlAddBox{
       <button type="button" class="btn small" id="onlineCopyMobileUrlBtn">コピー</button>
     </div>
 
+    <div class="online-sync-url-box mobile-editor-url-box">
+      <div class="online-sync-url-label">スマホ編集URL（本人専用）</div>
+      <input class="control" id="onlineMobileEditorUrl" readonly>
+      <button type="button" class="btn small" id="onlineCopyMobileEditorUrlBtn">コピー</button>
+    </div>
+    <div class="online-mobile-editor-note">このURLを知っている人はデータを編集できます。第三者には送らないでください。</div>
+
     <div class="online-sync-actions">
       <button type="button" class="btn" id="onlineExportConfigBtn">public_config.jsonを書き出す</button>
+      <button type="button" class="btn" id="onlinePullCloudBtn">クラウドから取り込む</button>
       <button type="button" class="btn" id="onlineSaveSettingsBtn">設定を保存</button>
       <button type="button" class="btn primary" id="onlineSyncNowBtn">今すぐ同期</button>
     </div>
@@ -5354,8 +5589,9 @@ const DB_NAME='characterDatabaseV03', STORE='characters', REPORT_PREFIX='__repor
 const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
+const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='6.8';
+const PUBLIC_VIEWER_VERSION='6.9';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -5372,6 +5608,11 @@ function loadAppData(){
  }
 }
 function saveAppData(){
+ if(isMobileEditorMode()){
+   publicRemoteData.appData=structuredClone(appData);
+   scheduleMobileEditorSync();
+   return;
+ }
  localStorage.setItem(APP_DATA_KEY,JSON.stringify(appData));
  schedulePublicSync();
 }
@@ -5413,6 +5654,15 @@ const uid=()=>crypto.randomUUID?.() || String(Date.now())+Math.random().toString
 let db=null, current=null;
 let publicRemoteData=null;
 let publicRemoteMode='';
+let mobileEditorOwnerSecret='';
+let mobileEditorViewerSecret='';
+let mobileEditorPublicConfig=null;
+let mobileEditorSyncTimer=null;
+let mobileEditorSyncRunning=false;
+let mobileEditorSyncAgain=false;
+function isMobileEditorMode(){
+ return PUBLIC_VIEWER_ONLY&&publicRemoteMode==='mobile-editor'&&!!publicRemoteData;
+}
 const selectedCharacterIds=new Set();
 
 function openDB(){
@@ -5450,12 +5700,25 @@ function all(){
  })
 }
 function put(x){
+ if(isMobileEditorMode()){
+   const copy=ensureShape(structuredClone(x));
+   const list=publicRemoteData.characters||(publicRemoteData.characters=[]);
+   const i=list.findIndex(ch=>ch.id===copy.id);
+   if(i>=0)list[i]=copy;else list.push(copy);
+   scheduleMobileEditorSync();
+   return Promise.resolve(copy);
+ }
  return new Promise(res=>{
    const r=store('readwrite').put(x);
    r.onsuccess=()=>{schedulePublicSync();res(x)};
  })
 }
 function remove(id){
+ if(isMobileEditorMode()){
+   publicRemoteData.characters=(publicRemoteData.characters||[]).filter(ch=>ch.id!==id);
+   scheduleMobileEditorSync();
+   return Promise.resolve();
+ }
  return new Promise(res=>{
    const r=store('readwrite').delete(id);
    r.onsuccess=()=>{schedulePublicSync();res()};
@@ -5476,6 +5739,14 @@ function allReportImages(){
  })
 }
 function putReportImage(x){
+ if(isMobileEditorMode()){
+   const list=publicRemoteData.reportImages||(publicRemoteData.reportImages=[]);
+   const copy={id:x.id,data:x.data||'',updatedAt:x.updatedAt||new Date().toISOString()};
+   const i=list.findIndex(img=>img.id===copy.id);
+   if(i>=0)list[i]=copy;else list.push(copy);
+   scheduleMobileEditorSync();
+   return Promise.resolve(copy);
+ }
  const record={
    id:REPORT_PREFIX+x.id,
    _recordType:'reportImage',
@@ -5486,11 +5757,22 @@ function putReportImage(x){
  return new Promise(res=>{const r=store('readwrite').put(record);r.onsuccess=()=>{schedulePublicSync();res(x)}})
 }
 function removeReportImage(id){
+ if(isMobileEditorMode()){
+   publicRemoteData.reportImages=(publicRemoteData.reportImages||[]).filter(img=>img.id!==id);
+   scheduleMobileEditorSync();
+   return Promise.resolve();
+ }
  return new Promise(res=>{const r=store('readwrite').delete(REPORT_PREFIX+id);r.onsuccess=()=>{schedulePublicSync();res()}})
 }
 
 
 function removeMany(ids){
+ if(isMobileEditorMode()){
+   const set=new Set(ids||[]);
+   publicRemoteData.characters=(publicRemoteData.characters||[]).filter(ch=>!set.has(ch.id));
+   scheduleMobileEditorSync();
+   return Promise.resolve();
+ }
  return new Promise((resolve,reject)=>{
    const tx=db.transaction(STORE,'readwrite'),s=tx.objectStore(STORE);
    ids.forEach(id=>s.delete(id));
@@ -5499,6 +5781,11 @@ function removeMany(ids){
  });
 }
 function clearAllCharacters(){
+ if(isMobileEditorMode()){
+   publicRemoteData.characters=[];
+   scheduleMobileEditorSync();
+   return Promise.resolve();
+ }
  return new Promise((resolve,reject)=>{
    const tx=db.transaction(STORE,'readwrite');
    const s=tx.objectStore(STORE);
@@ -5759,6 +6046,7 @@ async function syncPublicDatabase(showResult=true){
      p_payload:payload
    });
    lastOnlineSyncAt=new Date().toISOString();
+   localStorage.setItem(ONLINE_LAST_SEEN_KEY,payload.publishedAt||lastOnlineSyncAt);
    updateOnlineSyncStatus('同期済み');
    if(showResult)setOnlineSyncMessage('公開データを同期しました。以前の共有URLにも最新内容が反映されます。');
    return true;
@@ -5789,6 +6077,15 @@ function reportViewerUrl(cfg=loadOnlineSyncConfig()){
  u.searchParams.set('report',cfg.viewerSecret);
  return u.toString();
 }
+function mobileEditorUrl(cfg=loadOnlineSyncConfig()){
+ const base=normalizeShareBaseUrl(getSavedShareBaseUrl());
+ if(!base||!cfg.ownerSecret||!cfg.viewerSecret)return '';
+ const u=new URL(base);
+ u.searchParams.set('mobileedit',cfg.ownerSecret);
+ u.searchParams.set('view',cfg.viewerSecret);
+ return u.toString();
+}
+
 
 function fillOnlineSyncForm(){
  const cfg=loadOnlineSyncConfig();
@@ -5804,6 +6101,7 @@ function fillOnlineSyncForm(){
  $('onlineShowOwnerSecretBtn').textContent='表示';
  $('onlineShowViewerSecretBtn').textContent='表示';
  $('onlineMobileUrl').value=mobileViewerUrl(cfg);
+ $('onlineMobileEditorUrl').value=mobileEditorUrl(cfg);
  setOnlineSyncMessage('');
 }
 function collectOnlineSyncForm(){
@@ -5828,8 +6126,89 @@ function saveOnlineSyncForm(){
  saveOnlineSyncConfigValue(cfg);
  $('onlineShareBaseUrl').value=base;
  $('onlineMobileUrl').value=mobileViewerUrl(cfg);
+ $('onlineMobileEditorUrl').value=mobileEditorUrl(cfg);
  return cfg;
 }
+
+async function applyCloudPayloadToLocal(payload){
+ await ensureDbReady();
+ const data=normalizePublicPayload(payload);
+ const keepId=current?.id||'';
+
+ await new Promise((resolve,reject)=>{
+   const tx=db.transaction(STORE,'readwrite');
+   const s=tx.objectStore(STORE);
+   const clear=s.clear();
+   clear.onerror=()=>reject(clear.error);
+   clear.onsuccess=()=>{
+     for(const ch of data.characters||[])s.put(ensureShape(structuredClone(ch)));
+     for(const img of data.reportImages||[]){
+       s.put({
+         id:REPORT_PREFIX+img.id,
+         _recordType:'reportImage',
+         reportKey:img.id,
+         data:img.data||'',
+         updatedAt:img.updatedAt||''
+       });
+     }
+   };
+   tx.oncomplete=resolve;
+   tx.onerror=()=>reject(tx.error);
+ });
+
+ appData=structuredClone(data.appData);
+ localStorage.setItem(APP_DATA_KEY,JSON.stringify(appData));
+ localStorage.setItem(ONLINE_LAST_SEEN_KEY,data.publishedAt||new Date().toISOString());
+
+ const list=await all();
+ current=keepId?ensureShape(structuredClone(list.find(x=>x.id===keepId)||list[0]||null)):null;
+ if(current)renderAll();
+ else{
+   $('editor').classList.add('hidden');
+   $('viewer').classList.add('hidden');
+   $('emptyState').classList.remove('hidden');
+   renderList();
+ }
+ return data;
+}
+async function pullCloudDatabase(showConfirm=true){
+ const cfg=loadOnlineSyncConfig();
+ if(!onlineSyncConfigured(cfg)){
+   setOnlineSyncMessage('公開同期の設定が未完了です。',true);
+   return false;
+ }
+ if(showConfirm&&!confirm('クラウドの最新データで、このPCのローカルDATABASEを更新しますか？'))return false;
+ try{
+   setOnlineSyncMessage('クラウドデータを取得しています…');
+   const payload=await loadPublicDatabaseByViewerToken(cfg.viewerSecret);
+   await applyCloudPayloadToLocal(payload);
+   setOnlineSyncMessage('クラウドの最新データを取り込みました。');
+   updateOnlineSyncStatus('同期済み');
+   return true;
+ }catch(err){
+   console.error(err);
+   setOnlineSyncMessage('クラウドからの取り込みに失敗しました：'+(err?.message||err),true);
+   return false;
+ }
+}
+async function checkForNewerCloudData(){
+ if(PUBLIC_VIEWER_ONLY)return;
+ const cfg=loadOnlineSyncConfig();
+ const seen=localStorage.getItem(ONLINE_LAST_SEEN_KEY)||'';
+ if(!seen||!onlineSyncConfigured(cfg))return;
+ try{
+   const payload=await loadPublicDatabaseByViewerToken(cfg.viewerSecret);
+   const remote=String(payload.publishedAt||'');
+   if(remote&&remote>seen){
+     if(confirm('スマホ編集などで更新されたクラウドデータがあります。\nこのPCへ取り込みますか？')){
+       await applyCloudPayloadToLocal(payload);
+     }
+   }
+ }catch(err){
+   console.warn('cloud freshness check failed',err);
+ }
+}
+
 function openOnlineSyncModal(){
  fillOnlineSyncForm();
  $('onlineSyncModal').classList.remove('hidden');
@@ -5889,6 +6268,81 @@ function normalizePublicPayload(payload){
    reportImages:Array.isArray(payload.reportImages)?payload.reportImages:[]
  };
 }
+
+function updateMobileEditorSyncStatus(label,state=''){
+ const el=$('mobileEditorSyncStatus');
+ if(!el)return;
+ el.textContent=label;
+ el.dataset.state=state;
+}
+function mobileEditorPayload(){
+ return {
+   format:'CHARACTER DATABASE PUBLIC',
+   version:1,
+   publishedAt:new Date().toISOString(),
+   characters:(publicRemoteData?.characters||[]).map(ch=>ensureShape(structuredClone(ch))),
+   appData:structuredClone(appData),
+   reportImages:structuredClone(publicRemoteData?.reportImages||[])
+ };
+}
+function scheduleMobileEditorSync(){
+ if(!isMobileEditorMode())return;
+ clearTimeout(mobileEditorSyncTimer);
+ updateMobileEditorSyncStatus('未同期','pending');
+ mobileEditorSyncTimer=setTimeout(()=>syncMobileEditorRemote(false),700);
+}
+async function syncMobileEditorRemote(showError=true){
+ if(!isMobileEditorMode()||!mobileEditorPublicConfig||!mobileEditorOwnerSecret||!mobileEditorViewerSecret)return false;
+ if(mobileEditorSyncRunning){
+   mobileEditorSyncAgain=true;
+   return false;
+ }
+ mobileEditorSyncRunning=true;
+ updateMobileEditorSyncStatus('同期中','busy');
+ try{
+   const payload=mobileEditorPayload();
+   await publicRpc(mobileEditorPublicConfig,'set_public_database',{
+     p_dataset_id:mobileEditorPublicConfig.datasetId,
+     p_owner_secret:mobileEditorOwnerSecret,
+     p_viewer_secret:mobileEditorViewerSecret,
+     p_payload:payload
+   });
+   publicRemoteData=normalizePublicPayload(payload);
+   publicRemoteData.publishedAt=payload.publishedAt;
+   appData=structuredClone(publicRemoteData.appData);
+   updateMobileEditorSyncStatus('同期済み','ok');
+   return true;
+ }catch(err){
+   console.error(err);
+   updateMobileEditorSyncStatus('同期失敗','error');
+   if(showError)alert('スマホ編集の同期に失敗しました。\n'+(err?.message||err));
+   return false;
+ }finally{
+   mobileEditorSyncRunning=false;
+   if(mobileEditorSyncAgain){
+     mobileEditorSyncAgain=false;
+     scheduleMobileEditorSync();
+   }
+ }
+}
+async function startMobileEditor(ownerSecret,viewerSecret){
+ mobileEditorPublicConfig=await fetchPublicConfig();
+ mobileEditorOwnerSecret=String(ownerSecret||'');
+ mobileEditorViewerSecret=String(viewerSecret||'');
+ if(!mobileEditorOwnerSecret||!mobileEditorViewerSecret)throw new Error('スマホ編集URLが不完全です。');
+
+ publicRemoteData=await loadPublicDatabaseByViewerToken(mobileEditorViewerSecret);
+ appData=structuredClone(publicRemoteData.appData);
+ if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
+ if(!Array.isArray(appData.links))appData.links=[];
+
+ publicRemoteMode='mobile-editor';
+ document.body.classList.add('public-mobile-editor');
+ updateMobileEditorSyncStatus('同期済み','ok');
+ await showDatabaseView();
+ document.title='MOBILE EDITOR | CHARACTER DATABASE';
+}
+
 async function loadPublicDatabaseByViewerToken(viewerToken){
  const config=await fetchPublicConfig();
  const result=await publicRpc(config,'get_public_database',{
@@ -6682,9 +7136,80 @@ function normalizeScenarioDate(value){
  if(m)return `${m[1].slice(-4)}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
  return s;
 }
+
+function normalizeYosoNameKey(value){
+ return String(value||'').normalize('NFKC').trim().replace(/\s+/g,' ').toLowerCase();
+}
+function ensureYosoNames(value){
+ const names=Array.isArray(value)?value:scenarioPcNames(value);
+ const existing=new Set((appData.yosoRecords||[]).map(r=>normalizeYosoNameKey(r.name)).filter(Boolean));
+ let changed=false;
+ for(const raw of names){
+   const name=String(raw||'').trim();
+   const key=normalizeYosoNameKey(name);
+   if(!key||existing.has(key))continue;
+   appData.yosoRecords.push({
+     id:uid(),
+     pl:'',
+     kana:'',
+     name,
+     url:'',
+     draft:false,
+     autoAdded:true
+   });
+   existing.add(key);
+   changed=true;
+ }
+ if(changed)saveAppData();
+ return changed;
+}
+async function renameYosoReferences(oldName,newName){
+ const oldKey=normalizeYosoNameKey(oldName);
+ const cleanNew=String(newName||'').trim();
+ const newKey=normalizeYosoNameKey(cleanNew);
+ if(!oldKey||!newKey||oldKey===newKey)return 0;
+
+ let changedCount=0;
+ const chars=(await all()).map(ensureShape);
+ for(const ch of chars){
+   let chChanged=false;
+   for(const sc of ch.scenarios||[]){
+     const names=scenarioPcNames(sc.pcs);
+     const replaced=names.map(n=>normalizeYosoNameKey(n)===oldKey?cleanNew:n);
+     const next=scenarioPcText(replaced);
+     if(next!==sc.pcs){
+       sc.pcs=next;
+       chChanged=true;
+       changedCount++;
+     }
+   }
+   if(chChanged){
+     ch.updatedAt=new Date().toISOString();
+     await put(structuredClone(ch));
+     if(current?.id===ch.id)current=ensureShape(structuredClone(ch));
+   }
+ }
+
+ for(const rec of appData.plExtraSessions||[]){
+   const names=scenarioPcNames(rec.yoso||rec.pcs||'');
+   if(!names.some(n=>normalizeYosoNameKey(n)===oldKey))continue;
+   rec.yoso=scenarioPcText(names.map(n=>normalizeYosoNameKey(n)===oldKey?cleanNew:n));
+   changedCount++;
+ }
+ for(const rec of appData.kpSessions||[]){
+   const names=scenarioPcNames(rec.yoso||'');
+   if(!names.some(n=>normalizeYosoNameKey(n)===oldKey))continue;
+   rec.yoso=scenarioPcText(names.map(n=>normalizeYosoNameKey(n)===oldKey?cleanNew:n));
+   changedCount++;
+ }
+ if(changedCount)saveAppData();
+ return changedCount;
+}
+
 async function persistCurrentScenarioChanges(){
  if(!current)return;
  syncFormToModel();
+ for(const sc of current.scenarios||[])ensureYosoNames(sc.pcs||'');
  current.updatedAt=new Date().toISOString();
  await put(structuredClone(current));
  renderHeader();
@@ -7255,6 +7780,7 @@ function bindYosoSortHeaders(){
 }
 
 const editingYosoIds=new Set();
+const editingYosoOriginalNames=new Map();
 const editingScenarioIds=new Set();
 function sessionFilterValues(){
  return {
@@ -7468,6 +7994,7 @@ async function updatePlSessionRecord(row,values){
    scenario.url=values.url;
    scenario.title=values.title;
    scenario.pcs=values.yoso;
+   ensureYosoNames(scenario.pcs||'');
 
    if(targetChar.id===sourceChar.id){
      sourceChar.scenarios[scenarioIndex]=scenario;
@@ -7527,7 +8054,7 @@ async function deletePlSessionRecord(row){
 }
 
 async function addPlSessionToCharacter(){
- if(PUBLIC_VIEWER_ONLY)return;
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
 
  const date=normalizeScenarioDate($('sessionPlAddDate')?.value||'');
  const title=String($('sessionPlAddTitle')?.value||'').trim();
@@ -7577,6 +8104,7 @@ async function addPlSessionToCharacter(){
 
  ch.scenarios=Array.isArray(ch.scenarios)?ch.scenarios:[];
  ch.scenarios.push(scenario);
+ ensureYosoNames(scenario.pcs||'');
  ch.updatedAt=new Date().toISOString();
  await put(structuredClone(ch));
 
@@ -7783,7 +8311,7 @@ function renderLinks(){
  });
 }
 function addLinkRecord(){
- if(PUBLIC_VIEWER_ONLY)return;
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
  const title=String($('linkTitleInput')?.value||'').trim();
  const url=normalizeLinkUrl($('linkUrlInput')?.value||'');
  if(!url){
@@ -7865,13 +8393,21 @@ function renderYoso(){
      inp.oninput=e=>{rec[e.target.dataset.field]=e.target.value};
    });
    tr.querySelector('.yoso-edit')?.addEventListener('click',()=>{
+     editingYosoOriginalNames.set(rec.id,String(rec.name||''));
      editingYosoIds.add(rec.id);
      renderYoso();
    });
-   tr.querySelector('.yoso-confirm')?.addEventListener('click',()=>{
+   tr.querySelector('.yoso-confirm')?.addEventListener('click',async()=>{
+     const oldName=editingYosoOriginalNames.get(rec.id)||'';
+     const newName=String(rec.name||'').trim();
+     rec.name=newName;
      rec.draft=false;
      editingYosoIds.delete(rec.id);
+     editingYosoOriginalNames.delete(rec.id);
      saveAppData();
+     if(oldName&&newName&&normalizeYosoNameKey(oldName)!==normalizeYosoNameKey(newName)){
+       await renameYosoReferences(oldName,newName);
+     }
      renderYoso();
    });
    tr.querySelector('.yoso-delete')?.addEventListener('click',()=>{
@@ -8272,7 +8808,7 @@ function sessionKPDuplicateKey(row){
  ].join('\u241f');
 }
 async function deleteDuplicateSessionRecords(){
- if(PUBLIC_VIEWER_ONLY)return;
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
 
  if(activeSessionTab==='kp'){
    const seen=new Set();
@@ -8358,7 +8894,7 @@ async function deleteDuplicateSessionRecords(){
 }
 
 async function deleteAllSessionRecords(){
- if(PUBLIC_VIEWER_ONLY)return;
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
 
  if(activeSessionTab==='kp'){
    const count=(appData.kpSessions||[]).length;
@@ -8408,7 +8944,7 @@ async function deleteAllSessionRecords(){
 }
 
 async function deleteAllReportRecords(){
- if(PUBLIC_VIEWER_ONLY)return;
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
 
  const rows=await collectReportRows();
  const images=await allReportImages();
@@ -8459,7 +8995,7 @@ function yosoDuplicateKey(rec){
  ].join('\u241f');
 }
 function deleteDuplicateYosoRecords(){
- if(PUBLIC_VIEWER_ONLY)return;
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
 
  const rows=appData.yosoRecords||[];
  const seen=new Set();
@@ -8489,7 +9025,7 @@ function deleteDuplicateYosoRecords(){
 }
 
 function deleteAllYosoRecords(){
- if(PUBLIC_VIEWER_ONLY)return;
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
 
  const count=(appData.yosoRecords||[]).length;
  if(!count){
@@ -9393,7 +9929,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.8',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -10530,6 +11066,14 @@ $('onlineSyncNowBtn').onclick=async()=>{
  $('onlineMobileUrl').value=mobileViewerUrl(loadOnlineSyncConfig());
 };
 $('onlineExportConfigBtn').onclick=exportPublicConfig;
+
+$('onlinePullCloudBtn').onclick=()=>pullCloudDatabase(true);
+$('onlineCopyMobileEditorUrlBtn').onclick=async()=>{
+ const value=$('onlineMobileEditorUrl').value.trim();
+ if(!value){setOnlineSyncMessage('スマホ編集URLを作るには設定を保存してください。',true);return}
+ const ok=await copyTextPortable(value);
+ setOnlineSyncMessage(ok?'スマホ編集URLをコピーしました。':'コピーできませんでした。',!ok);
+};
 $('onlineCopyMobileUrlBtn').onclick=async()=>{
  const url=$('onlineMobileUrl').value;
  if(!url){setOnlineSyncMessage('GitHub Pages URLを設定してください。',true);return}
@@ -10601,6 +11145,8 @@ document.addEventListener('paste',e=>{
 $('copyChatPaletteBtn').onclick=()=>{if(current)copyPlainText(chatPaletteText(),'チャットパレットをコピーしました')};
 $('copyPieceJsonBtn').onclick=()=>{if(current)copyPlainText(pieceJsonText(),'駒データ(JSON)をコピーしました')};
 $('new6Btn').onclick=()=>makeNewCharacter('6');
+$('mobileNew6Btn').onclick=()=>makeNewCharacter('6');
+$('mobileNew7Btn').onclick=()=>makeNewCharacter('7');
 $('new7Btn').onclick=()=>makeNewCharacter('7');
 $('rollBtn').onclick=rollAll;
 $('editor').onsubmit=saveCurrent;
@@ -10658,9 +11204,16 @@ async function initCharacterDatabase(){
      const queryPc=params.get('pc')||'';
      const queryDatabase=params.get('database')||'';
      const queryReport=params.get('report')||'';
+     const queryMobileEdit=params.get('mobileedit')||'';
+     const queryMobileView=params.get('view')||'';
      const legacyPc=location.hash.startsWith('#pc=')?decodeURIComponent(location.hash.slice(4)):'';
      const legacyDatabase=location.hash.startsWith('#database=')?decodeURIComponent(location.hash.slice('#database='.length)):'';
      const legacyReport=location.hash.startsWith('#report=')?decodeURIComponent(location.hash.slice('#report='.length)):'';
+
+     if(queryMobileEdit&&queryMobileView){
+       await startMobileEditor(queryMobileEdit,queryMobileView);
+       return;
+     }
 
      const characterId=queryPc||legacyPc;
      if(characterId){
@@ -10715,6 +11268,7 @@ async function initCharacterDatabase(){
    db=x;
    renderList();
    updateOnlineSyncStatus();
+   setTimeout(()=>checkForNewerCloudData(),500);
  }).catch(err=>{
    console.error(err);
    alert('データベースを開けませんでした。\nページを一度閉じてから再度開いてください。\n'+(err?.message||err));
