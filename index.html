@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v6.9</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.0</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -4908,6 +4908,90 @@ body.public-mobile-editor #reportNoImageFilterWrap{
   display:flex!important;
 }
 
+
+/* v7.0 ------------------------------------------------------------ */
+
+/* Mobile editor header: two rows so the page itself never widens/shrinks. */
+body.public-mobile-editor .app-header{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-rows:auto auto!important;
+  gap:4px 7px!important;
+  width:100%!important;
+  max-width:100vw!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  padding:6px 8px!important;
+}
+body.public-mobile-editor .brand{
+  grid-column:1;
+  grid-row:1;
+  min-width:0!important;
+  justify-self:start;
+}
+body.public-mobile-editor .mobile-editor-sync-status{
+  grid-column:2;
+  grid-row:1;
+  justify-self:end;
+}
+body.public-mobile-editor .app-nav{
+  grid-column:1 / -1;
+  grid-row:2;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  white-space:nowrap!important;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+body.public-mobile-editor .app-nav::-webkit-scrollbar{display:none}
+body.public-mobile-editor .app-nav-btn{
+  flex:0 0 auto!important;
+  min-width:82px!important;
+  max-width:none!important;
+  padding:8px 10px!important;
+  font-size:10px!important;
+}
+body.public-mobile-editor .layout,
+body.public-mobile-editor .workspace{
+  min-width:0!important;
+  max-width:100vw!important;
+  overflow-x:hidden!important;
+}
+body.public-mobile-editor .database-table-wrap,
+body.public-mobile-editor .session-table-wrap,
+body.public-mobile-editor .choice-table-wrap,
+body.public-mobile-editor .table-wrap{
+  max-width:100%!important;
+}
+
+
+.session-yoso-autocomplete{
+  position:relative;
+  width:100%;
+  min-width:0;
+}
+.session-yoso-suggestions{
+  position:absolute;
+  z-index:180;
+  left:0;
+  right:0;
+  top:calc(100% + 3px);
+  max-height:210px;
+  overflow:auto;
+  padding:3px;
+  border:1px solid #cfd9e0;
+  border-radius:7px;
+  background:#fff;
+  box-shadow:0 8px 24px rgba(38,52,62,.16);
+}
+#sessionPLTable tr:has(.session-yoso-suggestions:not(.hidden)) td,
+#sessionKPTable tr:has(.session-yoso-suggestions:not(.hidden)) td{
+  overflow:visible!important;
+}
+
 </style>
 </head>
 <body>
@@ -5299,7 +5383,10 @@ body.public-mobile-editor #reportNoImageFilterWrap{
                 <datalist id="sessionPlUchiOptions"></datalist>
               </label>
               <label>yoso
-                <input class="control" id="sessionPlAddYoso" placeholder="同卓PC名（複数は / 区切り）">
+                <div class="session-yoso-autocomplete">
+                  <input class="control session-yoso-input" id="sessionPlAddYoso" autocomplete="off" placeholder="同卓PC名を入力">
+                  <div class="session-yoso-suggestions hidden" role="listbox"></div>
+                </div>
               </label>
               <button type="button" class="btn primary" id="sessionPlAddBtn">＋ 追加</button>
             </div>
@@ -5510,7 +5597,7 @@ body.public-mobile-editor #reportNoImageFilterWrap{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v6.9</p>
+    <p class="public-viewer-version">Viewer v7.0</p>
   </div>
 </div>
 
@@ -5591,7 +5678,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='6.9';
+const PUBLIC_VIEWER_VERSION='7.0';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7813,6 +7900,102 @@ function sessionLinkCell(url){
    ? `<a class="session-link" href="${esc(url)}" target="_blank" rel="noopener" title="${esc(url)}">🔗</a>`
    : `<span class="session-link disabled" title="リンクなし">—</span>`;
 }
+
+function sessionYosoCandidates(){
+ return (appData.yosoRecords||[])
+   .map(r=>({
+     name:String(r.name||'').trim(),
+     kana:String(r.kana||'').trim(),
+     pl:String(r.pl||'').trim()
+   }))
+   .filter(r=>r.name)
+   .filter((r,i,a)=>a.findIndex(x=>x.name===r.name&&x.kana===r.kana&&x.pl===r.pl)===i)
+   .sort((a,b)=>compareText(a.kana||a.name,b.kana||b.name)||compareText(a.name,b.name));
+}
+function sessionYosoCurrentToken(value){
+ const s=String(value||'');
+ const parts=s.split(/\s*(?:\/|／|,|、|，|\n)\s*/);
+ return String(parts[parts.length-1]||'').trim();
+}
+function sessionYosoInsertName(input,name){
+ const chosen=String(name||'').trim();
+ if(!chosen)return;
+ const raw=String(input.value||'');
+ const parts=raw.split(/\s*(?:\/|／|,|、|，|\n)\s*/).map(x=>x.trim()).filter(Boolean);
+ if(parts.length){
+   const token=sessionYosoCurrentToken(raw);
+   if(token)parts.pop();
+ }
+ if(!parts.includes(chosen))parts.push(chosen);
+ input.value=scenarioPcText(parts);
+ input.dispatchEvent(new Event('input',{bubbles:true}));
+}
+function bindSessionYosoAutocomplete(input){
+ if(!input||input.dataset.yosoAutocompleteBound==='1')return;
+ const host=input.closest('.session-yoso-autocomplete');
+ const list=host?.querySelector('.session-yoso-suggestions');
+ if(!host||!list)return;
+ input.dataset.yosoAutocompleteBound='1';
+
+ let matches=[];
+ let index=-1;
+
+ const render=()=>{
+   const selected=new Set(scenarioPcNames(input.value));
+   const q=sessionYosoCurrentToken(input.value).toLowerCase();
+   matches=sessionYosoCandidates()
+     .filter(r=>!selected.has(r.name))
+     .filter(r=>!q||`${r.name} ${r.kana} ${r.pl}`.toLowerCase().includes(q))
+     .slice(0,10);
+   index=matches.length?0:-1;
+   list.innerHTML=matches.map((r,i)=>`
+     <button type="button" class="scenario-pc-suggestion${i===index?' active':''}" data-index="${i}" role="option">
+       <span class="scenario-pc-suggestion-name">${esc(r.name)}</span>
+       <span class="scenario-pc-suggestion-sub">${esc([r.kana,r.pl?`PL:${r.pl}`:''].filter(Boolean).join(' / '))}</span>
+     </button>`).join('');
+   list.classList.toggle('hidden',!matches.length);
+   list.querySelectorAll('.scenario-pc-suggestion').forEach(btn=>{
+     btn.onmousedown=e=>e.preventDefault();
+     btn.onclick=()=>{
+       const pick=matches[Number(btn.dataset.index)];
+       if(pick){
+         sessionYosoInsertName(input,pick.name);
+         render();
+         input.focus();
+       }
+     };
+   });
+ };
+ const updateActive=()=>{
+   list.querySelectorAll('.scenario-pc-suggestion').forEach((btn,i)=>{
+     const active=i===index;
+     btn.classList.toggle('active',active);
+     if(active)btn.scrollIntoView({block:'nearest'});
+   });
+ };
+
+ input.addEventListener('focus',render);
+ input.addEventListener('input',render);
+ input.addEventListener('blur',()=>setTimeout(()=>list.classList.add('hidden'),120));
+ input.addEventListener('keydown',e=>{
+   if(e.key==='ArrowDown'&&matches.length){
+     e.preventDefault(); index=(index+1)%matches.length; updateActive(); return;
+   }
+   if(e.key==='ArrowUp'&&matches.length){
+     e.preventDefault(); index=(index-1+matches.length)%matches.length; updateActive(); return;
+   }
+   if(e.key==='Escape'){list.classList.add('hidden');return}
+   if(e.key==='Enter'&&matches.length){
+     e.preventDefault();
+     const pick=matches[index>=0?index:0];
+     if(pick){
+       sessionYosoInsertName(input,pick.name);
+       render();
+     }
+   }
+ });
+}
+
 async function collectPLSessions(){
  let chars=(await all()).map(ensureShape);
  if(current){
@@ -7892,7 +8075,10 @@ async function renderSessionPL(){
          <td class="col-link"><input class="session-pl-edit-url" value="${esc(r.url||'')}" placeholder="https://"></td>
          <td class="col-title"><input class="session-pl-edit-title" value="${esc(r.title||'')}" placeholder="シナリオ名"></td>
          <td class="col-uchi"><input class="session-pl-edit-uchi" list="sessionPlUchiOptions" value="${esc(r.uchi||'')}" autocomplete="off"></td>
-         <td class="col-yoso"><input class="session-pl-edit-yoso" value="${esc(r.yoso||'')}" placeholder="同卓PC名"></td>
+         <td class="col-yoso"><div class="session-yoso-autocomplete">
+           <input class="session-pl-edit-yoso session-yoso-input" autocomplete="off" value="${esc(r.yoso||'')}" placeholder="同卓PC名">
+           <div class="session-yoso-suggestions hidden" role="listbox"></div>
+         </div></td>
          <td class="col-action"><div class="record-actions">
            <button type="button" class="record-icon-btn confirm session-pl-confirm" title="確定" aria-label="確定">✓</button>
            <button type="button" class="record-icon-btn danger session-pl-delete" title="削除" aria-label="削除">×</button>
@@ -7916,6 +8102,8 @@ async function renderSessionPL(){
  </table>`:'<div class="database-empty">条件に合うPL記録はありません。</div>';
 
  bindSessionSortHeaders($('sessionPLTable'));
+ $('sessionPLTable').querySelectorAll('.session-yoso-input').forEach(bindSessionYosoAutocomplete);
+ bindSessionYosoAutocomplete($('sessionPlAddYoso'));
 
  $('sessionPLTable').querySelectorAll('.session-uchi-open').forEach(btn=>{
    btn.onclick=async()=>{
@@ -7984,11 +8172,23 @@ async function updatePlSessionRecord(row,values){
    if(scenarioIndex<0)return {ok:false,message:'元の通過シナリオが見つかりません。'};
 
    const targetKey=normalizePcLinkName(values.uchi);
-   const targets=chars.filter(ch=>normalizePcLinkName(ch.name||'')===targetKey);
-   if(!targets.length)return {ok:false,message:'uchiに一致するPCが見つかりません。'};
-   if(targets.length>1)return {ok:false,message:'同じPC名が複数あります。PC名を一意にしてから変更してください。'};
+   const sourceNameKey=normalizePcLinkName(sourceChar.name||'');
+   let targetChar=sourceChar;
 
-   const targetChar=targets[0];
+   // Existing SESSION rows already know their exact PC by charId/scenarioId.
+   // If uchi itself was not changed, duplicate PC names are irrelevant.
+   if(targetKey!==sourceNameKey){
+     const targets=chars.filter(ch=>normalizePcLinkName(ch.name||'')===targetKey);
+     if(!targets.length)return {ok:false,message:'uchiに一致するPCが見つかりません。'};
+     if(targets.length>1){
+       const sameSession=targets.filter(ch=>(ch.scenarios||[]).some(sc=>
+         normalizeScenarioDate(sc.date||'')===normalizeScenarioDate(values.date||'') &&
+         String(sc.title||'').trim()===String(values.title||'').trim()
+       ));
+       if(sameSession.length===1)targetChar=sameSession[0];
+       else return {ok:false,message:'同名PCが複数あります。移動先を判別できません。日時・シナリオ名・uchiの組み合わせを確認してください。'};
+     }else targetChar=targets[0];
+   }
    const scenario={...sourceChar.scenarios[scenarioIndex]};
    scenario.date=values.date;
    scenario.url=values.url;
@@ -8150,7 +8350,10 @@ function renderSessionKP(){
          <td class="col-link"><span class="session-link disabled">—</span></td>
          <td class="col-title"><input data-field="title" value="${esc(r.title||'')}"></td>
          <td class="col-uchi">—</td>
-         <td class="col-yoso"><input data-field="yoso" value="${esc(r.yoso||'')}"></td>
+         <td class="col-yoso"><div class="session-yoso-autocomplete">
+           <input class="session-yoso-input" data-field="yoso" autocomplete="off" value="${esc(r.yoso||'')}" placeholder="同卓PC名">
+           <div class="session-yoso-suggestions hidden" role="listbox"></div>
+         </div></td>
          <td class="col-action"><div class="record-actions">
            <button type="button" class="record-icon-btn confirm kp-confirm" title="確定" aria-label="確定">✓</button>
            <button type="button" class="record-icon-btn danger kp-delete" title="削除" aria-label="削除">×</button>
@@ -8173,6 +8376,7 @@ function renderSessionKP(){
  </table>`:'<div class="database-empty">条件に合うKP記録はありません。</div>';
 
  bindSessionSortHeaders($('sessionKPTable'));
+ $('sessionKPTable').querySelectorAll('.session-yoso-input').forEach(bindSessionYosoAutocomplete);
  $('sessionKPTable').querySelectorAll('tbody tr').forEach(tr=>{
    const rec=appData.kpSessions.find(x=>x.id===tr.dataset.id);
    if(!rec)return;
@@ -8191,6 +8395,8 @@ function renderSessionKP(){
      renderSessionKP();
    });
    tr.querySelector('.kp-confirm')?.addEventListener('click',()=>{
+     rec.yoso=scenarioPcText(scenarioPcNames(rec.yoso||''));
+     ensureYosoNames(rec.yoso||'');
      rec.draft=false;
      rec.edited=true;
      editingKPSessionIds.delete(rec.id);
@@ -9929,7 +10135,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'6.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.0',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
