@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.4.1</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.4.2</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5379,6 +5379,21 @@ body.hub-mode #hubView{
   }
 }
 
+
+/* v7.4.2 ---------------------------------------------------------- */
+/* LOG: open the registered log URL in a new browser tab.
+   Embedded preview/HTML-fetch reader is intentionally removed. */
+.log-reader,
+.log-reader-head,
+.log-reader-actions,
+.log-reader-status,
+.log-reader-frame{
+  display:none!important;
+}
+.log-session-row .log-preview-btn{
+  white-space:nowrap;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -5891,7 +5906,7 @@ body.hub-mode #hubView{
 
         <div class="log-note">
           個別PCの「通過シナリオ」に登録済みのURLを使ってログをまとめます。
-          Google Driveリンクはプレビュー表示し、「HTML読込」で本文取得も試します。
+          「読む」で新しいタブにログを開きます。
         </div>
 
         <div class="log-layout">
@@ -5911,22 +5926,6 @@ body.hub-mode #hubView{
             </div>
 
             <div class="log-session-list" id="logSessionList"></div>
-
-            <div class="log-reader hidden" id="logReader">
-              <div class="log-reader-head">
-                <div>
-                  <strong id="logReaderTitle">LOG</strong>
-                  <div class="log-reader-meta" id="logReaderMeta"></div>
-                </div>
-                <div class="log-reader-actions">
-                  <button type="button" class="btn small" id="logReadHtmlBtn">HTML読込</button>
-                  <button type="button" class="btn small" id="logOpenExternalBtn">元URLを開く</button>
-                  <button type="button" class="btn small" id="logReaderCloseBtn">閉じる</button>
-                </div>
-              </div>
-              <div class="log-reader-status" id="logReaderStatus"></div>
-              <iframe id="logReaderFrame" class="log-reader-frame" sandbox="allow-same-origin allow-popups allow-forms"></iframe>
-            </div>
           </section>
         </div>
       </div>
@@ -6040,7 +6039,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.4.1</p>
+    <p class="public-viewer-version">Viewer v7.4.2</p>
   </div>
 </div>
 
@@ -6121,7 +6120,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.4.1';
+const PUBLIC_VIEWER_VERSION='7.4.2';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9144,7 +9143,6 @@ function renderYoso(){
 
 let logPcRows=[];
 let logSelectedPcId='';
-let logSelectedRecord=null;
 
 function extractGoogleDriveFileId(url){
  const s=String(url||'').trim();
@@ -9218,11 +9216,24 @@ function renderLogPcList(){
  wrap.querySelectorAll('.log-pc-item').forEach(btn=>{
    btn.onclick=()=>{
      logSelectedPcId=btn.dataset.id||'';
-     logSelectedRecord=null;
      renderLogPcList();
      renderLogSelectedPc();
    };
  });
+}
+function logOpenUrl(record){
+ if(!record?.url)return '';
+ // Google Drive's own file page is the most reliable target in a new tab.
+ // It avoids iframe restrictions and lets Drive handle authentication/sharing.
+ return String(record.url||'');
+}
+function openLogInNewTab(record){
+ const url=logOpenUrl(record);
+ if(!url)return;
+ const w=window.open(url,'_blank','noopener');
+ if(!w){
+   alert('新しいタブを開けませんでした。ブラウザのポップアップ設定を確認してください。');
+ }
 }
 function renderLogSelectedPc(){
  const pc=logPcRows.find(p=>p.id===logSelectedPcId);
@@ -9231,7 +9242,6 @@ function renderLogSelectedPc(){
    $('logSelectedPcName').textContent='PCを選択してください';
    $('logSelectedPcSub').textContent='';
    list.innerHTML='';
-   closeLogReader();
    return;
  }
  $('logSelectedPcName').textContent=pc.name;
@@ -9244,62 +9254,14 @@ function renderLogSelectedPc(){
        <strong>${esc(r.title)}</strong>
        <span>${r.driveId?'Google Drive':'URL'}</span>
      </div>
-     <button type="button" class="btn small log-preview-btn" data-index="${i}">読む</button>
+     <button type="button" class="btn small log-preview-btn" data-index="${i}">読む ↗</button>
    </div>
  `).join('');
 
  list.querySelectorAll('.log-preview-btn').forEach(btn=>{
-   btn.onclick=()=>openLogReader(pc.logs[Number(btn.dataset.index)]);
+   btn.onclick=()=>openLogInNewTab(pc.logs[Number(btn.dataset.index)]);
  });
 }
-function openLogReader(record){
- if(!record)return;
- logSelectedRecord=record;
- $('logReader').classList.remove('hidden');
- $('logReaderTitle').textContent=record.title||'LOG';
- $('logReaderMeta').textContent=[record.date,record.pcName,record.driveId?'Google Drive':'URL'].filter(Boolean).join(' / ');
- $('logReaderStatus').textContent=record.driveId
-   ? 'Google Driveプレビューを表示しています。HTML読込で本文取得も試せます。'
-   : 'URLをプレビュー表示しています。';
- const frame=$('logReaderFrame');
- frame.removeAttribute('srcdoc');
- frame.src=record.driveId?googleDrivePreviewUrl(record.url):record.url;
- frame.scrollIntoView({behavior:'smooth',block:'start'});
-}
-function closeLogReader(){
- logSelectedRecord=null;
- const reader=$('logReader');
- if(reader)reader.classList.add('hidden');
- const frame=$('logReaderFrame');
- if(frame){
-   frame.removeAttribute('src');
-   frame.removeAttribute('srcdoc');
- }
-}
-async function tryReadLogHtml(){
- const r=logSelectedRecord;
- if(!r)return;
- const status=$('logReaderStatus');
- status.textContent='HTML本文を取得しています…';
- const target=r.driveId?googleDriveDownloadUrl(r.url):r.url;
- try{
-   const res=await fetch(target,{method:'GET',credentials:'omit',redirect:'follow'});
-   if(!res.ok)throw new Error(`HTTP ${res.status}`);
-   const body=await res.text();
-   if(!body.trim())throw new Error('空の内容でした');
-   const frame=$('logReaderFrame');
-   frame.removeAttribute('src');
-   frame.srcdoc=body;
-   status.textContent=`HTML本文を読み込みました（${body.length.toLocaleString()}文字）。`;
- }catch(err){
-   console.warn('LOG HTML fetch failed',err);
-   status.textContent='ブラウザからHTML本文を直接取得できませんでした。Google Driveプレビューは利用できます。共有設定やCORSの影響が考えられます。';
-   const frame=$('logReaderFrame');
-   frame.removeAttribute('srcdoc');
-   frame.src=r.driveId?googleDrivePreviewUrl(r.url):r.url;
- }
-}
-
 let reportRowCache=new Map();
 
 const collapsedReportYears=new Set();
@@ -10815,7 +10777,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -11845,11 +11807,6 @@ $('sessionEditionFilter').onchange=renderSessionHub;
 $('sessionSearchInput').oninput=renderSessionHub;
 
 $('logPcSearch').oninput=renderLogPcList;
-$('logReaderCloseBtn').onclick=closeLogReader;
-$('logReadHtmlBtn').onclick=tryReadLogHtml;
-$('logOpenExternalBtn').onclick=()=>{
- if(logSelectedRecord?.url)window.open(logSelectedRecord.url,'_blank','noopener');
-};
 
 $('reportLightboxClose').onclick=closeReportLightbox;
 $('reportLightbox').onclick=e=>{if(e.target===$('reportLightbox'))closeReportLightbox()};
