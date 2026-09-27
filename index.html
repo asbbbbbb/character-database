@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.4.3</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.4.4</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5424,6 +5424,83 @@ body.hub-mode #hubView{
   }
 }
 
+
+/* v7.4.4 ---------------------------------------------------------- */
+/* LOG tab placement / share */
+.log-head-actions{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+/* LOG-only public share route */
+body.public-online-log .sidebar,
+body.public-online-log .right-rail,
+body.public-online-log #workspaceTools,
+body.public-online-log #editor,
+body.public-online-log #viewer,
+body.public-online-log #emptyState,
+body.public-online-log #databaseView,
+body.public-online-log #choiceView,
+body.public-online-log .app-nav,
+body.public-online-log .header-utilities{
+  display:none!important;
+}
+body.public-online-log .app-header{
+  position:sticky;
+  top:0;
+  z-index:90;
+}
+body.public-online-log .brand{
+  pointer-events:none;
+}
+body.public-online-log .brand p{
+  display:none;
+}
+body.public-online-log .brand h1{
+  font-size:14px;
+}
+body.public-online-log .layout{
+  display:block!important;
+  width:100%!important;
+  min-height:calc(100vh - 52px);
+}
+body.public-online-log .workspace{
+  width:100%!important;
+  max-width:none!important;
+  padding:12px!important;
+  grid-column:auto!important;
+}
+body.public-online-log #hubView{
+  display:block!important;
+  width:100%!important;
+}
+body.public-online-log #sessionHub,
+body.public-online-log #reportHub,
+body.public-online-log #yosoHub,
+body.public-online-log #linkHub{
+  display:none!important;
+}
+body.public-online-log #logHub{
+  display:block!important;
+}
+body.public-online-log .log-content{
+  width:min(1500px,96%)!important;
+  margin:0 auto!important;
+}
+body.public-online-log #logPageShareBtn{
+  display:none!important;
+}
+@media(max-width:700px){
+  body.public-online-log .workspace{
+    padding:7px!important;
+  }
+  body.public-online-log .log-content{
+    width:100%!important;
+    min-width:0!important;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -5433,10 +5510,10 @@ body.hub-mode #hubView{
     <button type="button" class="app-nav-btn" id="databaseViewBtn">PC LIST</button>
     <button type="button" class="app-nav-btn" id="choiceViewBtn">CHOICE</button>
     <button type="button" class="app-nav-btn" id="sessionViewBtn">SESSION</button>
+    <button type="button" class="app-nav-btn" id="logViewBtn">LOG</button>
     <button type="button" class="app-nav-btn" id="reportViewBtn">REPORT</button>
     <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSONOKO</button>
     <button type="button" class="app-nav-btn" id="linkViewBtn">LINK</button>
-    <button type="button" class="app-nav-btn" id="logViewBtn">LOG</button>
   </nav>
   <div class="mobile-editor-sync-status" id="mobileEditorSyncStatus">クラウド接続</div>
   <div class="header-actions header-utilities">
@@ -5931,7 +6008,10 @@ body.hub-mode #hubView{
             <div class="hub-kicker">CHARACTER DATABASE</div>
             <h2>LOG</h2>
           </div>
-          <div class="log-count" id="logCount">0件</div>
+          <div class="log-head-actions">
+            <div class="log-count" id="logCount">0件</div>
+            <button type="button" class="btn small log-page-share-btn" id="logPageShareBtn">🔗 共有リンク</button>
+          </div>
         </div>
 
         <div class="log-note">
@@ -6069,7 +6149,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.4.3</p>
+    <p class="public-viewer-version">Viewer v7.4.4</p>
   </div>
 </div>
 
@@ -6150,7 +6230,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.4.3';
+const PUBLIC_VIEWER_VERSION='7.4.4';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -6634,6 +6714,13 @@ function reportViewerUrl(cfg=loadOnlineSyncConfig()){
  if(!base||!cfg.viewerSecret)return '';
  const u=new URL(base);
  u.searchParams.set('report',cfg.viewerSecret);
+ return u.toString();
+}
+function logViewerUrl(cfg=loadOnlineSyncConfig()){
+ const base=normalizeShareBaseUrl(getSavedShareBaseUrl());
+ if(!base||!cfg.viewerSecret)return '';
+ const u=new URL(base);
+ u.searchParams.set('log',cfg.viewerSecret);
  return u.toString();
 }
 function mobileEditorUrl(cfg=loadOnlineSyncConfig()){
@@ -10859,7 +10946,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.4',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -11922,6 +12009,20 @@ $('reportPageShareBtn').onclick=async()=>{
  setTimeout(()=>{btn.textContent=original},1500);
 };
 
+$('logPageShareBtn').onclick=async()=>{
+ const cfg=loadOnlineSyncConfig();
+ const url=logViewerUrl(cfg);
+ if(!onlineSyncConfigured(cfg)||!url){
+   alert('公開同期のGitHub Pages URL・Supabase設定を先に保存してください。');
+   return;
+ }
+ const ok=await copyTextPortable(url);
+ const btn=$('logPageShareBtn');
+ const original='🔗 共有リンク';
+ btn.textContent=ok?'✓ コピーしました':'URLをコピーできませんでした';
+ setTimeout(()=>{btn.textContent=original},1500);
+};
+
 $('sessionFilterResetBtn').onclick=()=>{
  $('sessionEditionFilter').value='';
  $('sessionSearchInput').value='';
@@ -12137,11 +12238,13 @@ async function initCharacterDatabase(){
      const queryPc=params.get('pc')||'';
      const queryDatabase=params.get('database')||'';
      const queryReport=params.get('report')||'';
+     const queryLog=params.get('log')||'';
      const queryMobileEdit=params.get('mobileedit')||'';
      const queryMobileView=params.get('view')||'';
      const legacyPc=location.hash.startsWith('#pc=')?decodeURIComponent(location.hash.slice(4)):'';
      const legacyDatabase=location.hash.startsWith('#database=')?decodeURIComponent(location.hash.slice('#database='.length)):'';
      const legacyReport=location.hash.startsWith('#report=')?decodeURIComponent(location.hash.slice('#report='.length)):'';
+     const legacyLog=location.hash.startsWith('#log=')?decodeURIComponent(location.hash.slice('#log='.length)):'';
 
      if(queryMobileEdit&&queryMobileView){
        await startMobileEditor(queryMobileEdit,queryMobileView);
@@ -12171,6 +12274,20 @@ async function initCharacterDatabase(){
        await showHubView('report');
        document.body.classList.remove('public-route-loading');
        document.title='REPORT | CHARACTER DATABASE';
+       return;
+     }
+
+     const logToken=queryLog||legacyLog;
+     if(logToken){
+       publicRemoteData=await loadPublicDatabaseByViewerToken(logToken);
+       appData=structuredClone(publicRemoteData.appData);
+       if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
+       if(!Array.isArray(appData.links))appData.links=[];
+       publicRemoteMode='log';
+       document.body.classList.add('public-online-log');
+       await showHubView('log');
+       document.body.classList.remove('public-route-loading');
+       document.title='LOG | CHARACTER DATABASE';
        return;
      }
 
