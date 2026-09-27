@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.9</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.9.1</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5730,6 +5730,63 @@ body.hub-mode #hubView{
   }
 }
 
+
+/* v7.9.1 ---------------------------------------------------------- */
+
+/* OTHER > ABILITY: stats vertically, values horizontally; no inner scrolling. */
+.ability-distribution-wrap{
+  width:100%;
+  overflow:visible!important;
+}
+.ability-distribution-table.transposed{
+  width:100%!important;
+  min-width:0!important;
+  table-layout:fixed!important;
+}
+.ability-distribution-table.transposed th,
+.ability-distribution-table.transposed td{
+  min-width:0!important;
+  width:auto!important;
+  height:27px!important;
+  padding:3px 2px!important;
+  font-size:9px!important;
+  overflow:hidden;
+  text-overflow:clip;
+}
+.ability-distribution-table.transposed .axis-head,
+.ability-distribution-table.transposed .ability-stat-name{
+  width:54px!important;
+  min-width:54px!important;
+  font-weight:800;
+}
+.ability-distribution-table.transposed .summary-head,
+.ability-distribution-table.transposed .summary-cell{
+  width:44px!important;
+  min-width:44px!important;
+  font-weight:800;
+}
+.ability-distribution-table.transposed .summary-cell{
+  background:#f2f5f7;
+}
+@media(max-width:900px){
+  .ability-distribution-table.transposed th,
+  .ability-distribution-table.transposed td{
+    padding:2px 1px!important;
+    font-size:7px!important;
+    height:24px!important;
+  }
+  .ability-distribution-table.transposed .axis-head,
+  .ability-distribution-table.transposed .ability-stat-name{
+    width:42px!important;
+    min-width:42px!important;
+  }
+  .ability-distribution-table.transposed .summary-head,
+  .ability-distribution-table.transposed .summary-cell{
+    width:34px!important;
+    min-width:34px!important;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -6378,7 +6435,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.9</p>
+    <p class="public-viewer-version">Viewer v7.9.1</p>
   </div>
 </div>
 
@@ -6459,7 +6516,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.9';
+const PUBLIC_VIEWER_VERSION='7.9.1';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9366,36 +9423,39 @@ async function renderAbilityDistribution(){
    }
  }
 
- const rows=[...values].sort((a,b)=>a-b);
+ const valueColumns=[...values].sort((a,b)=>a-b);
  const maxCount=Math.max(0,...STAT_KEYS.flatMap(k=>[...counts[k].values()]));
  if($('abilityPcCount'))$('abilityPcCount').textContent=`${edition}版 / ${chars.length}人`;
 
- if(!rows.length){
+ if(!valueColumns.length){
    wrap.innerHTML='<div class="database-empty">集計できる探索者がいません。</div>';
    return;
  }
 
- const sumCells=STAT_KEYS.map(k=>[...counts[k].values()].reduce((a,b)=>a+b,0));
- const avgCells=STAT_KEYS.map(k=>{
-   if(!chars.length)return '—';
-   const total=[...counts[k].entries()].reduce((a,[v,n])=>a+v*n,0);
-   const avg=total/chars.length;
-   return Number.isInteger(avg)?String(avg):avg.toFixed(1);
- });
+ const rows=STAT_KEYS.map(key=>{
+   const sum=[...counts[key].values()].reduce((a,b)=>a+b,0);
+   const total=[...counts[key].entries()].reduce((a,[v,n])=>a+v*n,0);
+   const avg=sum?total/sum:0;
+   const avgText=sum?(Number.isInteger(avg)?String(avg):avg.toFixed(1)):'—';
+   return `<tr>
+     <th class="ability-stat-name">${key}</th>
+     ${valueColumns.map(v=>{
+       const n=counts[key].get(v)||0;
+       return `<td class="${distributionCellClass(n,maxCount)}">${n||''}</td>`;
+     }).join('')}
+     <td class="summary-cell">${sum}</td>
+     <td class="summary-cell">${avgText}</td>
+   </tr>`;
+ }).join('');
 
- wrap.innerHTML=`<table class="other-stat-table ability-distribution-table">
-   <thead><tr><th class="axis-head">値</th>${STAT_KEYS.map(k=>`<th>${k}</th>`).join('')}</tr></thead>
-   <tbody>
-     ${rows.map(v=>`<tr>
-       <th class="axis-value">${v}</th>
-       ${STAT_KEYS.map(k=>{
-         const n=counts[k].get(v)||0;
-         return `<td class="${distributionCellClass(n,maxCount)}">${n||''}</td>`;
-       }).join('')}
-     </tr>`).join('')}
-     <tr class="summary-row"><th>SUM</th>${sumCells.map(v=>`<td>${v}</td>`).join('')}</tr>
-     <tr class="summary-row"><th>AVE</th>${avgCells.map(v=>`<td>${v}</td>`).join('')}</tr>
-   </tbody>
+ wrap.innerHTML=`<table class="other-stat-table ability-distribution-table transposed">
+   <thead><tr>
+     <th class="axis-head">能力値</th>
+     ${valueColumns.map(v=>`<th class="ability-value-head">${v}</th>`).join('')}
+     <th class="summary-head">SUM</th>
+     <th class="summary-head">AVE</th>
+   </tr></thead>
+   <tbody>${rows}</tbody>
  </table>`;
 }
 function featureCodeParts(value){
@@ -10779,16 +10839,22 @@ function databaseCanonicalSkillNames(edition){
  return names;
 }
 function databaseBaseSkillValue(character,skillName){
- let best=null;
- for(const arr of Object.values(character.skills||{})){
-   for(const sk of arr||[]){
-     if(String(sk?.name||'').trim()!==skillName)continue;
-     if(sk?.custom===true)continue;
-     const total=skillTotal(sk);
-     if(best===null||total>best)best=total;
+ const saved=current;
+ try{
+   current=ensureShape(structuredClone(character));
+   let best=null;
+   for(const arr of Object.values(current.skills||{})){
+     for(const sk of arr||[]){
+       if(String(sk?.name||'').trim()!==skillName)continue;
+       if(sk?.custom===true)continue;
+       const total=skillTotal(sk);
+       if(best===null||total>best)best=total;
+     }
    }
+   return best===null?'':String(best);
+ }finally{
+   current=saved;
  }
- return best===null?'':String(best);
 }
 function setDatabaseValueMode(mode){
  databaseValueMode=mode==='skill'?'skill':'ability';
@@ -11247,7 +11313,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
