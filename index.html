@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.6</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.7</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5252,6 +5252,149 @@ body.hub-mode #hubView{
   }
 }
 
+
+/* v7.7 ------------------------------------------------------------ */
+
+/* CHOICE: one condition = one horizontal row; additional conditions stack below. */
+.choice-condition-row{
+  grid-template-columns:24px minmax(88px,.92fr) minmax(96px,1fr) minmax(82px,.86fr) minmax(66px,.7fr) 28px!important;
+  grid-template-areas:"no type key op value del"!important;
+  gap:5px!important;
+  align-items:center!important;
+}
+.choice-condition-no{grid-area:no!important;align-self:center!important}
+.choice-condition-row .choice-type{grid-area:type!important}
+.choice-condition-row .choice-key,
+.choice-condition-row .choice-key-static{grid-area:key!important;min-width:0!important}
+.choice-condition-row .choice-op{grid-area:op!important}
+.choice-condition-row .choice-value{grid-area:value!important}
+.choice-condition-row .choice-condition-delete{
+  grid-area:del!important;
+  align-self:center!important;
+  justify-self:center!important;
+}
+.choice-condition-row .control,
+.choice-condition-row .choice-key-static{
+  width:100%;
+  min-width:0;
+}
+@media(min-width:1101px){
+  .choice-screen{
+    grid-template-columns:minmax(540px,1.25fr) minmax(0,1.75fr)!important;
+  }
+}
+@media(max-width:1100px){
+  .choice-condition-row{
+    grid-template-columns:24px minmax(100px,.9fr) minmax(120px,1.15fr) minmax(100px,.9fr) minmax(78px,.7fr) 28px!important;
+  }
+}
+@media(max-width:700px){
+  .choice-condition-row{
+    grid-template-columns:20px minmax(62px,.9fr) minmax(68px,1fr) minmax(64px,.9fr) minmax(54px,.72fr) 24px!important;
+  }
+}
+
+/* SESSION / YOSONOKO: add controls sit between filtering and the list. */
+#sessionPlAddBox{
+  margin:8px 0 10px!important;
+}
+.hub-add-between{
+  display:flex;
+  justify-content:flex-start;
+  margin:8px 0 10px;
+}
+
+/* Desktop editor right rail: fit all personal controls without internal scrolling. */
+@media(min-width:1181px){
+  #sheetHead{
+    overflow:hidden!important;
+    padding:7px 8px!important;
+  }
+  #sheetHead .profile-topbar{
+    margin-bottom:4px!important;
+    gap:4px!important;
+  }
+  #sheetHead .head-actions{
+    gap:2px!important;
+  }
+  #sheetHead .head-actions .btn{
+    min-height:25px!important;
+    padding:3px 2px!important;
+    font-size:9px!important;
+  }
+  #sheetHead .profile-left{
+    display:flex!important;
+    justify-content:center!important;
+  }
+  #sheetHead .thumb-box{
+    width:min(100%,190px)!important;
+    height:min(21vh,190px)!important;
+    max-width:190px!important;
+    max-height:190px!important;
+    aspect-ratio:1/1!important;
+    margin:0 auto!important;
+  }
+  #sheetHead .profile-right{
+    margin-top:4px!important;
+    gap:3px!important;
+  }
+  #sheetHead .profile-name-block{
+    margin-top:0!important;
+    padding:2px 5px!important;
+  }
+  #sheetHead .name-title-input{
+    font-size:17px!important;
+  }
+  #sheetHead .reading-title-input{
+    font-size:8px!important;
+  }
+  #sheetHead .profile-right-top,
+  #sheetHead .profile-data-grid.v08{
+    gap:3px!important;
+  }
+  #sheetHead .profile-field{
+    padding:3px 5px!important;
+  }
+  #sheetHead .profile-field>span:first-child{
+    font-size:7px!important;
+    margin-bottom:0!important;
+  }
+  #sheetHead .profile-field input,
+  #sheetHead .profile-field select{
+    min-height:17px!important;
+    font-size:10px!important;
+  }
+  #sheetHead .chat-palette-box.compact{
+    padding:4px!important;
+    margin-top:0!important;
+  }
+  #sheetHead .chat-palette-actions{
+    gap:3px!important;
+  }
+  #sheetHead .chat-palette-actions .btn{
+    min-height:25px!important;
+    padding:3px 2px!important;
+    font-size:8px!important;
+  }
+  #sheetHead .copy-status{
+    min-height:8px!important;
+    margin-top:1px!important;
+    font-size:8px!important;
+  }
+}
+@media(min-width:1181px) and (max-height:800px){
+  #sheetHead .thumb-box{
+    width:min(100%,150px)!important;
+    height:min(18vh,145px)!important;
+  }
+}
+@media(min-width:1181px) and (max-height:680px){
+  #sheetHead .thumb-box{
+    width:min(100%,110px)!important;
+    height:82px!important;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -5280,7 +5423,7 @@ body.hub-mode #hubView{
 <div class="layout">
   <aside class="sidebar">
     <div class="search">
-      <input class="control" id="searchInput" placeholder="名前・職業・シナリオを検索">
+      <input class="control" id="searchInput" placeholder="PC名を検索">
       <div class="filters">
         <select class="control" id="editionFilter"><option value="">6版＋7版</option><option value="6">6版</option><option value="7">7版</option></select>
         <select class="control" id="statusFilter"><option value="">全状態</option><option>新規</option><option>継続</option><option>継続不可</option><option>ロスト</option></select>
@@ -5627,7 +5770,6 @@ body.hub-mode #hubView{
         </div>
         <section class="hub-tab-panel active" id="sessionTabPL">
           <div class="session-note">探索者の「通過シナリオ」を参照して表示します。ここから追加した記録も、uchiで指定したPCの「通過シナリオ」へ反映されます。</div>
-          <div class="session-table-wrap" id="sessionPLTable"></div>
 
           <div class="session-pl-add-box" id="sessionPlAddBox">
             <div class="session-pl-add-title">＋ PL SESSIONを追加</div>
@@ -5655,6 +5797,8 @@ body.hub-mode #hubView{
             </div>
             <div class="session-pl-add-message" id="sessionPlAddMessage"></div>
           </div>
+
+          <div class="session-table-wrap" id="sessionPLTable"></div>
         </section>
         <section class="hub-tab-panel" id="sessionTabKP">
           <div class="session-note">KP記録はExcel取込に加えて、この画面から追加できます。確定後は読み取り表示になり、必要な時だけ「編集」を押します。</div>
@@ -5718,8 +5862,8 @@ body.hub-mode #hubView{
           <button type="button" class="btn small danger hub-bulk-delete" id="yosoDeleteAllBtn">一括削除</button>
           <span class="yoso-filter-count" id="yosoFilterCount"></span>
         </div>
+        <div class="hub-add-between"><button type="button" class="btn primary" id="addYosoBtn">＋ 追加</button></div>
         <div class="session-table-wrap" id="yosoTable"></div>
-        <div class="hub-add-bottom"><button type="button" class="btn primary" id="addYosoBtn">＋ 追加</button></div>
       </div>
 
       <div id="linkHub" class="hub-content link-content hidden">
@@ -5862,7 +6006,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.6</p>
+    <p class="public-viewer-version">Viewer v7.7</p>
   </div>
 </div>
 
@@ -5943,7 +6087,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.6';
+const PUBLIC_VIEWER_VERSION='7.7';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7889,9 +8033,8 @@ async function renderList(){
  if(!db)return; let list=await all();
  const q=$('searchInput').value.trim().toLowerCase(), ed=$('editionFilter').value, st=$('statusFilter').value;
  list=list.filter(x=>{
-   const scen=(x.scenarios||[]).map(s=>`${s.title||''} ${s.pcs||''}`).join(' ');
-   const text=`${x.name||''} ${x.occupation||''} ${scen}`.toLowerCase();
-   return (!q||text.includes(q))&&(!ed||x.edition===ed)&&(!st||x.status===st);
+   const name=String(x.name||'').toLowerCase();
+   return (!q||name.includes(q))&&(!ed||x.edition===ed)&&(!st||x.status===st);
  });
  const sortKey=$('listSortKey')?.value||'no';
  const sortOrder=$('listSortOrder')?.value||'asc';
@@ -10476,7 +10619,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.7',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
