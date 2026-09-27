@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.2</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.4.1</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5076,6 +5076,309 @@ body.public-route-loading::before{
   max-height:min(52vh,360px)!important;
 }
 
+
+/* v7.3 ------------------------------------------------------------ */
+
+/* Hub pages are mutually exclusive with the individual PC editor.
+   This also protects against any asynchronous re-render exposing an active tab panel. */
+body.hub-mode #editor,
+body.hub-mode #sheetHead,
+body.hub-mode #mainTabs,
+body.hub-mode #tab-basic,
+body.hub-mode #tab-equipment,
+body.hub-mode #tab-story,
+body.hub-mode #tab-backstory,
+body.hub-mode #tab-scenarios,
+body.hub-mode #saveNote{
+  display:none!important;
+}
+body.hub-mode #hubView{
+  display:block!important;
+}
+
+
+/* v7.4 ------------------------------------------------------------ */
+/* CHOICE: split into 2 columns on desktop so conditions stay on the left
+   and result list stays on the right. Ratio about 1:3. */
+.choice-screen{
+  display:grid;
+  grid-template-columns:minmax(300px,1fr) minmax(0,3fr);
+  grid-template-areas:
+    "head head"
+    "toolbar toolbar"
+    "conditions results";
+  gap:14px 18px;
+  align-items:start;
+}
+.choice-view-head{
+  grid-area:head;
+  margin-bottom:0!important;
+}
+.choice-toolbar{
+  grid-area:toolbar;
+  margin-bottom:0!important;
+}
+.choice-condition-list{
+  grid-area:conditions;
+  align-self:start;
+  max-height:calc(100vh - 250px);
+  overflow:auto;
+  padding-right:4px;
+}
+.choice-result-wrap{
+  grid-area:results;
+  min-width:0;
+  align-self:start;
+}
+.choice-result-wrap .choice-table-wrap{
+  max-height:calc(100vh - 250px);
+}
+
+/* Make each condition row more compact in the narrower left column. */
+.choice-condition-row{
+  grid-template-columns:28px minmax(0,1fr) 36px;
+  grid-template-areas:
+    "no type del"
+    "no key del"
+    "no op del"
+    "no value del";
+  gap:6px;
+  align-items:center;
+}
+.choice-condition-no{ grid-area:no; align-self:start; }
+.choice-condition-row .choice-type{ grid-area:type; }
+.choice-condition-row .choice-key,
+.choice-condition-row .choice-key-static{ grid-area:key; min-width:0; }
+.choice-condition-row .choice-op{ grid-area:op; }
+.choice-condition-row .choice-value{ grid-area:value; }
+.choice-condition-row .choice-condition-delete{
+  grid-area:del;
+  align-self:start;
+  justify-self:center;
+}
+
+/* tablet and down: stack again */
+@media(max-width:1100px){
+  .choice-screen{
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "head"
+      "toolbar"
+      "conditions"
+      "results";
+  }
+  .choice-condition-list{
+    max-height:none;
+    overflow:visible;
+    padding-right:0;
+  }
+  .choice-result-wrap .choice-table-wrap{
+    max-height:none;
+  }
+}
+/* On phone keep the pre-existing vertical behavior, but allow header width to shrink cleanly. */
+@media(max-width:700px){
+  .choice-screen{
+    gap:10px;
+  }
+}
+
+
+/* v7.4.1 ---------------------------------------------------------- */
+/* Experimental LOG reader: uses existing scenario URLs. */
+.log-content{
+  width:min(92%,1500px)!important;
+  max-width:1500px!important;
+}
+.log-note{
+  margin:-2px 0 10px;
+  color:#73808a;
+  font-size:10px;
+}
+.log-layout{
+  display:grid;
+  grid-template-columns:minmax(210px,1fr) minmax(0,3fr);
+  gap:12px;
+  align-items:start;
+}
+.log-pc-pane,
+.log-main-pane{
+  min-width:0;
+}
+.log-pc-pane{
+  position:sticky;
+  top:92px;
+  max-height:calc(100vh - 115px);
+  overflow:hidden;
+  border:1px solid #d6dee4;
+  border-radius:9px;
+  background:#fff;
+}
+.log-search-box{
+  padding:8px;
+  border-bottom:1px solid #e1e6ea;
+}
+.log-pc-list{
+  max-height:calc(100vh - 175px);
+  overflow:auto;
+  padding:5px;
+}
+.log-pc-item{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:7px;
+  padding:8px 9px;
+  border:0;
+  border-radius:7px;
+  background:transparent;
+  color:#34414c;
+  cursor:pointer;
+  text-align:left;
+}
+.log-pc-item:hover{background:#f1f5f7}
+.log-pc-item.active{
+  background:#e7eef3;
+  color:#1d2a34;
+  font-weight:800;
+}
+.log-pc-name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.log-pc-count{
+  flex:0 0 auto;
+  color:#77838d;
+  font-size:9px;
+}
+.log-main-pane{
+  display:grid;
+  gap:10px;
+}
+.log-selected-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  min-height:42px;
+  padding:8px 10px;
+  border:1px solid #d6dee4;
+  border-radius:9px;
+  background:#fff;
+}
+.log-selected-name{
+  font-size:15px;
+  font-weight:800;
+}
+.log-selected-sub{
+  margin-top:2px;
+  color:#7a8790;
+  font-size:9px;
+}
+.log-session-list{
+  display:grid;
+  gap:5px;
+}
+.log-session-row{
+  display:grid;
+  grid-template-columns:95px minmax(0,1fr) auto;
+  gap:8px;
+  align-items:center;
+  padding:8px 9px;
+  border:1px solid #dbe2e7;
+  border-radius:8px;
+  background:#fff;
+}
+.log-session-date{
+  color:#71808b;
+  font-size:10px;
+}
+.log-session-main{
+  display:grid;
+  gap:2px;
+  min-width:0;
+}
+.log-session-main strong{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:11px;
+}
+.log-session-main span{
+  color:#8b969e;
+  font-size:8px;
+}
+.log-reader{
+  border:1px solid #cfd8df;
+  border-radius:9px;
+  overflow:hidden;
+  background:#fff;
+}
+.log-reader-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  padding:9px 10px;
+  border-bottom:1px solid #e0e5e9;
+  background:#f7f9fa;
+}
+.log-reader-actions{
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.log-reader-meta,
+.log-reader-status{
+  color:#78858f;
+  font-size:9px;
+}
+.log-reader-status{
+  min-height:26px;
+  padding:7px 10px;
+  border-bottom:1px solid #edf0f2;
+}
+.log-reader-frame{
+  display:block;
+  width:100%;
+  min-height:620px;
+  border:0;
+  background:#fff;
+}
+@media(max-width:900px){
+  .log-content{width:100%!important}
+  .log-layout{
+    grid-template-columns:1fr;
+  }
+  .log-pc-pane{
+    position:static;
+    max-height:none;
+  }
+  .log-pc-list{
+    max-height:210px;
+  }
+  .log-reader-frame{
+    min-height:70vh;
+  }
+}
+@media(max-width:600px){
+  .log-session-row{
+    grid-template-columns:1fr auto;
+  }
+  .log-session-date{
+    grid-column:1 / -1;
+  }
+  .log-reader-head{
+    display:grid;
+  }
+  .log-reader-actions{
+    justify-content:flex-start;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -5088,6 +5391,7 @@ body.public-route-loading::before{
     <button type="button" class="app-nav-btn" id="reportViewBtn">REPORT</button>
     <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSONOKO</button>
     <button type="button" class="app-nav-btn" id="linkViewBtn">LINK</button>
+    <button type="button" class="app-nav-btn" id="logViewBtn">LOG</button>
   </nav>
   <div class="mobile-editor-sync-status" id="mobileEditorSyncStatus">クラウド接続</div>
   <div class="header-actions header-utilities">
@@ -5572,7 +5876,59 @@ body.public-route-loading::before{
           <button type="button" class="btn primary" id="linkAddBtn">＋ 追加</button>
         </div>
 
+
         <div class="link-grid" id="linkGrid"></div>
+      </div>
+
+      <div id="logHub" class="hub-content log-content hidden">
+        <div class="hub-view-head log-head">
+          <div>
+            <div class="hub-kicker">CHARACTER DATABASE</div>
+            <h2>LOG</h2>
+          </div>
+          <div class="log-count" id="logCount">0件</div>
+        </div>
+
+        <div class="log-note">
+          個別PCの「通過シナリオ」に登録済みのURLを使ってログをまとめます。
+          Google Driveリンクはプレビュー表示し、「HTML読込」で本文取得も試します。
+        </div>
+
+        <div class="log-layout">
+          <aside class="log-pc-pane">
+            <div class="log-search-box">
+              <input class="control" id="logPcSearch" placeholder="PC名を検索">
+            </div>
+            <div class="log-pc-list" id="logPcList"></div>
+          </aside>
+
+          <section class="log-main-pane">
+            <div class="log-selected-head">
+              <div>
+                <div class="log-selected-name" id="logSelectedPcName">PCを選択してください</div>
+                <div class="log-selected-sub" id="logSelectedPcSub"></div>
+              </div>
+            </div>
+
+            <div class="log-session-list" id="logSessionList"></div>
+
+            <div class="log-reader hidden" id="logReader">
+              <div class="log-reader-head">
+                <div>
+                  <strong id="logReaderTitle">LOG</strong>
+                  <div class="log-reader-meta" id="logReaderMeta"></div>
+                </div>
+                <div class="log-reader-actions">
+                  <button type="button" class="btn small" id="logReadHtmlBtn">HTML読込</button>
+                  <button type="button" class="btn small" id="logOpenExternalBtn">元URLを開く</button>
+                  <button type="button" class="btn small" id="logReaderCloseBtn">閉じる</button>
+                </div>
+              </div>
+              <div class="log-reader-status" id="logReaderStatus"></div>
+              <iframe id="logReaderFrame" class="log-reader-frame" sandbox="allow-same-origin allow-popups allow-forms"></iframe>
+            </div>
+          </section>
+        </div>
       </div>
     </section>
   </main>
@@ -5684,7 +6040,7 @@ body.public-route-loading::before{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.2</p>
+    <p class="public-viewer-version">Viewer v7.4.1</p>
   </div>
 </div>
 
@@ -5765,7 +6121,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.2';
+const PUBLIC_VIEWER_VERSION='7.4.1';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7651,6 +8007,7 @@ function renderBackstory(){
  area.appendChild(grid);
 }
 function renderAll(){
+ $('editor').style.display='';
  document.body.classList.remove('viewer-mode','database-mode','hub-mode','choice-mode');
  setTopNav('');
  $('databaseView').classList.add('hidden');
@@ -7877,9 +8234,10 @@ function setTopNav(active){
  if(active==='report')$('reportViewBtn')?.classList.add('active');
  if(active==='other')$('otherPcViewBtn')?.classList.add('active');
  if(active==='link')$('linkViewBtn')?.classList.add('active');
+ if(active==='log')$('logViewBtn')?.classList.add('active');
 }
 function showHomeWorkspace(){
- document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
+ document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('logHub').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').style.display='';if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
 }
 let activeSessionTab='pl';
 const editingPLSessionKeys=new Set();
@@ -8783,6 +9141,165 @@ function renderYoso(){
  });
 }
 
+
+let logPcRows=[];
+let logSelectedPcId='';
+let logSelectedRecord=null;
+
+function extractGoogleDriveFileId(url){
+ const s=String(url||'').trim();
+ if(!s)return '';
+ try{
+   const u=new URL(s);
+   const m=u.pathname.match(/\/file\/d\/([^/]+)/);
+   if(m)return m[1];
+   const id=u.searchParams.get('id');
+   if(id)return id;
+   const m2=u.pathname.match(/\/d\/([^/]+)/);
+   if(m2)return m2[1];
+ }catch(_){}
+ const raw=s.match(/\/file\/d\/([^/?#]+)/);
+ return raw?raw[1]:'';
+}
+function googleDrivePreviewUrl(url){
+ const id=extractGoogleDriveFileId(url);
+ return id?`https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`:String(url||'');
+}
+function googleDriveDownloadUrl(url){
+ const id=extractGoogleDriveFileId(url);
+ return id?`https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=download&confirm=t`:String(url||'');
+}
+function logScenarioRowsFromCharacters(chars){
+ return chars.map(ch=>{
+   const logs=(ch.scenarios||[])
+     .filter(sc=>String(sc.url||'').trim())
+     .map(sc=>({
+       pcId:ch.id,
+       pcName:ch.name||'名前未設定',
+       pcReading:ch.reading||'',
+       edition:ch.edition||'6',
+       scenarioId:sc.id||'',
+       title:sc.title||'シナリオ名未設定',
+       date:sc.date||'',
+       url:String(sc.url||'').trim(),
+       yoso:scenarioPcText(scenarioPcNames(sc.pcs||'')),
+       driveId:extractGoogleDriveFileId(sc.url||'')
+     }))
+     .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||compareText(a.title,b.title));
+   return {id:ch.id,name:ch.name||'名前未設定',reading:ch.reading||'',edition:ch.edition||'6',logs};
+ }).filter(x=>x.logs.length)
+   .sort((a,b)=>compareText(a.reading||a.name,b.reading||b.name)||compareText(a.name,b.name));
+}
+async function renderLogHub(){
+ const chars=(await all()).map(ensureShape);
+ logPcRows=logScenarioRowsFromCharacters(chars);
+ const total=logPcRows.reduce((n,p)=>n+p.logs.length,0);
+ $('logCount').textContent=`${total}件`;
+
+ if(logSelectedPcId&&!logPcRows.some(p=>p.id===logSelectedPcId))logSelectedPcId='';
+ if(!logSelectedPcId&&logPcRows.length)logSelectedPcId=logPcRows[0].id;
+
+ renderLogPcList();
+ renderLogSelectedPc();
+}
+function renderLogPcList(){
+ const wrap=$('logPcList');
+ if(!wrap)return;
+ const q=String($('logPcSearch')?.value||'').trim().toLowerCase();
+ const rows=logPcRows.filter(p=>!q||`${p.name} ${p.reading}`.toLowerCase().includes(q));
+
+ wrap.innerHTML=rows.length?rows.map(p=>`
+   <button type="button" class="log-pc-item${p.id===logSelectedPcId?' active':''}" data-id="${esc(p.id)}">
+     <span class="log-pc-name">${esc(p.name)}</span>
+     <span class="log-pc-count">${p.logs.length}件</span>
+   </button>
+ `).join(''):'<div class="database-empty">URL付き通過シナリオがありません。</div>';
+
+ wrap.querySelectorAll('.log-pc-item').forEach(btn=>{
+   btn.onclick=()=>{
+     logSelectedPcId=btn.dataset.id||'';
+     logSelectedRecord=null;
+     renderLogPcList();
+     renderLogSelectedPc();
+   };
+ });
+}
+function renderLogSelectedPc(){
+ const pc=logPcRows.find(p=>p.id===logSelectedPcId);
+ const list=$('logSessionList');
+ if(!pc){
+   $('logSelectedPcName').textContent='PCを選択してください';
+   $('logSelectedPcSub').textContent='';
+   list.innerHTML='';
+   closeLogReader();
+   return;
+ }
+ $('logSelectedPcName').textContent=pc.name;
+ $('logSelectedPcSub').textContent=`${pc.edition}版 / ${pc.logs.length}件`;
+
+ list.innerHTML=pc.logs.map((r,i)=>`
+   <div class="log-session-row">
+     <div class="log-session-date">${esc(r.date||'—')}</div>
+     <div class="log-session-main">
+       <strong>${esc(r.title)}</strong>
+       <span>${r.driveId?'Google Drive':'URL'}</span>
+     </div>
+     <button type="button" class="btn small log-preview-btn" data-index="${i}">読む</button>
+   </div>
+ `).join('');
+
+ list.querySelectorAll('.log-preview-btn').forEach(btn=>{
+   btn.onclick=()=>openLogReader(pc.logs[Number(btn.dataset.index)]);
+ });
+}
+function openLogReader(record){
+ if(!record)return;
+ logSelectedRecord=record;
+ $('logReader').classList.remove('hidden');
+ $('logReaderTitle').textContent=record.title||'LOG';
+ $('logReaderMeta').textContent=[record.date,record.pcName,record.driveId?'Google Drive':'URL'].filter(Boolean).join(' / ');
+ $('logReaderStatus').textContent=record.driveId
+   ? 'Google Driveプレビューを表示しています。HTML読込で本文取得も試せます。'
+   : 'URLをプレビュー表示しています。';
+ const frame=$('logReaderFrame');
+ frame.removeAttribute('srcdoc');
+ frame.src=record.driveId?googleDrivePreviewUrl(record.url):record.url;
+ frame.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closeLogReader(){
+ logSelectedRecord=null;
+ const reader=$('logReader');
+ if(reader)reader.classList.add('hidden');
+ const frame=$('logReaderFrame');
+ if(frame){
+   frame.removeAttribute('src');
+   frame.removeAttribute('srcdoc');
+ }
+}
+async function tryReadLogHtml(){
+ const r=logSelectedRecord;
+ if(!r)return;
+ const status=$('logReaderStatus');
+ status.textContent='HTML本文を取得しています…';
+ const target=r.driveId?googleDriveDownloadUrl(r.url):r.url;
+ try{
+   const res=await fetch(target,{method:'GET',credentials:'omit',redirect:'follow'});
+   if(!res.ok)throw new Error(`HTTP ${res.status}`);
+   const body=await res.text();
+   if(!body.trim())throw new Error('空の内容でした');
+   const frame=$('logReaderFrame');
+   frame.removeAttribute('src');
+   frame.srcdoc=body;
+   status.textContent=`HTML本文を読み込みました（${body.length.toLocaleString()}文字）。`;
+ }catch(err){
+   console.warn('LOG HTML fetch failed',err);
+   status.textContent='ブラウザからHTML本文を直接取得できませんでした。Google Driveプレビューは利用できます。共有設定やCORSの影響が考えられます。';
+   const frame=$('logReaderFrame');
+   frame.removeAttribute('srcdoc');
+   frame.src=r.driveId?googleDrivePreviewUrl(r.url):r.url;
+ }
+}
+
 let reportRowCache=new Map();
 
 const collapsedReportYears=new Set();
@@ -9420,6 +9937,7 @@ async function showHubView(kind){
  $('databaseView').style.display='none';
  $('choiceView').classList.add('hidden');
  $('editor').classList.add('hidden');
+ $('editor').style.display='none';
  $('viewer').classList.add('hidden');
  $('emptyState').classList.add('hidden');
  $('hubView').classList.remove('hidden');
@@ -9428,6 +9946,7 @@ async function showHubView(kind){
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
+ $('logHub').classList.add('hidden');
 
  if(kind==='session'){
    setTopNav('session');
@@ -9441,10 +9960,14 @@ async function showHubView(kind){
    setTopNav('other');
    $('yosoHub').classList.remove('hidden');
    renderYoso();
- }else{
+ }else if(kind==='link'){
    setTopNav('link');
    $('linkHub').classList.remove('hidden');
    renderLinks();
+ }else{
+   setTopNav('log');
+   $('logHub').classList.remove('hidden');
+   await renderLogHub();
  }
  window.scrollTo(0,0);
 }
@@ -9462,6 +9985,7 @@ async function showDatabaseView(){
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
+ $('logHub').classList.add('hidden');
  $('databaseView').style.display='';
  $('databaseView').classList.remove('hidden');
  await renderDatabaseView();
@@ -10291,7 +10815,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -11293,6 +11817,7 @@ $('sessionViewBtn').onclick=()=>showHubView('session');
 $('reportViewBtn').onclick=()=>showHubView('report');
 $('otherPcViewBtn').onclick=()=>showHubView('other');
 $('linkViewBtn').onclick=()=>showHubView('link');
+$('logViewBtn').onclick=()=>showHubView('log');
 $('backFromDatabaseBtn').onclick=leaveDatabaseView;
 $('databaseEditionFilter').onchange=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
 $('databaseFilterResetBtn').onclick=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
@@ -11318,6 +11843,14 @@ document.querySelectorAll('.hub-tab').forEach(btn=>btn.onclick=async()=>{
 });
 $('sessionEditionFilter').onchange=renderSessionHub;
 $('sessionSearchInput').oninput=renderSessionHub;
+
+$('logPcSearch').oninput=renderLogPcList;
+$('logReaderCloseBtn').onclick=closeLogReader;
+$('logReadHtmlBtn').onclick=tryReadLogHtml;
+$('logOpenExternalBtn').onclick=()=>{
+ if(logSelectedRecord?.url)window.open(logSelectedRecord.url,'_blank','noopener');
+};
+
 $('reportLightboxClose').onclick=closeReportLightbox;
 $('reportLightbox').onclick=e=>{if(e.target===$('reportLightbox'))closeReportLightbox()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('reportLightbox').classList.contains('hidden'))closeReportLightbox()});
