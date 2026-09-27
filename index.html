@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.7</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.7.1</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5256,41 +5256,65 @@ body.hub-mode #hubView{
 /* v7.7 ------------------------------------------------------------ */
 
 /* CHOICE: one condition = one horizontal row; additional conditions stack below. */
-.choice-condition-row{
-  grid-template-columns:24px minmax(88px,.92fr) minmax(96px,1fr) minmax(82px,.86fr) minmax(66px,.7fr) 28px!important;
-  grid-template-areas:"no type key op value del"!important;
-  gap:5px!important;
+#choiceConditionList .choice-condition-row{
+  display:grid!important;
+  grid-template-columns:24px minmax(110px,.95fr) minmax(130px,1.1fr) minmax(100px,.9fr) 92px 28px!important;
+  grid-template-areas:none!important;
+  gap:6px!important;
   align-items:center!important;
 }
-.choice-condition-no{grid-area:no!important;align-self:center!important}
-.choice-condition-row .choice-type{grid-area:type!important}
-.choice-condition-row .choice-key,
-.choice-condition-row .choice-key-static{grid-area:key!important;min-width:0!important}
-.choice-condition-row .choice-op{grid-area:op!important}
-.choice-condition-row .choice-value{grid-area:value!important}
-.choice-condition-row .choice-condition-delete{
-  grid-area:del!important;
+#choiceConditionList .choice-condition-no{
+  grid-column:1!important;
+  grid-row:1!important;
   align-self:center!important;
   justify-self:center!important;
 }
-.choice-condition-row .control,
-.choice-condition-row .choice-key-static{
-  width:100%;
-  min-width:0;
+#choiceConditionList .choice-type{grid-column:2!important;grid-row:1!important}
+#choiceConditionList .choice-key,
+#choiceConditionList .choice-key-static{grid-column:3!important;grid-row:1!important;min-width:0!important}
+#choiceConditionList .choice-op{grid-column:4!important;grid-row:1!important}
+#choiceConditionList .choice-value{grid-column:5!important;grid-row:1!important}
+#choiceConditionList .choice-condition-delete{
+  grid-column:6!important;
+  grid-row:1!important;
+  align-self:center!important;
+  justify-self:center!important;
+}
+#choiceConditionList .choice-condition-row .control,
+#choiceConditionList .choice-condition-row .choice-key-static{
+  width:100%!important;
+  min-width:0!important;
 }
 @media(min-width:1101px){
   .choice-screen{
-    grid-template-columns:minmax(540px,1.25fr) minmax(0,1.75fr)!important;
+    grid-template-columns:minmax(620px,1.32fr) minmax(0,1.68fr)!important;
   }
 }
 @media(max-width:1100px){
-  .choice-condition-row{
-    grid-template-columns:24px minmax(100px,.9fr) minmax(120px,1.15fr) minmax(100px,.9fr) minmax(78px,.7fr) 28px!important;
+  #choiceConditionList .choice-condition-row{
+    grid-template-columns:24px minmax(92px,.92fr) minmax(112px,1fr) minmax(92px,.88fr) 84px 28px!important;
   }
 }
 @media(max-width:700px){
-  .choice-condition-row{
-    grid-template-columns:20px minmax(62px,.9fr) minmax(68px,1fr) minmax(64px,.9fr) minmax(54px,.72fr) 24px!important;
+  #choiceConditionList .choice-condition-row{
+    grid-template-columns:20px minmax(64px,.92fr) minmax(70px,1fr) minmax(66px,.9fr) 58px 24px!important;
+    gap:4px!important;
+    padding:5px!important;
+  }
+  #choiceConditionList .choice-condition-row .control,
+  #choiceConditionList .choice-condition-row .choice-key-static{
+    font-size:9px!important;
+    min-height:30px!important;
+    padding:3px 5px!important;
+  }
+  #choiceConditionList .choice-condition-no{
+    width:20px!important;
+    height:20px!important;
+    font-size:8px!important;
+  }
+  #choiceConditionList .choice-condition-delete{
+    width:24px!important;
+    height:24px!important;
   }
 }
 
@@ -6006,7 +6030,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.7</p>
+    <p class="public-viewer-version">Viewer v7.7.1</p>
   </div>
 </div>
 
@@ -6087,7 +6111,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.7';
+const PUBLIC_VIEWER_VERSION='7.7.1';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -10619,7 +10643,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.7',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.7.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
