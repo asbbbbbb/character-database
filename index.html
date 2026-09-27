@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.8</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.9</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5552,6 +5552,184 @@ body.hub-mode #hubView{
   .birth-calendar thead th{width:86px;min-width:86px}
 }
 
+
+/* v7.9 ------------------------------------------------------------ */
+
+.ability-total-cell{
+  font-weight:800!important;
+  background:#eef3f6!important;
+}
+
+/* PC LIST mode switch */
+.database-toolbar{
+  grid-template-columns:130px auto auto minmax(0,1fr)!important;
+}
+.database-value-mode{
+  display:flex;
+  gap:4px;
+  align-items:end;
+}
+.database-value-mode .btn{
+  min-width:72px;
+}
+.database-value-mode .btn.active{
+  background:#263b4e;
+  border-color:#263b4e;
+  color:#fff;
+  font-weight:800;
+}
+.database-table.db-mode-skill{
+  min-width:2500px;
+}
+.database-table td.db-skill{
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.database-table td.db-ability-total{
+  font-weight:800;
+  background:#eef3f6;
+}
+@media(max-width:820px){
+  .database-toolbar{
+    grid-template-columns:1fr!important;
+  }
+  .database-value-mode{
+    justify-content:flex-start;
+  }
+}
+
+/* OTHER statistics */
+.other-stat-toolbar{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  margin-bottom:8px;
+}
+.other-stat-toolbar label{
+  display:grid;
+  gap:3px;
+  width:120px;
+  color:#6c7882;
+  font-size:9px;
+  font-weight:700;
+}
+.other-stat-count,
+.features-summary{
+  color:#6e7b85;
+  font-size:10px;
+  font-weight:700;
+}
+.ability-distribution-wrap,
+.features-distribution-wrap{
+  width:100%;
+}
+.other-stat-table{
+  border-collapse:collapse;
+  width:auto;
+  min-width:520px;
+  background:#fff;
+  border:1px solid #cfd8df;
+}
+.other-stat-table th,
+.other-stat-table td{
+  min-width:54px;
+  height:28px;
+  padding:4px 7px;
+  border:1px solid #d7dfe5;
+  text-align:center;
+  font-size:10px;
+  font-variant-numeric:tabular-nums;
+}
+.other-stat-table thead th{
+  background:#3d4348;
+  color:#fff;
+  font-weight:800;
+}
+.other-stat-table .axis-head,
+.other-stat-table .axis-value{
+  min-width:42px;
+  background:#4a5055;
+  color:#fff;
+  font-weight:800;
+}
+.other-stat-table .summary-row th,
+.other-stat-table .summary-row td{
+  background:#5b6064;
+  color:#fff;
+  font-weight:800;
+}
+.other-stat-table td.heat-1{background:#edf4f6}
+.other-stat-table td.heat-2{background:#d9eceb}
+.other-stat-table td.heat-3{background:#f3dfd9}
+.other-stat-table td.heat-4{background:#efc2bd}
+.features-note{
+  margin:0 0 8px;
+  color:#72808a;
+  font-size:10px;
+}
+.features-summary{margin-bottom:6px}
+.features-distribution-table{min-width:430px}
+.features-distribution-table th,
+.features-distribution-table td{
+  min-width:64px;
+  height:31px;
+}
+
+/* BIRTH: no inner scroll; fit 12 months across page width */
+.birth-calendar-wrap{
+  width:100%!important;
+  max-height:none!important;
+  overflow:visible!important;
+  border:1px solid #d4dde4!important;
+  border-radius:8px!important;
+  background:#fff!important;
+}
+.birth-calendar{
+  min-width:0!important;
+  width:100%!important;
+  table-layout:fixed!important;
+}
+.birth-calendar thead th{
+  position:static!important;
+  width:auto!important;
+  min-width:0!important;
+  height:28px!important;
+  padding:3px 2px!important;
+  font-size:9px!important;
+}
+.birth-calendar .birth-corner{
+  position:static!important;
+  width:42px!important;
+  min-width:42px!important;
+}
+.birth-calendar tbody .birth-day{
+  position:static!important;
+  width:42px!important;
+  min-width:42px!important;
+  padding:3px!important;
+  font-size:9px!important;
+}
+.birth-calendar td{
+  height:34px!important;
+  padding:2px!important;
+}
+.birth-pc-chip{
+  padding:2px 3px!important;
+  font-size:8px!important;
+  line-height:1.15!important;
+}
+@media(max-width:900px){
+  .birth-calendar thead th,
+  .birth-calendar tbody .birth-day{
+    font-size:7px!important;
+    padding:2px 1px!important;
+  }
+  .birth-pc-chip{
+    font-size:7px!important;
+    padding:1px 2px!important;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -5851,11 +6029,15 @@ body.hub-mode #hubView{
           <button type="button" class="btn small" id="mobileNew6Btn">＋6版</button>
           <button type="button" class="btn small" id="mobileNew7Btn">＋7版</button>
         </div>
-        <label class="database-edition-field">表示
+        <label class="database-edition-field">版
           <select class="control" id="databaseEditionFilter">
             <option value="6">6版</option><option value="7">7版</option>
           </select>
         </label>
+        <div class="database-value-mode" id="databaseValueMode" aria-label="表示項目">
+          <button type="button" class="btn small active" id="databaseAbilityModeBtn">能力値</button>
+          <button type="button" class="btn small" id="databaseSkillModeBtn">技能値</button>
+        </div>
         <button type="button" class="btn small" id="databaseFilterResetBtn">列フィルターを解除</button>
         <span class="database-filter-summary" id="databaseFilterSummary"></span>
       </div>
@@ -6034,11 +6216,26 @@ body.hub-mode #hubView{
         </div>
 
         <nav class="hub-tabs other-subtabs" id="otherSubTabs">
-          <button type="button" class="hub-tab active" id="otherLinkTabBtn" data-other-tab="link">LINK</button>
+          <button type="button" class="hub-tab active" id="otherAbilityTabBtn" data-other-tab="ability">ABILITY</button>
           <button type="button" class="hub-tab" id="otherBirthTabBtn" data-other-tab="birth">BIRTH</button>
+          <button type="button" class="hub-tab" id="otherFeaturesTabBtn" data-other-tab="features">FEATURES</button>
+          <button type="button" class="hub-tab" id="otherLinkTabBtn" data-other-tab="link">LINK</button>
         </nav>
 
-        <section class="other-tab-panel active" id="otherLinkPanel">
+        <section class="other-tab-panel active" id="otherAbilityPanel">
+          <div class="other-stat-toolbar">
+            <label>版
+              <select class="control" id="abilityEditionFilter">
+                <option value="6">6版</option>
+                <option value="7">7版</option>
+              </select>
+            </label>
+            <span class="other-stat-count" id="abilityPcCount"></span>
+          </div>
+          <div class="ability-distribution-wrap" id="abilityDistributionWrap"></div>
+        </section>
+
+        <section class="other-tab-panel hidden" id="otherLinkPanel">
           <div class="other-link-head">
             <div class="link-count" id="linkCount">0件</div>
           </div>
@@ -6063,6 +6260,11 @@ body.hub-mode #hubView{
         <section class="other-tab-panel hidden" id="otherBirthPanel">
           <div class="birth-note">縦軸が日、横軸が月です。PCの誕生日と一致するマスに、PCのカラーコードを背景色として表示します。</div>
           <div class="birth-calendar-wrap" id="birthCalendarWrap"></div>
+        </section>
+
+        <section class="other-tab-panel hidden" id="otherFeaturesPanel">
+          <div class="features-note">6版の特徴表を、横軸1～6・縦軸1～10で集計します。特徴表1・特徴表2の両方を数えます。</div>
+          <div class="features-distribution-wrap" id="featuresDistributionWrap"></div>
         </section>
       </div>
 
@@ -6176,7 +6378,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.8</p>
+    <p class="public-viewer-version">Viewer v7.9</p>
   </div>
 </div>
 
@@ -6257,7 +6459,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.8';
+const PUBLIC_VIEWER_VERSION='7.9';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7513,8 +7715,8 @@ function renderHeader(){
  renderChatTools();
 }
 function abilityColumns(){
- if(current.edition==='6') return ['STR','CON','POW','DEX','APP','SIZ','INT','EDU','HP','MP','IDEA','幸運','知識','DB'];
- return ['STR','CON','POW','DEX','APP','SIZ','INT','EDU','HP','MP','幸運','DB','BLD','MOV'];
+ if(current.edition==='6') return ['STR','CON','POW','DEX','APP','SIZ','INT','EDU','合計','HP','MP','IDEA','幸運','知識','DB'];
+ return ['STR','CON','POW','DEX','APP','SIZ','INT','EDU','合計','HP','MP','幸運','DB','BLD','MOV'];
 }
 function derivedKeyValue(key, base=false){
  const d=derivedFor(base?current.stats:currentStats());
@@ -7531,6 +7733,13 @@ function buildAbilityTable(cols,blockNo){
      const totalMod=num(current.statMods[k])+num(fm[k]);
      mod+=`<td><input type="number" class="mod-input ability-mod" data-stat="${k}" data-auto="${num(fm[k])}" value="${totalMod}" title="${fm[k]?`特徴表による自動補正 ${fm[k]>0?'+':''}${fm[k]}`:'手動補正'}"></td>`;
      now+=`<td class="readonly-cell current-cell" data-now="${k}">${num(current.stats[k])+totalMod}</td>`;
+   }else if(k==='合計'){
+     const baseTotal=STAT_KEYS.reduce((a,key)=>a+num(current.stats[key]),0);
+     const modTotal=STAT_KEYS.reduce((a,key)=>a+num(current.statMods[key])+num(fm[key]),0);
+     const nowTotal=STAT_KEYS.reduce((a,key)=>a+num(currentStats()[key]),0);
+     base+=`<td class="readonly-cell ability-total-cell">${baseTotal}</td>`;
+     mod+=`<td class="readonly-cell ability-total-cell">${modTotal}</td>`;
+     now+=`<td class="readonly-cell current-cell ability-total-cell">${nowTotal}</td>`;
    }else if(current.edition==='7'&&k==='幸運'){
      base+=`<td><input type="number" class="ability-luck" value="${num(current.luck7)}"></td>`;
      mod+=`<td class="readonly-cell">—</td>`;
@@ -7547,7 +7756,7 @@ function renderAbilityTable(){
  const host=$('abilityTables'); if(!host)return;
  const cols=abilityColumns();
  const w=document.querySelector('.workspace')?.clientWidth||1000;
- const groups=w<1000?[cols.slice(0,8),cols.slice(8)]:[cols];
+ const groups=w<1000?[cols.slice(0,9),cols.slice(9)]:[cols];
  host.innerHTML=groups.map((g,i)=>buildAbilityTable(g,i)).join('');
  host.querySelectorAll('.ability-base').forEach(inp=>inp.oninput=e=>{
    current.stats[e.target.dataset.stat]=num(e.target.value);renderAbilityTable();renderPoints();renderSkills();
@@ -8375,7 +8584,7 @@ function showHomeWorkspace(){
  document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').style.display='';if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
 }
 let activeSessionTab='pl';
-let activeOtherTab='link';
+let activeOtherTab='ability';
 const editingPLSessionKeys=new Set();
 const editingKPSessionIds=new Set();
 let viewerSkillSortMode='category';
@@ -9115,6 +9324,111 @@ function linkPreviewHtml(rec){
  return `<div class="link-thumb"><span>NO IMAGE</span></div>`;
 }
 
+
+async function otherSourceCharacters(){
+ const list=(await all()).map(x=>ensureShape(structuredClone(x)));
+ if(current){
+   const copy=ensureShape(structuredClone(current));
+   const i=list.findIndex(x=>x.id===copy.id);
+   if(i>=0)list[i]=copy;else list.push(copy);
+ }
+ return list;
+}
+function distributionCellClass(count,max){
+ if(!count)return '';
+ const ratio=max?count/max:0;
+ if(ratio>=.75)return 'heat-4';
+ if(ratio>=.5)return 'heat-3';
+ if(ratio>=.25)return 'heat-2';
+ return 'heat-1';
+}
+async function renderAbilityDistribution(){
+ const wrap=$('abilityDistributionWrap');
+ if(!wrap)return;
+ const edition=$('abilityEditionFilter')?.value||'6';
+ const chars=(await otherSourceCharacters()).filter(ch=>ch.edition===edition);
+ const counts={};
+ STAT_KEYS.forEach(k=>counts[k]=new Map());
+ const values=new Set();
+
+ for(const ch of chars){
+   const saved=current;
+   try{
+     current=ensureShape(structuredClone(ch));
+     const stats=currentStats();
+     for(const key of STAT_KEYS){
+       const v=num(stats[key]);
+       values.add(v);
+       counts[key].set(v,(counts[key].get(v)||0)+1);
+     }
+   }finally{
+     current=saved;
+   }
+ }
+
+ const rows=[...values].sort((a,b)=>a-b);
+ const maxCount=Math.max(0,...STAT_KEYS.flatMap(k=>[...counts[k].values()]));
+ if($('abilityPcCount'))$('abilityPcCount').textContent=`${edition}版 / ${chars.length}人`;
+
+ if(!rows.length){
+   wrap.innerHTML='<div class="database-empty">集計できる探索者がいません。</div>';
+   return;
+ }
+
+ const sumCells=STAT_KEYS.map(k=>[...counts[k].values()].reduce((a,b)=>a+b,0));
+ const avgCells=STAT_KEYS.map(k=>{
+   if(!chars.length)return '—';
+   const total=[...counts[k].entries()].reduce((a,[v,n])=>a+v*n,0);
+   const avg=total/chars.length;
+   return Number.isInteger(avg)?String(avg):avg.toFixed(1);
+ });
+
+ wrap.innerHTML=`<table class="other-stat-table ability-distribution-table">
+   <thead><tr><th class="axis-head">値</th>${STAT_KEYS.map(k=>`<th>${k}</th>`).join('')}</tr></thead>
+   <tbody>
+     ${rows.map(v=>`<tr>
+       <th class="axis-value">${v}</th>
+       ${STAT_KEYS.map(k=>{
+         const n=counts[k].get(v)||0;
+         return `<td class="${distributionCellClass(n,maxCount)}">${n||''}</td>`;
+       }).join('')}
+     </tr>`).join('')}
+     <tr class="summary-row"><th>SUM</th>${sumCells.map(v=>`<td>${v}</td>`).join('')}</tr>
+     <tr class="summary-row"><th>AVE</th>${avgCells.map(v=>`<td>${v}</td>`).join('')}</tr>
+   </tbody>
+ </table>`;
+}
+function featureCodeParts(value){
+ const m=String(value||'').match(/^\s*([1-6])\s*-\s*(10|[1-9])(?:\s*：|:|$)/);
+ return m?{col:Number(m[1]),row:Number(m[2])}:null;
+}
+async function renderFeaturesDistribution(){
+ const wrap=$('featuresDistributionWrap');
+ if(!wrap)return;
+ const chars=(await otherSourceCharacters()).filter(ch=>ch.edition==='6');
+ const counts=Array.from({length:10},()=>Array(6).fill(0));
+
+ for(const ch of chars){
+   for(const value of [ch.feature1,ch.feature2]){
+     const p=featureCodeParts(value);
+     if(p)counts[p.row-1][p.col-1]++;
+   }
+ }
+
+ const maxCount=Math.max(0,...counts.flat());
+ const total=counts.flat().reduce((a,b)=>a+b,0);
+
+ wrap.innerHTML=`<div class="features-summary">6版 ${chars.length}人 / 特徴登録 ${total}件</div>
+ <table class="other-stat-table features-distribution-table">
+   <thead><tr><th class="axis-head"></th>${[1,2,3,4,5,6].map(n=>`<th>${n}</th>`).join('')}</tr></thead>
+   <tbody>
+     ${counts.map((row,i)=>`<tr>
+       <th class="axis-value">${i+1}</th>
+       ${row.map(n=>`<td class="${distributionCellClass(n,maxCount)}">${n||''}</td>`).join('')}
+     </tr>`).join('')}
+   </tbody>
+ </table>`;
+}
 function parseBirthdayMonthDay(value){
  const raw=String(value||'').normalize('NFKC').trim();
  if(!raw)return null;
@@ -9128,13 +9442,7 @@ function parseBirthdayMonthDay(value){
  return {month,day};
 }
 async function birthSourceCharacters(){
- const list=(await all()).map(x=>ensureShape(structuredClone(x)));
- if(current){
-   const copy=ensureShape(structuredClone(current));
-   const i=list.findIndex(x=>x.id===copy.id);
-   if(i>=0)list[i]=copy;else list.push(copy);
- }
- return list;
+ return otherSourceCharacters();
 }
 async function openBirthCharacter(id){
  const chars=await birthSourceCharacters();
@@ -9189,12 +9497,21 @@ async function renderBirthCalendar(){
  });
 }
 async function renderOtherHub(){
- const birth=activeOtherTab==='birth';
- $('otherLinkPanel')?.classList.toggle('hidden',birth);
- $('otherBirthPanel')?.classList.toggle('hidden',!birth);
- $('otherLinkTabBtn')?.classList.toggle('active',!birth);
- $('otherBirthTabBtn')?.classList.toggle('active',birth);
- if(birth)await renderBirthCalendar();else renderLinks();
+ const ids={
+   ability:['otherAbilityPanel','otherAbilityTabBtn'],
+   birth:['otherBirthPanel','otherBirthTabBtn'],
+   features:['otherFeaturesPanel','otherFeaturesTabBtn'],
+   link:['otherLinkPanel','otherLinkTabBtn']
+ };
+ for(const [tab,[panelId,btnId]] of Object.entries(ids)){
+   const active=activeOtherTab===tab;
+   $(panelId)?.classList.toggle('hidden',!active);
+   $(btnId)?.classList.toggle('active',active);
+ }
+ if(activeOtherTab==='ability')await renderAbilityDistribution();
+ else if(activeOtherTab==='birth')await renderBirthCalendar();
+ else if(activeOtherTab==='features')await renderFeaturesDistribution();
+ else renderLinks();
 }
 
 function renderLinks(){
@@ -10281,6 +10598,7 @@ async function showChoiceView(){
 }
 
 const dbFilterState={filters:{},sortKey:'no',sortDir:'asc'};
+let databaseValueMode='ability';
 let dbFilterContext={columns:[],sourceRows:[],activeKey:''};
 let databaseVisibleRows=[];
 
@@ -10445,6 +10763,43 @@ function mostFrequentScenarioPl(character,lookup){
    .join(' / ');
 }
 
+
+function databaseCanonicalSkillNames(edition){
+ const src=edition==='6'?SKILLS6:SKILLS7;
+ const names=[];
+ const seen=new Set();
+ for(const arr of Object.values(src)){
+   for(const [name] of arr){
+     const n=String(name||'').trim();
+     if(!n||seen.has(n))continue;
+     seen.add(n);
+     names.push(n);
+   }
+ }
+ return names;
+}
+function databaseBaseSkillValue(character,skillName){
+ let best=null;
+ for(const arr of Object.values(character.skills||{})){
+   for(const sk of arr||[]){
+     if(String(sk?.name||'').trim()!==skillName)continue;
+     if(sk?.custom===true)continue;
+     const total=skillTotal(sk);
+     if(best===null||total>best)best=total;
+   }
+ }
+ return best===null?'':String(best);
+}
+function setDatabaseValueMode(mode){
+ databaseValueMode=mode==='skill'?'skill':'ability';
+ $('databaseAbilityModeBtn')?.classList.toggle('active',databaseValueMode==='ability');
+ $('databaseSkillModeBtn')?.classList.toggle('active',databaseValueMode==='skill');
+ dbFilterState.filters={};
+ dbFilterState.sortKey='no';
+ dbFilterState.sortDir='asc';
+ closeDbFilterPopover();
+ renderDatabaseView();
+}
 async function renderDatabaseView(){
  if(!db && !(PUBLIC_VIEWER_ONLY&&publicRemoteData))return;
  let list=(await all()).map(ensureShape);
@@ -10458,17 +10813,24 @@ async function renderDatabaseView(){
  const derivedCols=edition==='6'
    ? [['HP','HP'],['MP','MP'],['IDEA','IDEA'],['幸運','幸運'],['知識','知識'],['DB','DB']]
    : [['HP','HP'],['MP','MP'],['幸運','幸運'],['DB','DB'],['BLD','BLD'],['MOV','MOV']];
+ const skillNames=databaseCanonicalSkillNames(edition);
 
- const columns=[
+ const commonColumns=[
    {key:'no',label:'No.'},{key:'status',label:'状態'},{key:'cc',label:'CC'},{key:'passed',label:'通過'},
-   {key:'name',label:'名前'},{key:'gender',label:'性別'},{key:'age',label:'年齢'},{key:'birthday',label:'誕生日'},
+   {key:'name',label:'名前'}
+ ];
+ const abilityColumns=[
+   {key:'gender',label:'性別'},{key:'age',label:'年齢'},{key:'birthday',label:'誕生日'},
    {key:'height',label:'H'},{key:'weight',label:'W'},{key:'occupation',label:'職業'},
    ...STAT_KEYS.map(k=>({key:k,label:k})),
-   {key:'total',label:'合計'},
+   {key:'total',label:'能力値合計'},
    ...derivedCols.map(([label,key])=>({key:`d_${key}`,label}))
  ];
- if(edition==='6')columns.push({key:'feature1',label:'特徴表1'},{key:'feature2',label:'特徴表2'});
- columns.push({key:'topPl',label:'最多同卓PL'});
+ if(edition==='6')abilityColumns.push({key:'feature1',label:'特徴表1'},{key:'feature2',label:'特徴表2'});
+ abilityColumns.push({key:'topPl',label:'最多同卓PL'});
+
+ const skillColumns=skillNames.map((name,i)=>({key:`sk_${i}`,label:name,skillName:name}));
+ const columns=[...commonColumns,...(databaseValueMode==='skill'?skillColumns:abilityColumns)];
 
  let rows=list.filter(x=>x.edition===edition).map((x,i)=>{
    const c=computedCharacterSnapshot(x),s=c.stats,d=c.derived;
@@ -10483,6 +10845,7 @@ async function renderDatabaseView(){
    };
    STAT_KEYS.forEach(k=>values[k]=String(s[k]??''));
    derivedCols.forEach(([label,key])=>values[`d_${key}`]=String(d[key]??''));
+   skillColumns.forEach(col=>values[col.key]=databaseBaseSkillValue(x,col.skillName));
    return {x,s,d,no,values};
  });
 
@@ -10493,10 +10856,13 @@ async function renderDatabaseView(){
  rows.sort((a,b)=>dbCompare(a,b,dbFilterState.sortKey)*(dbFilterState.sortDir==='desc'?-1:1));
  databaseVisibleRows=[...rows];
 
+ $('databaseAbilityModeBtn')?.classList.toggle('active',databaseValueMode==='ability');
+ $('databaseSkillModeBtn')?.classList.toggle('active',databaseValueMode==='skill');
  $('databaseCount').textContent=`${edition}版 / ${rows.length}人`;
  $('databaseFilterSummary').textContent=Object.keys(dbFilterState.filters).length
    ? `フィルター ${Object.keys(dbFilterState.filters).length}列`
    : '列見出しをクリックして絞り込み';
+
  const wrap=$('databaseTableWrap');
  if(!rows.length){
    wrap.innerHTML='<div class="database-empty">該当する探索者はいません。</div>';
@@ -10510,11 +10876,10 @@ async function renderDatabaseView(){
  }
  function pcListWeight(key,label){
    const len=pcListContentLen(key,label);
-   // Ability values are a visual group, so all STR–EDU columns stay equal.
+   if(key.startsWith('sk_'))return Math.min(6.2,Math.max(4.4,len*.55));
    if(STAT_KEYS.includes(key))return 3.15;
-   // Derived numeric groups also stay compact and close in size.
    if(['total','d_HP','d_MP','d_IDEA','d_幸運','d_知識','d_DB','d_BLD','d_MOV'].includes(key)){
-     if(key==='total')return 4.0;
+     if(key==='total')return 5.0;
      if(key==='d_DB')return 4.0;
      return 3.45;
    }
@@ -10532,35 +10897,42 @@ async function renderDatabaseView(){
    if(key==='feature1'||key==='feature2')return Math.min(13.0,Math.max(8.3,len*.67));
    return Math.min(8.0,Math.max(3.2,len*.56));
  }
+
  const rawWeights=columns.map(c=>pcListWeight(c.key,c.label));
  const totalWeight=rawWeights.reduce((a,b)=>a+b,0);
  const widths=rawWeights.map(w=>w/totalWeight*100);
  const colgroup='<colgroup>'+widths.map(w=>`<col style="width:${w.toFixed(3)}%">`).join('')+'</colgroup>';
 
- const body=rows.map(({x,s,d,no,values})=>{
+ const body=rows.map(({x,values})=>{
    const cc=x.cc||'#8AA0B6';
-   const featureCells=edition==='6'
-     ? `<td class="db-feature" title="${esc(values.feature1)}">${esc(values.feature1)}</td><td class="db-feature" title="${esc(values.feature2)}">${esc(values.feature2)}</td>`
-     : '';
-   return `<tr data-id="${esc(x.id)}">
-     <td class="db-no"><div class="db-no-tools"><button type="button" class="db-no-open">${esc(no)}</button><button type="button" class="db-no-share" title="共有URL">🔗</button></div></td>
+   const common=`<td class="db-no"><div class="db-no-tools"><button type="button" class="db-no-open">${esc(values.no)}</button><button type="button" class="db-no-share" title="共有URL">🔗</button></div></td>
      <td>${esc(values.status)}</td>
      <td class="db-cc" style="background:${esc(cc)};color:${colorTextForBg(cc)}">${esc(values.cc)}</td>
      <td class="db-num">${esc(values.passed)}</td>
-     <td class="db-name" title="${esc(values.name)}">${esc(values.name)}</td>
-     <td>${esc(values.gender)}</td><td class="db-num">${esc(values.age)}</td><td>${esc(values.birthday)}</td>
-     <td class="db-num">${esc(values.height)}</td><td class="db-num">${esc(values.weight)}</td>
-     <td class="db-job" title="${esc(values.occupation)}">${esc(values.occupation)}</td>
-     ${STAT_KEYS.map(k=>`<td class="db-num">${esc(values[k])}</td>`).join('')}
-     <td class="db-num">${esc(values.total)}</td>
-     ${derivedCols.map(([label,key])=>`<td class="db-num">${esc(values[`d_${key}`])}</td>`).join('')}
-     ${featureCells}
-     <td class="db-top-pl" title="${esc(values.topPl)}">${esc(values.topPl)}</td>
-   </tr>`;
+     <td class="db-name" title="${esc(values.name)}">${esc(values.name)}</td>`;
+
+   let detail='';
+   if(databaseValueMode==='skill'){
+     detail=skillColumns.map(col=>`<td class="db-num db-skill">${esc(values[col.key])}</td>`).join('');
+   }else{
+     const featureCells=edition==='6'
+       ? `<td class="db-feature" title="${esc(values.feature1)}">${esc(values.feature1)}</td><td class="db-feature" title="${esc(values.feature2)}">${esc(values.feature2)}</td>`
+       : '';
+     detail=`<td>${esc(values.gender)}</td><td class="db-num">${esc(values.age)}</td><td>${esc(values.birthday)}</td>
+       <td class="db-num">${esc(values.height)}</td><td class="db-num">${esc(values.weight)}</td>
+       <td class="db-job" title="${esc(values.occupation)}">${esc(values.occupation)}</td>
+       ${STAT_KEYS.map(k=>`<td class="db-num">${esc(values[k])}</td>`).join('')}
+       <td class="db-num db-ability-total">${esc(values.total)}</td>
+       ${derivedCols.map(([label,key])=>`<td class="db-num">${esc(values[`d_${key}`])}</td>`).join('')}
+       ${featureCells}
+       <td class="db-top-pl" title="${esc(values.topPl)}">${esc(values.topPl)}</td>`;
+   }
+
+   return `<tr data-id="${esc(x.id)}">${common}${detail}</tr>`;
  }).join('');
 
  const headers=columns.map(c=>`<th>${dbHeader(c.label,c.key)}</th>`).join('');
- wrap.innerHTML=`<table class="database-table db-edition-${edition}">${colgroup}<thead><tr>
+ wrap.innerHTML=`<table class="database-table db-edition-${edition} db-mode-${databaseValueMode}">${colgroup}<thead><tr>
    ${headers}
  </tr></thead><tbody>${body}</tbody></table>`;
 
@@ -10607,6 +10979,7 @@ async function renderDatabaseView(){
    };
  });
 }
+
 function showViewer(){
  syncFormToModel();
  document.body.classList.remove('database-mode','hub-mode');
@@ -10874,7 +11247,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.8',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -11878,6 +12251,8 @@ $('otherPcViewBtn').onclick=()=>showHubView('other');
 $('linkViewBtn').onclick=()=>showHubView('link');
 $('backFromDatabaseBtn').onclick=leaveDatabaseView;
 $('databaseEditionFilter').onchange=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
+$('databaseAbilityModeBtn').onclick=()=>setDatabaseValueMode('ability');
+$('databaseSkillModeBtn').onclick=()=>setDatabaseValueMode('skill');
 $('databaseFilterResetBtn').onclick=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
 
 $('choiceEditionFilter').onchange=renderChoiceResults;
@@ -11958,14 +12333,23 @@ $('addKPSessionBtn').onclick=()=>{
 $('yosoPlFilter').onchange=renderYoso;
 $('yosoSearchInput').oninput=renderYoso;
 
-$('otherLinkTabBtn').onclick=async()=>{
- activeOtherTab='link';
+$('otherAbilityTabBtn').onclick=async()=>{
+ activeOtherTab='ability';
  await renderOtherHub();
 };
 $('otherBirthTabBtn').onclick=async()=>{
  activeOtherTab='birth';
  await renderOtherHub();
 };
+$('otherFeaturesTabBtn').onclick=async()=>{
+ activeOtherTab='features';
+ await renderOtherHub();
+};
+$('otherLinkTabBtn').onclick=async()=>{
+ activeOtherTab='link';
+ await renderOtherHub();
+};
+$('abilityEditionFilter').onchange=renderAbilityDistribution;
 $('linkSearchInput').oninput=renderLinks;
 $('linkSearchResetBtn').onclick=()=>{
  $('linkSearchInput').value='';
