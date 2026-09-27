@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.4.8</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.4.9</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5693,6 +5693,11 @@ body.public-viewer-only #logDriveImport{
   }
 }
 
+
+/* v7.4.9 ---------------------------------------------------------- */
+/* Google Drive PC-name matching ignores half/full-width spaces.
+   Example: "山田太郎" = "山田 太郎" = "山田　太郎". */
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -6373,7 +6378,7 @@ body.public-viewer-only #logDriveImport{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.4.8</p>
+    <p class="public-viewer-version">Viewer v7.4.9</p>
   </div>
 </div>
 
@@ -6457,7 +6462,7 @@ const DRIVE_LOG_FOLDER_KEY='characterDatabaseV0747DriveLogFolderV1';
 const DRIVE_LOG_SCRIPT_URL_KEY='characterDatabaseV0747DriveLogScriptUrlV1';
 const DRIVE_LOG_LAST_SYNC_KEY='characterDatabaseV0748DriveLogLastSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.4.8';
+const PUBLIC_VIEWER_VERSION='7.4.9';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -11023,7 +11028,10 @@ function openDbFilterPopover(button,key){
 }
 
 function normalizePcLinkName(value){
- return String(value??'').normalize('NFKC').trim().replace(/\s+/g,' ').toLowerCase();
+ return String(value??'')
+   .normalize('NFKC')
+   .replace(/[\s\u3000]+/g,'')
+   .toLowerCase();
 }
 function buildYosoPlLookup(){
  const map=new Map();
@@ -11484,7 +11492,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.8',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
