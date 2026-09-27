@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.9.1</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.9.2</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5787,6 +5787,41 @@ body.hub-mode #hubView{
   }
 }
 
+
+/* v7.9.2 ---------------------------------------------------------- */
+
+/* OTHER > TALLY: ABILITY and FEATURES stacked vertically. */
+.tally-section{
+  margin-bottom:14px;
+  padding:12px;
+  border:1px solid #d9e1e7;
+  border-radius:9px;
+  background:#fff;
+}
+.tally-section:last-child{
+  margin-bottom:0;
+}
+.tally-section-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+.tally-section-head h3{
+  margin:0;
+  font-size:14px;
+  letter-spacing:.06em;
+}
+.tally-section .other-stat-toolbar{
+  margin-bottom:0;
+}
+
+/* PC LIST skill mode: No. + Name only before skill columns. */
+.database-table.db-mode-skill .db-name{
+  min-width:150px;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -6273,23 +6308,35 @@ body.hub-mode #hubView{
         </div>
 
         <nav class="hub-tabs other-subtabs" id="otherSubTabs">
-          <button type="button" class="hub-tab active" id="otherAbilityTabBtn" data-other-tab="ability">ABILITY</button>
+          <button type="button" class="hub-tab active" id="otherTallyTabBtn" data-other-tab="tally">TALLY</button>
           <button type="button" class="hub-tab" id="otherBirthTabBtn" data-other-tab="birth">BIRTH</button>
-          <button type="button" class="hub-tab" id="otherFeaturesTabBtn" data-other-tab="features">FEATURES</button>
           <button type="button" class="hub-tab" id="otherLinkTabBtn" data-other-tab="link">LINK</button>
         </nav>
 
-        <section class="other-tab-panel active" id="otherAbilityPanel">
-          <div class="other-stat-toolbar">
-            <label>版
-              <select class="control" id="abilityEditionFilter">
-                <option value="6">6版</option>
-                <option value="7">7版</option>
-              </select>
-            </label>
-            <span class="other-stat-count" id="abilityPcCount"></span>
+        <section class="other-tab-panel active" id="otherTallyPanel">
+          <div class="tally-section">
+            <div class="tally-section-head">
+              <h3>ABILITY</h3>
+              <div class="other-stat-toolbar">
+                <label>版
+                  <select class="control" id="abilityEditionFilter">
+                    <option value="6">6版</option>
+                    <option value="7">7版</option>
+                  </select>
+                </label>
+                <span class="other-stat-count" id="abilityPcCount"></span>
+              </div>
+            </div>
+            <div class="ability-distribution-wrap" id="abilityDistributionWrap"></div>
           </div>
-          <div class="ability-distribution-wrap" id="abilityDistributionWrap"></div>
+
+          <div class="tally-section">
+            <div class="tally-section-head">
+              <h3>FEATURES</h3>
+            </div>
+            <div class="features-note">6版の特徴表を、横軸1～6・縦軸1～10で集計します。特徴表1・特徴表2の両方を数えます。</div>
+            <div class="features-distribution-wrap" id="featuresDistributionWrap"></div>
+          </div>
         </section>
 
         <section class="other-tab-panel hidden" id="otherLinkPanel">
@@ -6319,10 +6366,6 @@ body.hub-mode #hubView{
           <div class="birth-calendar-wrap" id="birthCalendarWrap"></div>
         </section>
 
-        <section class="other-tab-panel hidden" id="otherFeaturesPanel">
-          <div class="features-note">6版の特徴表を、横軸1～6・縦軸1～10で集計します。特徴表1・特徴表2の両方を数えます。</div>
-          <div class="features-distribution-wrap" id="featuresDistributionWrap"></div>
-        </section>
       </div>
 
     </section>
@@ -6435,7 +6478,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.9.1</p>
+    <p class="public-viewer-version">Viewer v7.9.2</p>
   </div>
 </div>
 
@@ -6516,7 +6559,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.9.1';
+const PUBLIC_VIEWER_VERSION='7.9.2';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -8641,7 +8684,7 @@ function showHomeWorkspace(){
  document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').style.display='';if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
 }
 let activeSessionTab='pl';
-let activeOtherTab='ability';
+let activeOtherTab='tally';
 const editingPLSessionKeys=new Set();
 const editingKPSessionIds=new Set();
 let viewerSkillSortMode='category';
@@ -9558,9 +9601,8 @@ async function renderBirthCalendar(){
 }
 async function renderOtherHub(){
  const ids={
-   ability:['otherAbilityPanel','otherAbilityTabBtn'],
+   tally:['otherTallyPanel','otherTallyTabBtn'],
    birth:['otherBirthPanel','otherBirthTabBtn'],
-   features:['otherFeaturesPanel','otherFeaturesTabBtn'],
    link:['otherLinkPanel','otherLinkTabBtn']
  };
  for(const [tab,[panelId,btnId]] of Object.entries(ids)){
@@ -9568,10 +9610,14 @@ async function renderOtherHub(){
    $(panelId)?.classList.toggle('hidden',!active);
    $(btnId)?.classList.toggle('active',active);
  }
- if(activeOtherTab==='ability')await renderAbilityDistribution();
- else if(activeOtherTab==='birth')await renderBirthCalendar();
- else if(activeOtherTab==='features')await renderFeaturesDistribution();
- else renderLinks();
+ if(activeOtherTab==='tally'){
+   await renderAbilityDistribution();
+   await renderFeaturesDistribution();
+ }else if(activeOtherTab==='birth'){
+   await renderBirthCalendar();
+ }else{
+   renderLinks();
+ }
 }
 
 function renderLinks(){
@@ -10881,10 +10927,12 @@ async function renderDatabaseView(){
    : [['HP','HP'],['MP','MP'],['幸運','幸運'],['DB','DB'],['BLD','BLD'],['MOV','MOV']];
  const skillNames=databaseCanonicalSkillNames(edition);
 
- const commonColumns=[
-   {key:'no',label:'No.'},{key:'status',label:'状態'},{key:'cc',label:'CC'},{key:'passed',label:'通過'},
-   {key:'name',label:'名前'}
- ];
+ const commonColumns=databaseValueMode==='skill'
+   ? [{key:'no',label:'No.'},{key:'name',label:'名前'}]
+   : [
+       {key:'no',label:'No.'},{key:'status',label:'状態'},{key:'cc',label:'CC'},{key:'passed',label:'通過'},
+       {key:'name',label:'名前'}
+     ];
  const abilityColumns=[
    {key:'gender',label:'性別'},{key:'age',label:'年齢'},{key:'birthday',label:'誕生日'},
    {key:'height',label:'H'},{key:'weight',label:'W'},{key:'occupation',label:'職業'},
@@ -10971,11 +11019,14 @@ async function renderDatabaseView(){
 
  const body=rows.map(({x,values})=>{
    const cc=x.cc||'#8AA0B6';
-   const common=`<td class="db-no"><div class="db-no-tools"><button type="button" class="db-no-open">${esc(values.no)}</button><button type="button" class="db-no-share" title="共有URL">🔗</button></div></td>
-     <td>${esc(values.status)}</td>
-     <td class="db-cc" style="background:${esc(cc)};color:${colorTextForBg(cc)}">${esc(values.cc)}</td>
-     <td class="db-num">${esc(values.passed)}</td>
-     <td class="db-name" title="${esc(values.name)}">${esc(values.name)}</td>`;
+   const common=databaseValueMode==='skill'
+     ? `<td class="db-no"><div class="db-no-tools"><button type="button" class="db-no-open">${esc(values.no)}</button><button type="button" class="db-no-share" title="共有URL">🔗</button></div></td>
+        <td class="db-name" title="${esc(values.name)}">${esc(values.name)}</td>`
+     : `<td class="db-no"><div class="db-no-tools"><button type="button" class="db-no-open">${esc(values.no)}</button><button type="button" class="db-no-share" title="共有URL">🔗</button></div></td>
+        <td>${esc(values.status)}</td>
+        <td class="db-cc" style="background:${esc(cc)};color:${colorTextForBg(cc)}">${esc(values.cc)}</td>
+        <td class="db-num">${esc(values.passed)}</td>
+        <td class="db-name" title="${esc(values.name)}">${esc(values.name)}</td>`;
 
    let detail='';
    if(databaseValueMode==='skill'){
@@ -11313,7 +11364,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -12399,16 +12450,12 @@ $('addKPSessionBtn').onclick=()=>{
 $('yosoPlFilter').onchange=renderYoso;
 $('yosoSearchInput').oninput=renderYoso;
 
-$('otherAbilityTabBtn').onclick=async()=>{
- activeOtherTab='ability';
+$('otherTallyTabBtn').onclick=async()=>{
+ activeOtherTab='tally';
  await renderOtherHub();
 };
 $('otherBirthTabBtn').onclick=async()=>{
  activeOtherTab='birth';
- await renderOtherHub();
-};
-$('otherFeaturesTabBtn').onclick=async()=>{
- activeOtherTab='features';
  await renderOtherHub();
 };
 $('otherLinkTabBtn').onclick=async()=>{
