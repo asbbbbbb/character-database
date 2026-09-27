@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.4.2</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.4.3</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5394,6 +5394,36 @@ body.hub-mode #hubView{
   white-space:nowrap;
 }
 
+
+/* v7.4.3 ---------------------------------------------------------- */
+.log-pc-name{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.log-pc-edition{
+  flex:0 0 auto;
+  padding:1px 4px;
+  border:1px solid #d3dce2;
+  border-radius:999px;
+  background:#f4f7f9;
+  color:#73808a;
+  font-size:7px;
+  font-weight:800;
+}
+.log-session-actions{
+  display:flex;
+  gap:4px;
+  justify-content:flex-end;
+}
+@media(max-width:600px){
+  .log-session-actions{
+    grid-column:2;
+    grid-row:1 / span 2;
+    align-self:center;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -5906,7 +5936,7 @@ body.hub-mode #hubView{
 
         <div class="log-note">
           個別PCの「通過シナリオ」に登録済みのURLを使ってログをまとめます。
-          「読む」で新しいタブにログを開きます。
+          「読む」はHTML表示用URLを新しいタブで試し、「Drive」は元のGoogle Drive画面を開きます。
         </div>
 
         <div class="log-layout">
@@ -6039,7 +6069,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.4.2</p>
+    <p class="public-viewer-version">Viewer v7.4.3</p>
   </div>
 </div>
 
@@ -6120,7 +6150,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.4.2';
+const PUBLIC_VIEWER_VERSION='7.4.3';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9167,32 +9197,68 @@ function googleDriveDownloadUrl(url){
  const id=extractGoogleDriveFileId(url);
  return id?`https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=download&confirm=t`:String(url||'');
 }
+function googleDriveHtmlViewUrl(url){
+ const id=extractGoogleDriveFileId(url);
+ // Experimental: Google Drive no longer guarantees HTML hosting,
+ // but this is the closest direct-view endpoint and works for some files/accounts.
+ return id?`https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`:String(url||'');
+}
+function scenarioLogUrl(sc){
+ return String(sc?.url||sc?.link||sc?.URL||sc?.href||'').trim();
+}
+function normalizeLogEdition(value){
+ const s=String(value||'').trim();
+ if(s.startsWith('7'))return '7';
+ if(s.startsWith('6'))return '6';
+ return s||'6';
+}
 function logScenarioRowsFromCharacters(chars){
  return chars.map(ch=>{
-   const logs=(ch.scenarios||[])
-     .filter(sc=>String(sc.url||'').trim())
-     .map(sc=>({
+   const scenarios=Array.isArray(ch.scenarios)?ch.scenarios:
+     Array.isArray(ch.scenario)?ch.scenario:[];
+   const logs=scenarios
+     .map(sc=>({sc,url:scenarioLogUrl(sc)}))
+     .filter(x=>x.url)
+     .map(({sc,url})=>({
        pcId:ch.id,
        pcName:ch.name||'名前未設定',
        pcReading:ch.reading||'',
-       edition:ch.edition||'6',
+       edition:normalizeLogEdition(ch.edition),
        scenarioId:sc.id||'',
-       title:sc.title||'シナリオ名未設定',
-       date:sc.date||'',
-       url:String(sc.url||'').trim(),
-       yoso:scenarioPcText(scenarioPcNames(sc.pcs||'')),
-       driveId:extractGoogleDriveFileId(sc.url||'')
+       title:sc.title||sc.name||'シナリオ名未設定',
+       date:sc.date||sc.playDate||'',
+       url,
+       yoso:scenarioPcText(scenarioPcNames(sc.pcs||sc.yoso||'')),
+       driveId:extractGoogleDriveFileId(url)
      }))
      .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||compareText(a.title,b.title));
-   return {id:ch.id,name:ch.name||'名前未設定',reading:ch.reading||'',edition:ch.edition||'6',logs};
+   return {
+     id:ch.id,
+     name:ch.name||'名前未設定',
+     reading:ch.reading||'',
+     edition:normalizeLogEdition(ch.edition),
+     logs
+   };
  }).filter(x=>x.logs.length)
    .sort((a,b)=>compareText(a.reading||a.name,b.reading||b.name)||compareText(a.name,b.name));
 }
+async function logSourceCharacters(){
+ const list=(await all()).map(x=>ensureShape(structuredClone(x)));
+ // Include the currently opened character even before a full page reload.
+ if(current){
+   const copy=ensureShape(structuredClone(current));
+   const i=list.findIndex(x=>x.id===copy.id);
+   if(i>=0)list[i]=copy;else list.push(copy);
+ }
+ return list;
+}
 async function renderLogHub(){
- const chars=(await all()).map(ensureShape);
+ const chars=await logSourceCharacters();
  logPcRows=logScenarioRowsFromCharacters(chars);
  const total=logPcRows.reduce((n,p)=>n+p.logs.length,0);
- $('logCount').textContent=`${total}件`;
+ const pc6=logPcRows.filter(p=>p.edition==='6').length;
+ const pc7=logPcRows.filter(p=>p.edition==='7').length;
+ $('logCount').textContent=`${total}件 / 6版 ${pc6}人・7版 ${pc7}人`;
 
  if(logSelectedPcId&&!logPcRows.some(p=>p.id===logSelectedPcId))logSelectedPcId='';
  if(!logSelectedPcId&&logPcRows.length)logSelectedPcId=logPcRows[0].id;
@@ -9208,7 +9274,7 @@ function renderLogPcList(){
 
  wrap.innerHTML=rows.length?rows.map(p=>`
    <button type="button" class="log-pc-item${p.id===logSelectedPcId?' active':''}" data-id="${esc(p.id)}">
-     <span class="log-pc-name">${esc(p.name)}</span>
+     <span class="log-pc-name"><span class="log-pc-edition">${esc(p.edition)}版</span>${esc(p.name)}</span>
      <span class="log-pc-count">${p.logs.length}件</span>
    </button>
  `).join(''):'<div class="database-empty">URL付き通過シナリオがありません。</div>';
@@ -9221,19 +9287,29 @@ function renderLogPcList(){
    };
  });
 }
-function logOpenUrl(record){
+function openExternalTab(url){
+ const href=String(url||'').trim();
+ if(!href)return;
+ // Using a real anchor avoids the false "popup blocked" warning that can occur
+ // when window.open(...,'noopener') successfully opens a tab but returns null.
+ const a=document.createElement('a');
+ a.href=href;
+ a.target='_blank';
+ a.rel='noopener noreferrer';
+ a.style.display='none';
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+}
+function logOpenHtmlUrl(record){
  if(!record?.url)return '';
- // Google Drive's own file page is the most reliable target in a new tab.
- // It avoids iframe restrictions and lets Drive handle authentication/sharing.
- return String(record.url||'');
+ return record.driveId?googleDriveHtmlViewUrl(record.url):String(record.url||'');
 }
 function openLogInNewTab(record){
- const url=logOpenUrl(record);
- if(!url)return;
- const w=window.open(url,'_blank','noopener');
- if(!w){
-   alert('新しいタブを開けませんでした。ブラウザのポップアップ設定を確認してください。');
- }
+ openExternalTab(logOpenHtmlUrl(record));
+}
+function openLogDriveTab(record){
+ if(record?.url)openExternalTab(record.url);
 }
 function renderLogSelectedPc(){
  const pc=logPcRows.find(p=>p.id===logSelectedPcId);
@@ -9254,12 +9330,18 @@ function renderLogSelectedPc(){
        <strong>${esc(r.title)}</strong>
        <span>${r.driveId?'Google Drive':'URL'}</span>
      </div>
-     <button type="button" class="btn small log-preview-btn" data-index="${i}">読む ↗</button>
+     <div class="log-session-actions">
+       <button type="button" class="btn small log-preview-btn" data-index="${i}">読む ↗</button>
+       ${r.driveId?`<button type="button" class="btn small log-drive-btn" data-index="${i}">Drive ↗</button>`:''}
+     </div>
    </div>
  `).join('');
 
  list.querySelectorAll('.log-preview-btn').forEach(btn=>{
    btn.onclick=()=>openLogInNewTab(pc.logs[Number(btn.dataset.index)]);
+ });
+ list.querySelectorAll('.log-drive-btn').forEach(btn=>{
+   btn.onclick=()=>openLogDriveTab(pc.logs[Number(btn.dataset.index)]);
  });
 }
 let reportRowCache=new Map();
@@ -10777,7 +10859,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
