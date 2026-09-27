@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.1</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.2</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5045,9 +5045,40 @@ body.public-mobile-editor .table-wrap{
   min-width:150px;
 }
 
+
+/* v7.2 ------------------------------------------------------------ */
+
+/* Public routes stay covered until their remote data/UI is ready. */
+body.public-route-loading{
+  overflow:hidden!important;
+}
+body.public-route-loading > *{
+  visibility:hidden!important;
+}
+body.public-route-loading::before{
+  content:"CHARACTER DATABASE";
+  visibility:visible!important;
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eef1f4;
+  color:#6f7b88;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.12em;
+}
+
+/* REPORT PC candidate list may contain all PCs; keep the list scrollable. */
+.report-pc-suggestions{
+  max-height:min(52vh,360px)!important;
+}
+
 </style>
 </head>
-<body>
+<body class="public-route-loading">
 <header class="app-header">
   <button type="button" class="brand brand-button" id="homeViewBtn" title="通常画面へ戻る"><h1>DATABASE</h1><p>CALL OF CTHULHU INVESTIGATOR ARCHIVE</p></button>
   <nav class="app-nav">
@@ -5474,7 +5505,7 @@ body.public-mobile-editor .table-wrap{
           </label>
           <label class="report-pc-field">PC
             <div class="report-pc-autocomplete">
-              <input class="control" id="reportPcFilter" autocomplete="off" placeholder="すべてのPC">
+              <input class="control" id="reportPcFilter" autocomplete="off" placeholder="すべてのPC（名前検索）">
               <div class="report-pc-suggestions hidden" id="reportPcSuggestions" role="listbox"></div>
             </div>
           </label>
@@ -5653,7 +5684,7 @@ body.public-mobile-editor .table-wrap{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.1</p>
+    <p class="public-viewer-version">Viewer v7.2</p>
   </div>
 </div>
 
@@ -5734,7 +5765,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.1';
+const PUBLIC_VIEWER_VERSION='7.2';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -6483,6 +6514,7 @@ async function startMobileEditor(ownerSecret,viewerSecret){
  document.body.classList.add('public-mobile-editor');
  updateMobileEditorSyncStatus('同期済み','ok');
  await showDatabaseView();
+ document.body.classList.remove('public-route-loading');
  document.title='MOBILE EDITOR | CHARACTER DATABASE';
 }
 
@@ -6697,10 +6729,12 @@ async function tryStartSharedViewer(){
    document.body.classList.add('share-mode');
    renderAll();
    showViewer();
+   document.body.classList.remove('public-route-loading');
    document.title=`${current.name||'探索者'} | CHARACTER DATABASE`;
    return true;
  }catch(err){
    console.error(err);
+   document.body.classList.remove('public-route-loading');
    alert('共有URLを開けませんでした。\n'+(err?.message||err));
    return false;
  }
@@ -8761,8 +8795,7 @@ function renderReportPcSuggestions(){
 
  const q=String(input.value||'').trim().toLowerCase();
  const matches=reportPcCandidates
-   .filter(n=>!q||String(n).toLowerCase().includes(q))
-   .slice(0,10);
+   .filter(n=>!q||String(n).toLowerCase().includes(q));
 
  box.innerHTML=matches.map((name,idx)=>`
    <button type="button" class="report-pc-suggestion" data-name="${esc(name)}" role="option">
@@ -10258,7 +10291,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -11550,6 +11583,7 @@ async function initCharacterDatabase(){
        document.body.classList.add('share-mode','public-online-character');
        renderAll();
        showViewer();
+       document.body.classList.remove('public-route-loading');
        document.title=`${current.name||'探索者'} | CHARACTER DATABASE`;
        return;
      }
@@ -11563,6 +11597,7 @@ async function initCharacterDatabase(){
        publicRemoteMode='report';
        document.body.classList.add('public-online-report');
        await showHubView('report');
+       document.body.classList.remove('public-route-loading');
        document.title='REPORT | CHARACTER DATABASE';
        return;
      }
@@ -11576,11 +11611,13 @@ async function initCharacterDatabase(){
        publicRemoteMode='database';
        document.body.classList.add('public-online-database');
        await showDatabaseView();
+       document.body.classList.remove('public-route-loading');
        return;
      }
 
      document.body.classList.add('public-viewer-only');
      $('publicShareLanding').classList.remove('hidden');
+     document.body.classList.remove('public-route-loading');
      return;
    }catch(err){
      console.error(err);
@@ -11588,6 +11625,7 @@ async function initCharacterDatabase(){
      $('publicShareLanding').classList.remove('hidden');
      const p=$('publicShareLanding').querySelector('.note');
      if(p)p.textContent='公開データを開けませんでした：'+(err?.message||err);
+     document.body.classList.remove('public-route-loading');
      return;
    }
  }
