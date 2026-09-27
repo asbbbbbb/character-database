@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.5</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.6</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5184,556 +5184,7 @@ body.hub-mode #hubView{
 }
 
 
-/* v7.4.1 ---------------------------------------------------------- */
-/* Experimental LOG reader: uses existing scenario URLs. */
-.log-content{
-  width:min(92%,1500px)!important;
-  max-width:1500px!important;
-}
-.log-note{
-  margin:-2px 0 10px;
-  color:#73808a;
-  font-size:10px;
-}
-.log-layout{
-  display:grid;
-  grid-template-columns:minmax(210px,1fr) minmax(0,3fr);
-  gap:12px;
-  align-items:start;
-}
-.log-pc-pane,
-.log-main-pane{
-  min-width:0;
-}
-.log-pc-pane{
-  position:sticky;
-  top:92px;
-  max-height:calc(100vh - 115px);
-  overflow:hidden;
-  border:1px solid #d6dee4;
-  border-radius:9px;
-  background:#fff;
-}
-.log-search-box{
-  padding:8px;
-  border-bottom:1px solid #e1e6ea;
-}
-.log-pc-list{
-  max-height:calc(100vh - 175px);
-  overflow:auto;
-  padding:5px;
-}
-.log-pc-item{
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:7px;
-  padding:8px 9px;
-  border:0;
-  border-radius:7px;
-  background:transparent;
-  color:#34414c;
-  cursor:pointer;
-  text-align:left;
-}
-.log-pc-item:hover{background:#f1f5f7}
-.log-pc-item.active{
-  background:#e7eef3;
-  color:#1d2a34;
-  font-weight:800;
-}
-.log-pc-name{
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-.log-pc-count{
-  flex:0 0 auto;
-  color:#77838d;
-  font-size:9px;
-}
-.log-main-pane{
-  display:grid;
-  gap:10px;
-}
-.log-selected-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  min-height:42px;
-  padding:8px 10px;
-  border:1px solid #d6dee4;
-  border-radius:9px;
-  background:#fff;
-}
-.log-selected-name{
-  font-size:15px;
-  font-weight:800;
-}
-.log-selected-sub{
-  margin-top:2px;
-  color:#7a8790;
-  font-size:9px;
-}
-.log-session-list{
-  display:grid;
-  gap:5px;
-}
-.log-session-row{
-  display:grid;
-  grid-template-columns:95px minmax(0,1fr) auto;
-  gap:8px;
-  align-items:center;
-  padding:8px 9px;
-  border:1px solid #dbe2e7;
-  border-radius:8px;
-  background:#fff;
-}
-.log-session-date{
-  color:#71808b;
-  font-size:10px;
-}
-.log-session-main{
-  display:grid;
-  gap:2px;
-  min-width:0;
-}
-.log-session-main strong{
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  font-size:11px;
-}
-.log-session-main span{
-  color:#8b969e;
-  font-size:8px;
-}
-.log-reader{
-  border:1px solid #cfd8df;
-  border-radius:9px;
-  overflow:hidden;
-  background:#fff;
-}
-.log-reader-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:10px;
-  padding:9px 10px;
-  border-bottom:1px solid #e0e5e9;
-  background:#f7f9fa;
-}
-.log-reader-actions{
-  display:flex;
-  gap:5px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-.log-reader-meta,
-.log-reader-status{
-  color:#78858f;
-  font-size:9px;
-}
-.log-reader-status{
-  min-height:26px;
-  padding:7px 10px;
-  border-bottom:1px solid #edf0f2;
-}
-.log-reader-frame{
-  display:block;
-  width:100%;
-  min-height:620px;
-  border:0;
-  background:#fff;
-}
-@media(max-width:900px){
-  .log-content{width:100%!important}
-  .log-layout{
-    grid-template-columns:1fr;
-  }
-  .log-pc-pane{
-    position:static;
-    max-height:none;
-  }
-  .log-pc-list{
-    max-height:210px;
-  }
-  .log-reader-frame{
-    min-height:70vh;
-  }
-}
-@media(max-width:600px){
-  .log-session-row{
-    grid-template-columns:1fr auto;
-  }
-  .log-session-date{
-    grid-column:1 / -1;
-  }
-  .log-reader-head{
-    display:grid;
-  }
-  .log-reader-actions{
-    justify-content:flex-start;
-  }
-}
-
-
-/* v7.4.2 ---------------------------------------------------------- */
-/* LOG: open the registered log URL in a new browser tab.
-   Embedded preview/HTML-fetch reader is intentionally removed. */
-.log-reader,
-.log-reader-head,
-.log-reader-actions,
-.log-reader-status,
-.log-reader-frame{
-  display:none!important;
-}
-.log-session-row .log-preview-btn{
-  white-space:nowrap;
-}
-
-
-/* v7.4.3 ---------------------------------------------------------- */
-.log-pc-name{
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-.log-pc-edition{
-  flex:0 0 auto;
-  padding:1px 4px;
-  border:1px solid #d3dce2;
-  border-radius:999px;
-  background:#f4f7f9;
-  color:#73808a;
-  font-size:7px;
-  font-weight:800;
-}
-.log-session-actions{
-  display:flex;
-  gap:4px;
-  justify-content:flex-end;
-}
-@media(max-width:600px){
-  .log-session-actions{
-    grid-column:2;
-    grid-row:1 / span 2;
-    align-self:center;
-  }
-}
-
-
-/* v7.4.4 ---------------------------------------------------------- */
-/* LOG tab placement / share */
-.log-head-actions{
-  display:flex;
-  align-items:center;
-  gap:7px;
-}
-
-/* LOG-only public share route */
-body.public-online-log .sidebar,
-body.public-online-log .right-rail,
-body.public-online-log #workspaceTools,
-body.public-online-log #editor,
-body.public-online-log #viewer,
-body.public-online-log #emptyState,
-body.public-online-log #databaseView,
-body.public-online-log #choiceView,
-body.public-online-log .app-nav,
-body.public-online-log .header-utilities{
-  display:none!important;
-}
-body.public-online-log .app-header{
-  position:sticky;
-  top:0;
-  z-index:90;
-}
-body.public-online-log .brand{
-  pointer-events:none;
-}
-body.public-online-log .brand p{
-  display:none;
-}
-body.public-online-log .brand h1{
-  font-size:14px;
-}
-body.public-online-log .layout{
-  display:block!important;
-  width:100%!important;
-  min-height:calc(100vh - 52px);
-}
-body.public-online-log .workspace{
-  width:100%!important;
-  max-width:none!important;
-  padding:12px!important;
-  grid-column:auto!important;
-}
-body.public-online-log #hubView{
-  display:block!important;
-  width:100%!important;
-}
-body.public-online-log #sessionHub,
-body.public-online-log #reportHub,
-body.public-online-log #yosoHub,
-body.public-online-log #linkHub{
-  display:none!important;
-}
-body.public-online-log #logHub{
-  display:block!important;
-}
-body.public-online-log .log-content{
-  width:min(1500px,96%)!important;
-  margin:0 auto!important;
-}
-body.public-online-log #logPageShareBtn{
-  display:none!important;
-}
-@media(max-width:700px){
-  body.public-online-log .workspace{
-    padding:7px!important;
-  }
-  body.public-online-log .log-content{
-    width:100%!important;
-    min-width:0!important;
-  }
-}
-
-
-/* v7.4.5 ---------------------------------------------------------- */
-/* Mobile LOG: compact the PC-name suggestion/list area. */
-@media(max-width:700px){
-  body.public-online-log .log-pc-list,
-  body.public-mobile-editor .log-pc-list{
-    max-height:145px!important;
-    padding:3px!important;
-  }
-  body.public-online-log .log-pc-item,
-  body.public-mobile-editor .log-pc-item{
-    padding:5px 7px!important;
-    min-height:30px;
-    font-size:10px!important;
-  }
-  body.public-online-log .log-pc-name,
-  body.public-mobile-editor .log-pc-name{
-    gap:4px!important;
-    font-size:10px!important;
-  }
-  body.public-online-log .log-pc-count,
-  body.public-mobile-editor .log-pc-count{
-    font-size:8px!important;
-  }
-  body.public-online-log .log-pc-edition,
-  body.public-mobile-editor .log-pc-edition{
-    padding:1px 3px!important;
-    font-size:6px!important;
-  }
-  body.public-online-log .log-search-box,
-  body.public-mobile-editor .log-search-box{
-    padding:6px!important;
-  }
-  body.public-online-log #logPcSearch,
-  body.public-mobile-editor #logPcSearch{
-    height:34px!important;
-    padding:6px 8px!important;
-    font-size:11px!important;
-  }
-}
-
-
-/* v7.4.6 ---------------------------------------------------------- */
-/* Google Drive parent-folder link matcher */
-.log-drive-import{
-  margin-bottom:12px;
-  padding:10px;
-  border:1px solid #d7dfe5;
-  border-radius:9px;
-  background:#fff;
-}
-.log-drive-import-title{
-  margin-bottom:7px;
-  color:#34424d;
-  font-size:11px;
-  font-weight:800;
-}
-.log-drive-import-grid{
-  display:grid;
-  grid-template-columns:minmax(280px,1.2fr) minmax(260px,1fr) auto;
-  gap:7px;
-  align-items:end;
-}
-.log-drive-import-grid label{
-  display:grid;
-  gap:3px;
-  color:#6b7882;
-  font-size:9px;
-  font-weight:700;
-}
-.log-drive-import-options{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-top:8px;
-}
-.log-drive-import-options label{
-  display:flex;
-  align-items:center;
-  gap:5px;
-  color:#6a7780;
-  font-size:9px;
-  font-weight:700;
-}
-.log-drive-import-note,
-.log-drive-import-status{
-  margin-top:6px;
-  color:#7a8790;
-  font-size:9px;
-}
-.log-drive-import-status.error{
-  color:#a33c3c;
-}
-.log-drive-match-wrap{
-  max-height:280px;
-  overflow:auto;
-  margin-top:8px;
-  border:1px solid #dbe2e7;
-  border-radius:7px;
-}
-.log-drive-match-table{
-  width:100%;
-  border-collapse:collapse;
-  background:#fff;
-}
-.log-drive-match-table th,
-.log-drive-match-table td{
-  padding:6px 7px;
-  border-bottom:1px solid #e5e9ec;
-  text-align:left;
-  font-size:9px;
-}
-.log-drive-match-table th{
-  position:sticky;
-  top:0;
-  z-index:2;
-  background:#f3f6f8;
-}
-.log-drive-match-badge{
-  display:inline-block;
-  padding:2px 6px;
-  border-radius:999px;
-  background:#edf1f4;
-  color:#687681;
-  font-size:8px;
-  font-weight:800;
-  white-space:nowrap;
-}
-.log-drive-match-badge.exact{
-  background:#e9f4ec;
-  color:#3d7650;
-}
-.log-drive-match-badge.approx{
-  background:#fff5dc;
-  color:#8c6d20;
-}
-.log-drive-match-badge.unmatched,
-.log-drive-match-badge.ambiguous,
-.log-drive-match-badge.pc-missing,
-.log-drive-match-badge.pc-ambiguous{
-  background:#f8e8e8;
-  color:#9b4242;
-}
-
-/* Shared/view-only pages never expose Drive import credentials/settings. */
-body.public-online-log #logDriveImport,
-body.public-online-database #logDriveImport,
-body.public-online-report #logDriveImport,
-body.public-viewer-only #logDriveImport{
-  display:none!important;
-}
-
-@media(max-width:900px){
-  .log-drive-import-grid{
-    grid-template-columns:1fr;
-  }
-  .log-drive-import-options{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-}
-
-
-/* v7.4.8 ---------------------------------------------------------- */
-.log-drive-scan-actions{
-  display:flex;
-  gap:5px;
-  align-items:center;
-  justify-content:flex-end;
-}
-.log-drive-last-sync{
-  color:#78858f;
-  font-size:9px;
-  white-space:nowrap;
-}
-.log-drive-modified{
-  display:block;
-  margin-top:2px;
-  color:#8a959d;
-  font-size:7px;
-  white-space:nowrap;
-}
-@media(max-width:900px){
-  .log-drive-scan-actions{
-    justify-content:flex-start;
-  }
-  .log-drive-import-options{
-    gap:7px;
-  }
-}
-
-
-/* v7.4.9 ---------------------------------------------------------- */
-/* Google Drive PC-name matching ignores half/full-width spaces.
-   Example: "山田太郎" = "山田 太郎" = "山田　太郎". */
-
-
 /* v7.5 ------------------------------------------------------------ */
-
-/* LOG: import box can collapse after use; keep only a compact header visible. */
-.log-drive-import-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-.log-drive-import-summary{
-  margin-top:1px;
-  color:#89949c;
-  font-size:8px;
-  font-weight:600;
-}
-.log-drive-import-body{
-  margin-top:7px;
-}
-.log-drive-import.collapsed{
-  padding-top:6px;
-  padding-bottom:6px;
-}
-.log-drive-import.collapsed .log-drive-import-body{
-  display:none;
-}
-.log-drive-import.collapsed .log-drive-import-title{
-  font-size:10px;
-}
-.log-drive-import.collapsed .log-drive-import-summary{
-  display:inline;
-  margin-left:5px;
-}
-.log-drive-import-note{
-  line-height:1.35;
-}
 
 /* CHOICE: keep the 4 condition controls in one horizontal row, even on phones. */
 @media(max-width:700px){
@@ -5810,7 +5261,6 @@ body.public-viewer-only #logDriveImport{
     <button type="button" class="app-nav-btn" id="databaseViewBtn">PC LIST</button>
     <button type="button" class="app-nav-btn" id="choiceViewBtn">CHOICE</button>
     <button type="button" class="app-nav-btn" id="sessionViewBtn">SESSION</button>
-    <button type="button" class="app-nav-btn" id="logViewBtn">LOG</button>
     <button type="button" class="app-nav-btn" id="reportViewBtn">REPORT</button>
     <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSONOKO</button>
     <button type="button" class="app-nav-btn" id="linkViewBtn">LINK</button>
@@ -6302,81 +5752,6 @@ body.public-viewer-only #logDriveImport{
         <div class="link-grid" id="linkGrid"></div>
       </div>
 
-      <div id="logHub" class="hub-content log-content hidden">
-        <div class="hub-view-head log-head">
-          <div>
-            <div class="hub-kicker">CHARACTER DATABASE</div>
-            <h2>LOG</h2>
-          </div>
-          <div class="log-head-actions">
-            <div class="log-count" id="logCount">0件</div>
-            <button type="button" class="btn small log-page-share-btn" id="logPageShareBtn">🔗 共有リンク</button>
-          </div>
-        </div>
-
-        <div class="log-note">
-          PCの「通過シナリオ」に登録されたログURLを一覧表示します。「読む」はHTML表示、「Drive」は元ファイルを開きます。
-        </div>
-
-        <div class="log-drive-import" id="logDriveImport">
-          <div class="log-drive-import-head">
-            <div>
-              <div class="log-drive-import-title">Google Driveリンク読込</div>
-              <div class="log-drive-import-summary" id="logDriveImportSummary">差分取得・未一致再照合</div>
-            </div>
-            <button type="button" class="btn small" id="logDriveCollapseBtn">閉じる</button>
-          </div>
-          <div class="log-drive-import-body" id="logDriveImportBody">
-            <div class="log-drive-import-grid apps-script">
-              <label>Apps Script WebアプリURL
-                <input class="control" id="logDriveScriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
-              </label>
-              <label>親フォルダURL
-                <input class="control" id="logDriveFolderUrl" placeholder="https://drive.google.com/drive/folders/...">
-              </label>
-              <div class="log-drive-scan-actions">
-                <button type="button" class="btn" id="logDriveScanBtn">差分読込</button>
-                <button type="button" class="btn" id="logDriveFullScanBtn">全件再読込</button>
-              </div>
-            </div>
-            <div class="log-drive-import-options">
-              <label><input type="checkbox" id="logDriveOverwrite"> 既存の🔗も上書き</label>
-              <span class="log-drive-last-sync" id="logDriveLastSync">最終読込：なし</span>
-              <button type="button" class="btn primary" id="logDriveApplyBtn" disabled>一致リンクを反映</button>
-            </div>
-            <div class="log-drive-import-note">
-              差分読込は新規・更新HTMLと、前回未一致だったHTMLだけを再照合します。
-            </div>
-            <div class="log-drive-import-status" id="logDriveImportStatus"></div>
-            <div class="log-drive-match-wrap hidden" id="logDriveMatchWrap">
-              <table class="log-drive-match-table">
-                <thead><tr><th>PC</th><th>HTML</th><th>通過シナリオ</th><th>判定</th></tr></thead>
-                <tbody id="logDriveMatchBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="log-layout">
-          <aside class="log-pc-pane">
-            <div class="log-search-box">
-              <input class="control" id="logPcSearch" placeholder="PC名を検索">
-            </div>
-            <div class="log-pc-list" id="logPcList"></div>
-          </aside>
-
-          <section class="log-main-pane">
-            <div class="log-selected-head">
-              <div>
-                <div class="log-selected-name" id="logSelectedPcName">PCを選択してください</div>
-                <div class="log-selected-sub" id="logSelectedPcSub"></div>
-              </div>
-            </div>
-
-            <div class="log-session-list" id="logSessionList"></div>
-          </section>
-        </div>
-      </div>
     </section>
   </main>
   <aside class="right-rail" aria-hidden="true"></aside>
@@ -6487,7 +5862,7 @@ body.public-viewer-only #logDriveImport{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.5</p>
+    <p class="public-viewer-version">Viewer v7.6</p>
   </div>
 </div>
 
@@ -6567,13 +5942,8 @@ const APP_DATA_KEY='characterDatabaseV03AppDataV1';
 const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
-const DRIVE_LOG_FOLDER_KEY='characterDatabaseV0747DriveLogFolderV1';
-const DRIVE_LOG_SCRIPT_URL_KEY='characterDatabaseV0747DriveLogScriptUrlV1';
-const DRIVE_LOG_LAST_SYNC_KEY='characterDatabaseV0748DriveLogLastSyncV1';
-const DRIVE_LOG_PENDING_KEY='characterDatabaseV075DriveLogPendingV1';
-const DRIVE_LOG_COLLAPSED_KEY='characterDatabaseV075DriveLogCollapsedV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.5';
+const PUBLIC_VIEWER_VERSION='7.6';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7057,13 +6427,6 @@ function reportViewerUrl(cfg=loadOnlineSyncConfig()){
  if(!base||!cfg.viewerSecret)return '';
  const u=new URL(base);
  u.searchParams.set('report',cfg.viewerSecret);
- return u.toString();
-}
-function logViewerUrl(cfg=loadOnlineSyncConfig()){
- const base=normalizeShareBaseUrl(getSavedShareBaseUrl());
- if(!base||!cfg.viewerSecret)return '';
- const u=new URL(base);
- u.searchParams.set('log',cfg.viewerSecret);
  return u.toString();
 }
 function mobileEditorUrl(cfg=loadOnlineSyncConfig()){
@@ -8693,10 +8056,9 @@ function setTopNav(active){
  if(active==='report')$('reportViewBtn')?.classList.add('active');
  if(active==='other')$('otherPcViewBtn')?.classList.add('active');
  if(active==='link')$('linkViewBtn')?.classList.add('active');
- if(active==='log')$('logViewBtn')?.classList.add('active');
 }
 function showHomeWorkspace(){
- document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('logHub').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').style.display='';if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
+ document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').style.display='';if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
 }
 let activeSessionTab='pl';
 const editingPLSessionKeys=new Set();
@@ -9602,574 +8964,6 @@ function renderYoso(){
 
 
 
-let logDriveMatches=[];
-
-function extractGoogleDriveFolderId(value){
- const s=String(value||'').trim();
- if(!s)return '';
- try{
-   const u=new URL(s);
-   const m=u.pathname.match(/\/folders\/([^/?#]+)/);
-   if(m)return m[1];
-   return u.searchParams.get('id')||'';
- }catch(_){
-   const m=s.match(/\/folders\/([^/?#]+)/);
-   return m?m[1]:s.replace(/[^A-Za-z0-9_-]/g,'');
- }
-}
-function normalizeAppsScriptUrl(value){
- const s=String(value||'').trim();
- if(!s)return '';
- try{
-   const u=new URL(s);
-   if(u.protocol!=='https:')return '';
-   if(!/\.google\.com$/i.test(u.hostname)&&!/\.googleusercontent\.com$/i.test(u.hostname))return '';
-   return u.toString();
- }catch(_){return ''}
-}
-function normalizeDriveMatchText(value){
- return String(value||'')
-   .normalize('NFKC')
-   .toLowerCase()
-   .replace(/\.(?:html?|htm)$/i,'')
-   .replace(/[【】「」『』［］()[\]{}]/g,'')
-   .replace(/[・･]/g,'')
-   .replace(/[\s\u3000_\-－―ー]+/g,'')
-   .trim();
-}
-function driveFolderPcName(folderName){
- const raw=String(folderName||'').normalize('NFKC').trim();
- const m=raw.match(/^[^-－―]+[-－―](.+)$/);
- return (m?m[1]:raw).trim();
-}
-function driveFileTitleInfo(fileName){
- let stem=String(fileName||'').replace(/\.(?:html?|htm)$/i,'').trim();
- let date='';
- let m=stem.match(/^\s*(\d{4})[-_.\/](\d{1,2})[-_.\/](\d{1,2})[\s_\-－―]*/);
- if(m){
-   date=`${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
-   stem=stem.slice(m[0].length).trim();
- }else{
-   m=stem.match(/^\s*((?:19|20)\d{6})[\s_\-－―]*/);
-   if(m){
-     const d=m[1];
-     date=`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
-     stem=stem.slice(m[0].length).trim();
-   }
- }
- return {title:stem||String(fileName||''),date};
-}
-function appsScriptJsonp(scriptUrl,folderId,options={}){
- return new Promise((resolve,reject)=>{
-   const callback='__cdDriveLog_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-   const script=document.createElement('script');
-   let finished=false;
-   const cleanup=()=>{
-     if(finished)return;
-     finished=true;
-     clearTimeout(timeout);
-     try{delete window[callback]}catch(_){window[callback]=undefined}
-     script.remove();
-   };
-   const timeout=setTimeout(()=>{
-     cleanup();
-     reject(new Error('Apps Scriptから120秒以内に応答がありませんでした。全件再読込ではなく差分読込を試してください。'));
-   },120000);
-
-   window[callback]=payload=>{
-     cleanup();
-     if(!payload||payload.ok===false){
-       reject(new Error(payload?.error||'Apps Scriptの読み込みに失敗しました。'));
-       return;
-     }
-     resolve(payload);
-   };
-
-   const u=new URL(scriptUrl);
-   u.searchParams.set('action','scanLogs');
-   u.searchParams.set('folderId',folderId);
-   u.searchParams.set('callback',callback);
-   if(options.since)u.searchParams.set('since',options.since);
-   if(options.full)u.searchParams.set('full','1');
-   u.searchParams.set('_',String(Date.now()));
-   script.src=u.toString();
-   script.async=true;
-   script.onerror=()=>{
-     cleanup();
-     reject(new Error('Apps Script Webアプリを読み込めませんでした。'));
-   };
-   document.head.appendChild(script);
- });
-}
-function matchDriveFileToScenario(character,file){
- const info=driveFileTitleInfo(file.name);
- const fileKey=normalizeDriveMatchText(info.title);
- const scenarios=(character.scenarios||[]).map(sc=>({
-   sc,
-   title:String(sc.title||'').trim(),
-   key:normalizeDriveMatchText(sc.title||''),
-   date:normalizeScenarioDate(sc.date||'')
- })).filter(x=>x.key);
-
- let candidates=scenarios.filter(x=>x.key===fileKey);
- if(candidates.length>1&&info.date){
-   const dated=candidates.filter(x=>x.date===info.date);
-   if(dated.length===1)candidates=dated;
- }
- if(candidates.length===1){
-   return {status:'exact',label:'一致',scenario:candidates[0].sc,scenarioTitle:candidates[0].title};
- }
- if(candidates.length>1){
-   return {status:'ambiguous',label:'複数候補',scenario:null,scenarioTitle:'—'};
- }
-
- const approx=scenarios.filter(x=>x.key.includes(fileKey)||fileKey.includes(x.key));
- if(approx.length===1){
-   return {status:'approx',label:'推定一致',scenario:approx[0].sc,scenarioTitle:approx[0].title};
- }
- if(approx.length>1){
-   return {status:'ambiguous',label:'複数候補',scenario:null,scenarioTitle:'—'};
- }
- return {status:'unmatched',label:'未一致',scenario:null,scenarioTitle:'—'};
-}
-function drivePendingKey(item){
- const file=item?.file||item||{};
- return String(file.id||'').trim() || `${normalizePcLinkName(item?.folderName||'')}|${String(item?.fileName||file.name||'').trim().toLowerCase()}`;
-}
-function loadDrivePending(){
- try{
-   const parsed=JSON.parse(localStorage.getItem(DRIVE_LOG_PENDING_KEY)||'[]');
-   return Array.isArray(parsed)?parsed.filter(x=>x&&x.fileName&&x.folderName):[];
- }catch(_){return []}
-}
-function saveDrivePending(items){
- const compact=[];
- const seen=new Set();
- for(const item of items||[]){
-   const file=item.file||item;
-   const row={
-     folderName:String(item.folderName||''),
-     fileName:String(item.fileName||file.name||''),
-     id:String(file.id||''),
-     url:String(item.url||file.url||file.webViewLink||''),
-     mimeType:String(file.mimeType||'text/html'),
-     modifiedTime:String(item.modifiedTime||file.modifiedTime||'')
-   };
-   const key=drivePendingKey({folderName:row.folderName,fileName:row.fileName,file:row});
-   if(!key||seen.has(key))continue;
-   seen.add(key);
-   compact.push(row);
- }
- localStorage.setItem(DRIVE_LOG_PENDING_KEY,JSON.stringify(compact));
- updateDriveLogSummary();
-}
-function mergeDriveScanFiles(folders,pending){
- const map=new Map();
- const put=(folderName,file)=>{
-   const row={
-     folderName:String(folderName||''),
-     fileName:String(file?.name||file?.fileName||''),
-     file:{
-       id:String(file?.id||''),
-       name:String(file?.name||file?.fileName||''),
-       url:String(file?.url||file?.webViewLink||''),
-       webViewLink:String(file?.webViewLink||''),
-       mimeType:String(file?.mimeType||'text/html'),
-       modifiedTime:String(file?.modifiedTime||'')
-     }
-   };
-   const key=drivePendingKey(row);
-   if(key)map.set(key,row);
- };
- for(const p of pending||[])put(p.folderName,p);
- for(const folder of folders||[]){
-   for(const file of folder.files||[])put(folder.name,file);
- }
- return [...map.values()];
-}
-function updateDriveLogSummary(){
- const el=$('logDriveImportSummary');
- if(!el)return;
- const pending=loadDrivePending().length;
- el.textContent=pending?`差分取得・保留 ${pending}件を再照合`:'差分取得・未一致再照合';
-}
-function setDriveImportCollapsed(collapsed){
- const box=$('logDriveImport');
- const btn=$('logDriveCollapseBtn');
- if(!box||!btn)return;
- box.classList.toggle('collapsed',!!collapsed);
- btn.textContent=collapsed?'開く':'閉じる';
- localStorage.setItem(DRIVE_LOG_COLLAPSED_KEY,collapsed?'1':'0');
-}
-async function scanDriveLogFolder(fullScan=false){
- const folderUrl=String($('logDriveFolderUrl')?.value||'').trim();
- const scriptUrl=normalizeAppsScriptUrl($('logDriveScriptUrl')?.value||'');
- const status=$('logDriveImportStatus');
- const wrap=$('logDriveMatchWrap');
- const body=$('logDriveMatchBody');
- const applyBtn=$('logDriveApplyBtn');
-
- const folderId=extractGoogleDriveFolderId(folderUrl);
- if(!scriptUrl){
-   status.textContent='Apps Script WebアプリURLを確認してください。';
-   status.classList.add('error');
-   return;
- }
- if(!folderId){
-   status.textContent='親フォルダURLを確認してください。';
-   status.classList.add('error');
-   return;
- }
-
- localStorage.setItem(DRIVE_LOG_FOLDER_KEY,folderUrl);
- localStorage.setItem(DRIVE_LOG_SCRIPT_URL_KEY,scriptUrl);
-
- const lastSync=String(localStorage.getItem(DRIVE_LOG_LAST_SYNC_KEY)||'').trim();
- const since=fullScan?'':lastSync;
- const pending=fullScan?[]:loadDrivePending();
-
- status.classList.remove('error');
- status.textContent=fullScan
-   ? '全件を読み込んでいます…（最大120秒）'
-   : (since
-       ? `差分を読み込んでいます… 保留 ${pending.length}件も再照合`
-       : '初回読込中…（最大120秒）');
- wrap.classList.add('hidden');
- applyBtn.disabled=true;
- logDriveMatches=[];
-
- try{
-   const payload=await appsScriptJsonp(scriptUrl,folderId,{since,full:fullScan});
-   const folders=Array.isArray(payload.folders)?payload.folders:[];
-   const sourceItems=mergeDriveScanFiles(folders,pending);
-   const chars=(await all()).map(ensureShape);
-   const overwrite=!!$('logDriveOverwrite')?.checked;
-   let existingSkipped=0;
-
-   for(const source of sourceItems){
-     const folderName=source.folderName;
-     const file=source.file;
-     if(!/\.html?$/i.test(file.name||'')&&String(file.mimeType||'').toLowerCase()!=='text/html')continue;
-
-     const pcName=driveFolderPcName(folderName);
-     const pcKey=normalizePcLinkName(pcName);
-     const pcCandidates=chars.filter(ch=>normalizePcLinkName(ch.name||'')===pcKey);
-     const url=String(file.url||file.webViewLink||'').trim() ||
-       (file.id?`https://drive.google.com/file/d/${encodeURIComponent(file.id)}/view`:'');
-
-     if(pcCandidates.length!==1){
-       logDriveMatches.push({
-         pcName,folderName,fileName:file.name,file,url,
-         character:null,scenario:null,scenarioTitle:'—',
-         modifiedTime:file.modifiedTime||'',
-         status:pcCandidates.length?'pc-ambiguous':'pc-missing',
-         label:pcCandidates.length?'PC複数':'PCなし'
-       });
-       continue;
-     }
-
-     const character=pcCandidates[0];
-     const match=matchDriveFileToScenario(character,file);
-
-     if(match.scenario && String(match.scenario.url||'').trim() && !overwrite){
-       existingSkipped++;
-       continue;
-     }
-
-     logDriveMatches.push({
-       pcName:character.name||pcName,
-       folderName,fileName:file.name,file,url,character,
-       scenario:match.scenario,
-       scenarioTitle:match.scenarioTitle,
-       modifiedTime:file.modifiedTime||'',
-       status:match.status,
-       label:match.label
-     });
-   }
-
-   const applicable=logDriveMatches.filter(x=>x.scenario&&(x.status==='exact'||x.status==='approx'));
-   const exact=logDriveMatches.filter(x=>x.status==='exact').length;
-   const approx=logDriveMatches.filter(x=>x.status==='approx').length;
-   const unresolved=logDriveMatches.filter(x=>!x.scenario||!(x.status==='exact'||x.status==='approx')).length;
-
-   // Every not-yet-applied item is kept locally. This prevents old unmatched files
-   // from disappearing after the Drive-side delta watermark advances.
-   saveDrivePending(logDriveMatches);
-
-   const watermark=String(payload.scannedAt||new Date().toISOString());
-   localStorage.setItem(DRIVE_LOG_LAST_SYNC_KEY,watermark);
-   updateDriveLogLastSyncLabel();
-
-   body.innerHTML=logDriveMatches.length?logDriveMatches.map(m=>`
-     <tr class="drive-match-${esc(m.status)}">
-       <td>${esc(m.pcName||'—')}</td>
-       <td title="${esc(m.fileName)}">${esc(m.fileName)}</td>
-       <td>${esc(m.scenarioTitle||'—')}</td>
-       <td>
-         <span class="log-drive-match-badge ${esc(m.status)}">${esc(m.label)}</span>
-         ${m.modifiedTime?`<span class="log-drive-modified">${esc(formatDriveSyncTime(m.modifiedTime))}</span>`:''}
-       </td>
-     </tr>
-   `).join(''):'<tr><td colspan="4">今回の対象HTMLはありませんでした。</td></tr>';
-
-   wrap.classList.remove('hidden');
-   applyBtn.disabled=!applicable.length;
-
-   const modeText=fullScan?'全件':'差分';
-   const returned=Number(payload.returnedFileCount||0);
-   const examined=Number(payload.examinedFileCount||0);
-   status.textContent=`${modeText}：新規/更新 ${returned}件・保留込み ${logDriveMatches.length}件｜一致 ${exact} / 推定 ${approx} / 未一致 ${unresolved}${existingSkipped?`｜既存🔗 ${existingSkipped}件スキップ`:''}`;
- }catch(err){
-   console.error(err);
-   status.textContent='Google Driveの読み込みに失敗しました：'+(err?.message||err);
-   status.classList.add('error');
-   wrap.classList.add('hidden');
-   applyBtn.disabled=true;
- }
-}
-async function applyDriveLogMatches(){
- const status=$('logDriveImportStatus');
- const overwrite=!!$('logDriveOverwrite')?.checked;
- const targets=logDriveMatches.filter(x=>x.character&&x.scenario&&(x.status==='exact'||x.status==='approx'));
- if(!targets.length)return;
-
- const chars=(await all()).map(ensureShape);
- const byId=new Map(chars.map(ch=>[ch.id,ch]));
- let applied=0,skipped=0;
- const appliedKeys=new Set();
- const changedIds=new Set();
-
- for(const match of targets){
-   const ch=byId.get(match.character.id);
-   if(!ch){skipped++;continue}
-   const sc=(ch.scenarios||[]).find(x=>x.id===match.scenario.id);
-   if(!sc){skipped++;continue}
-   if(String(sc.url||'').trim()&&!overwrite){skipped++;continue}
-   sc.url=match.url;
-   ch.updatedAt=new Date().toISOString();
-   changedIds.add(ch.id);
-   appliedKeys.add(drivePendingKey(match));
-   applied++;
- }
-
- for(const id of changedIds){
-   const ch=byId.get(id);
-   if(!ch)continue;
-   await put(structuredClone(ch));
-   if(current?.id===id)current=ensureShape(structuredClone(ch));
- }
-
- const remaining=loadDrivePending().filter(item=>!appliedKeys.has(drivePendingKey({
-   folderName:item.folderName,
-   fileName:item.fileName,
-   file:item
- })));
- saveDrivePending(remaining);
-
- status.classList.remove('error');
- status.textContent=`${applied}件を反映${skipped?`・${skipped}件スキップ`:''}。保留 ${remaining.length}件は次回も再照合します。`;
- updateDriveLogLastSyncLabel();
- if(current)renderScenarios();
- renderList();
- await renderLogHub();
-}
-function formatDriveSyncTime(value){
- const s=String(value||'').trim();
- if(!s)return 'なし';
- const d=new Date(s);
- if(Number.isNaN(d.getTime()))return s;
- return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-}
-function updateDriveLogLastSyncLabel(){
- const el=$('logDriveLastSync');
- if(!el)return;
- const value=localStorage.getItem(DRIVE_LOG_LAST_SYNC_KEY)||'';
- el.textContent=`最終読込：${formatDriveSyncTime(value)}`;
-}
-function initDriveLogImportInputs(){
- const folder=$('logDriveFolderUrl');
- const scriptUrl=$('logDriveScriptUrl');
- if(folder&&!folder.value)folder.value=localStorage.getItem(DRIVE_LOG_FOLDER_KEY)||'';
- if(scriptUrl&&!scriptUrl.value)scriptUrl.value=localStorage.getItem(DRIVE_LOG_SCRIPT_URL_KEY)||'';
- updateDriveLogLastSyncLabel();
- updateDriveLogSummary();
- setDriveImportCollapsed(localStorage.getItem(DRIVE_LOG_COLLAPSED_KEY)==='1');
-}
-
-let logPcRows=[];
-let logSelectedPcId='';
-
-function extractGoogleDriveFileId(url){
- const s=String(url||'').trim();
- if(!s)return '';
- try{
-   const u=new URL(s);
-   const m=u.pathname.match(/\/file\/d\/([^/]+)/);
-   if(m)return m[1];
-   const id=u.searchParams.get('id');
-   if(id)return id;
-   const m2=u.pathname.match(/\/d\/([^/]+)/);
-   if(m2)return m2[1];
- }catch(_){}
- const raw=s.match(/\/file\/d\/([^/?#]+)/);
- return raw?raw[1]:'';
-}
-function googleDrivePreviewUrl(url){
- const id=extractGoogleDriveFileId(url);
- return id?`https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`:String(url||'');
-}
-function googleDriveDownloadUrl(url){
- const id=extractGoogleDriveFileId(url);
- return id?`https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=download&confirm=t`:String(url||'');
-}
-function googleDriveHtmlViewUrl(url){
- const id=extractGoogleDriveFileId(url);
- // Experimental: Google Drive no longer guarantees HTML hosting,
- // but this is the closest direct-view endpoint and works for some files/accounts.
- return id?`https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`:String(url||'');
-}
-function scenarioLogUrl(sc){
- return String(sc?.url||sc?.link||sc?.URL||sc?.href||'').trim();
-}
-function normalizeLogEdition(value){
- const s=String(value||'').trim();
- if(s.startsWith('7'))return '7';
- if(s.startsWith('6'))return '6';
- return s||'6';
-}
-function logScenarioRowsFromCharacters(chars){
- return chars.map(ch=>{
-   const scenarios=Array.isArray(ch.scenarios)?ch.scenarios:
-     Array.isArray(ch.scenario)?ch.scenario:[];
-   const logs=scenarios
-     .map(sc=>({sc,url:scenarioLogUrl(sc)}))
-     .filter(x=>x.url)
-     .map(({sc,url})=>({
-       pcId:ch.id,
-       pcName:ch.name||'名前未設定',
-       pcReading:ch.reading||'',
-       edition:normalizeLogEdition(ch.edition),
-       scenarioId:sc.id||'',
-       title:sc.title||sc.name||'シナリオ名未設定',
-       date:sc.date||sc.playDate||'',
-       url,
-       yoso:scenarioPcText(scenarioPcNames(sc.pcs||sc.yoso||'')),
-       driveId:extractGoogleDriveFileId(url)
-     }))
-     .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||compareText(a.title,b.title));
-   return {
-     id:ch.id,
-     name:ch.name||'名前未設定',
-     reading:ch.reading||'',
-     edition:normalizeLogEdition(ch.edition),
-     logs
-   };
- }).filter(x=>x.logs.length)
-   .sort((a,b)=>compareText(a.reading||a.name,b.reading||b.name)||compareText(a.name,b.name));
-}
-async function logSourceCharacters(){
- const list=(await all()).map(x=>ensureShape(structuredClone(x)));
- // Include the currently opened character even before a full page reload.
- if(current){
-   const copy=ensureShape(structuredClone(current));
-   const i=list.findIndex(x=>x.id===copy.id);
-   if(i>=0)list[i]=copy;else list.push(copy);
- }
- return list;
-}
-async function renderLogHub(){
- initDriveLogImportInputs();
- const chars=await logSourceCharacters();
- logPcRows=logScenarioRowsFromCharacters(chars);
- const total=logPcRows.reduce((n,p)=>n+p.logs.length,0);
- const pc6=logPcRows.filter(p=>p.edition==='6').length;
- const pc7=logPcRows.filter(p=>p.edition==='7').length;
- $('logCount').textContent=`${total}件 / 6版 ${pc6}人・7版 ${pc7}人`;
-
- if(logSelectedPcId&&!logPcRows.some(p=>p.id===logSelectedPcId))logSelectedPcId='';
- if(!logSelectedPcId&&logPcRows.length)logSelectedPcId=logPcRows[0].id;
-
- renderLogPcList();
- renderLogSelectedPc();
-}
-function renderLogPcList(){
- const wrap=$('logPcList');
- if(!wrap)return;
- const q=String($('logPcSearch')?.value||'').trim().toLowerCase();
- const rows=logPcRows.filter(p=>!q||`${p.name} ${p.reading}`.toLowerCase().includes(q));
-
- wrap.innerHTML=rows.length?rows.map(p=>`
-   <button type="button" class="log-pc-item${p.id===logSelectedPcId?' active':''}" data-id="${esc(p.id)}">
-     <span class="log-pc-name"><span class="log-pc-edition">${esc(p.edition)}版</span>${esc(p.name)}</span>
-     <span class="log-pc-count">${p.logs.length}件</span>
-   </button>
- `).join(''):'<div class="database-empty">URL付き通過シナリオがありません。</div>';
-
- wrap.querySelectorAll('.log-pc-item').forEach(btn=>{
-   btn.onclick=()=>{
-     logSelectedPcId=btn.dataset.id||'';
-     renderLogPcList();
-     renderLogSelectedPc();
-   };
- });
-}
-function openExternalTab(url){
- const href=String(url||'').trim();
- if(!href)return;
- // Using a real anchor avoids the false "popup blocked" warning that can occur
- // when window.open(...,'noopener') successfully opens a tab but returns null.
- const a=document.createElement('a');
- a.href=href;
- a.target='_blank';
- a.rel='noopener noreferrer';
- a.style.display='none';
- document.body.appendChild(a);
- a.click();
- a.remove();
-}
-function logOpenHtmlUrl(record){
- if(!record?.url)return '';
- return record.driveId?googleDriveHtmlViewUrl(record.url):String(record.url||'');
-}
-function openLogInNewTab(record){
- openExternalTab(logOpenHtmlUrl(record));
-}
-function openLogDriveTab(record){
- if(record?.url)openExternalTab(record.url);
-}
-function renderLogSelectedPc(){
- const pc=logPcRows.find(p=>p.id===logSelectedPcId);
- const list=$('logSessionList');
- if(!pc){
-   $('logSelectedPcName').textContent='PCを選択してください';
-   $('logSelectedPcSub').textContent='';
-   list.innerHTML='';
-   return;
- }
- $('logSelectedPcName').textContent=pc.name;
- $('logSelectedPcSub').textContent=`${pc.edition}版 / ${pc.logs.length}件`;
-
- list.innerHTML=pc.logs.map((r,i)=>`
-   <div class="log-session-row">
-     <div class="log-session-date">${esc(r.date||'—')}</div>
-     <div class="log-session-main">
-       <strong>${esc(r.title)}</strong>
-       <span>${r.driveId?'Google Drive':'URL'}</span>
-     </div>
-     <div class="log-session-actions">
-       <button type="button" class="btn small log-preview-btn" data-index="${i}">読む ↗</button>
-       ${r.driveId?`<button type="button" class="btn small log-drive-btn" data-index="${i}">Drive ↗</button>`:''}
-     </div>
-   </div>
- `).join('');
-
- list.querySelectorAll('.log-preview-btn').forEach(btn=>{
-   btn.onclick=()=>openLogInNewTab(pc.logs[Number(btn.dataset.index)]);
- });
- list.querySelectorAll('.log-drive-btn').forEach(btn=>{
-   btn.onclick=()=>openLogDriveTab(pc.logs[Number(btn.dataset.index)]);
- });
-}
 let reportRowCache=new Map();
 
 const collapsedReportYears=new Set();
@@ -10816,7 +9610,6 @@ async function showHubView(kind){
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
- $('logHub').classList.add('hidden');
 
  if(kind==='session'){
    setTopNav('session');
@@ -10834,10 +9627,6 @@ async function showHubView(kind){
    setTopNav('link');
    $('linkHub').classList.remove('hidden');
    renderLinks();
- }else{
-   setTopNav('log');
-   $('logHub').classList.remove('hidden');
-   await renderLogHub();
  }
  window.scrollTo(0,0);
 }
@@ -10855,7 +9644,6 @@ async function showDatabaseView(){
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
- $('logHub').classList.add('hidden');
  $('databaseView').style.display='';
  $('databaseView').classList.remove('hidden');
  await renderDatabaseView();
@@ -11688,7 +10476,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.5',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -12690,7 +11478,6 @@ $('sessionViewBtn').onclick=()=>showHubView('session');
 $('reportViewBtn').onclick=()=>showHubView('report');
 $('otherPcViewBtn').onclick=()=>showHubView('other');
 $('linkViewBtn').onclick=()=>showHubView('link');
-$('logViewBtn').onclick=()=>showHubView('log');
 $('backFromDatabaseBtn').onclick=leaveDatabaseView;
 $('databaseEditionFilter').onchange=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
 $('databaseFilterResetBtn').onclick=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
@@ -12717,11 +11504,6 @@ document.querySelectorAll('.hub-tab').forEach(btn=>btn.onclick=async()=>{
 $('sessionEditionFilter').onchange=renderSessionHub;
 $('sessionSearchInput').oninput=renderSessionHub;
 
-$('logPcSearch').oninput=renderLogPcList;
-$('logDriveScanBtn').onclick=()=>scanDriveLogFolder(false);
-$('logDriveFullScanBtn').onclick=()=>scanDriveLogFolder(true);
-$('logDriveApplyBtn').onclick=applyDriveLogMatches;
-$('logDriveCollapseBtn').onclick=()=>setDriveImportCollapsed(!$('logDriveImport').classList.contains('collapsed'));
 
 $('reportLightboxClose').onclick=closeReportLightbox;
 $('reportLightbox').onclick=e=>{if(e.target===$('reportLightbox'))closeReportLightbox()};
@@ -12755,19 +11537,7 @@ $('reportPageShareBtn').onclick=async()=>{
  setTimeout(()=>{btn.textContent=original},1500);
 };
 
-$('logPageShareBtn').onclick=async()=>{
- const cfg=loadOnlineSyncConfig();
- const url=logViewerUrl(cfg);
- if(!onlineSyncConfigured(cfg)||!url){
-   alert('公開同期のGitHub Pages URL・Supabase設定を先に保存してください。');
-   return;
- }
- const ok=await copyTextPortable(url);
- const btn=$('logPageShareBtn');
- const original='🔗 共有リンク';
- btn.textContent=ok?'✓ コピーしました':'URLをコピーできませんでした';
- setTimeout(()=>{btn.textContent=original},1500);
-};
+
 
 $('sessionFilterResetBtn').onclick=()=>{
  $('sessionEditionFilter').value='';
@@ -12984,13 +11754,11 @@ async function initCharacterDatabase(){
      const queryPc=params.get('pc')||'';
      const queryDatabase=params.get('database')||'';
      const queryReport=params.get('report')||'';
-     const queryLog=params.get('log')||'';
      const queryMobileEdit=params.get('mobileedit')||'';
      const queryMobileView=params.get('view')||'';
      const legacyPc=location.hash.startsWith('#pc=')?decodeURIComponent(location.hash.slice(4)):'';
      const legacyDatabase=location.hash.startsWith('#database=')?decodeURIComponent(location.hash.slice('#database='.length)):'';
      const legacyReport=location.hash.startsWith('#report=')?decodeURIComponent(location.hash.slice('#report='.length)):'';
-     const legacyLog=location.hash.startsWith('#log=')?decodeURIComponent(location.hash.slice('#log='.length)):'';
 
      if(queryMobileEdit&&queryMobileView){
        await startMobileEditor(queryMobileEdit,queryMobileView);
@@ -13023,19 +11791,6 @@ async function initCharacterDatabase(){
        return;
      }
 
-     const logToken=queryLog||legacyLog;
-     if(logToken){
-       publicRemoteData=await loadPublicDatabaseByViewerToken(logToken);
-       appData=structuredClone(publicRemoteData.appData);
-       if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
-       if(!Array.isArray(appData.links))appData.links=[];
-       publicRemoteMode='log';
-       document.body.classList.add('public-online-log');
-       await showHubView('log');
-       document.body.classList.remove('public-route-loading');
-       document.title='LOG | CHARACTER DATABASE';
-       return;
-     }
 
      const viewerToken=queryDatabase||legacyDatabase;
      if(viewerToken){
