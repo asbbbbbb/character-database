@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.0</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.1</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -4992,6 +4992,59 @@ body.public-mobile-editor .table-wrap{
   overflow:visible!important;
 }
 
+
+/* v7.1 ------------------------------------------------------------ */
+
+/* SESSION PL yoso: multi-select chips, same idea as individual scenario PC names. */
+.session-yoso-multi{
+  display:grid;
+  gap:4px;
+  min-width:0;
+}
+.session-yoso-selected{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  min-height:0;
+}
+.session-yoso-selected.empty{
+  display:none;
+}
+.session-yoso-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  max-width:100%;
+  padding:2px 7px;
+  border:1px solid #cbd6de;
+  border-radius:999px;
+  background:#f2f6f8;
+  color:#35434e;
+  font-size:9px;
+  line-height:1.4;
+  white-space:nowrap;
+}
+.session-yoso-chip-remove{
+  width:14px;
+  height:14px;
+  min-width:14px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:transparent;
+  color:#77838d;
+  font-size:11px;
+  line-height:13px;
+  cursor:pointer;
+}
+.session-yoso-chip-remove:hover{
+  background:#dde6eb;
+  color:#283640;
+}
+#sessionPLTable .session-yoso-multi{
+  min-width:150px;
+}
+
 </style>
 </head>
 <body>
@@ -5383,9 +5436,12 @@ body.public-mobile-editor .table-wrap{
                 <datalist id="sessionPlUchiOptions"></datalist>
               </label>
               <label>yoso
-                <div class="session-yoso-autocomplete">
-                  <input class="control session-yoso-input" id="sessionPlAddYoso" autocomplete="off" placeholder="同卓PC名を入力">
-                  <div class="session-yoso-suggestions hidden" role="listbox"></div>
+                <div class="session-yoso-multi">
+                  <div class="session-yoso-selected"></div>
+                  <div class="session-yoso-autocomplete">
+                    <input class="control session-yoso-input" id="sessionPlAddYoso" autocomplete="off" placeholder="同卓PC名を入力">
+                    <div class="session-yoso-suggestions hidden" role="listbox"></div>
+                  </div>
                 </div>
               </label>
               <button type="button" class="btn primary" id="sessionPlAddBtn">＋ 追加</button>
@@ -5597,7 +5653,7 @@ body.public-mobile-editor .table-wrap{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.0</p>
+    <p class="public-viewer-version">Viewer v7.1</p>
   </div>
 </div>
 
@@ -5678,7 +5734,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.0';
+const PUBLIC_VIEWER_VERSION='7.1';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7934,17 +7990,57 @@ function bindSessionYosoAutocomplete(input){
  if(!input||input.dataset.yosoAutocompleteBound==='1')return;
  const host=input.closest('.session-yoso-autocomplete');
  const list=host?.querySelector('.session-yoso-suggestions');
+ const multi=input.closest('.session-yoso-multi');
+ const chips=multi?.querySelector('.session-yoso-selected');
  if(!host||!list)return;
  input.dataset.yosoAutocompleteBound='1';
 
  let matches=[];
  let index=-1;
 
+ const renderChips=()=>{
+   if(!chips)return;
+   const names=scenarioPcNames(input.value);
+   chips.innerHTML=names.map((name,i)=>`
+     <span class="session-yoso-chip">
+       <span>${esc(name)}</span>
+       <button type="button" class="session-yoso-chip-remove" data-index="${i}" aria-label="${esc(name)}を外す">×</button>
+     </span>`).join('');
+   chips.classList.toggle('empty',!names.length);
+   chips.querySelectorAll('.session-yoso-chip-remove').forEach(btn=>{
+     btn.onclick=()=>{
+       const now=scenarioPcNames(input.value);
+       now.splice(Number(btn.dataset.index),1);
+       input.value=scenarioPcText(now);
+       input.dispatchEvent(new Event('input',{bubbles:true}));
+       renderChips();
+       render();
+       input.focus();
+     };
+   });
+ };
+
+ const commitName=name=>{
+   const chosen=String(name||'').trim();
+   if(!chosen)return;
+   const currentNames=scenarioPcNames(input.value);
+   const token=sessionYosoCurrentToken(input.value);
+   let base=[...currentNames];
+   if(token&&base.length&&normalizeYosoNameKey(base[base.length-1])===normalizeYosoNameKey(token)){
+     base.pop();
+   }
+   if(!base.some(n=>normalizeYosoNameKey(n)===normalizeYosoNameKey(chosen)))base.push(chosen);
+   input.value=scenarioPcText(base);
+   input.dispatchEvent(new Event('input',{bubbles:true}));
+   renderChips();
+ };
+
  const render=()=>{
-   const selected=new Set(scenarioPcNames(input.value));
+   renderChips();
+   const selectedKeys=new Set(scenarioPcNames(input.value).map(normalizeYosoNameKey));
    const q=sessionYosoCurrentToken(input.value).toLowerCase();
    matches=sessionYosoCandidates()
-     .filter(r=>!selected.has(r.name))
+     .filter(r=>!selectedKeys.has(normalizeYosoNameKey(r.name)))
      .filter(r=>!q||`${r.name} ${r.kana} ${r.pl}`.toLowerCase().includes(q))
      .slice(0,10);
    index=matches.length?0:-1;
@@ -7959,13 +8055,15 @@ function bindSessionYosoAutocomplete(input){
      btn.onclick=()=>{
        const pick=matches[Number(btn.dataset.index)];
        if(pick){
-         sessionYosoInsertName(input,pick.name);
+         commitName(pick.name);
+         input.value=scenarioPcText(scenarioPcNames(input.value))+' / ';
          render();
          input.focus();
        }
      };
    });
  };
+
  const updateActive=()=>{
    list.querySelectorAll('.scenario-pc-suggestion').forEach((btn,i)=>{
      const active=i===index;
@@ -7976,7 +8074,17 @@ function bindSessionYosoAutocomplete(input){
 
  input.addEventListener('focus',render);
  input.addEventListener('input',render);
- input.addEventListener('blur',()=>setTimeout(()=>list.classList.add('hidden'),120));
+ input.addEventListener('blur',()=>setTimeout(()=>{
+   // Commit a manually typed final name when focus leaves the field.
+   const token=sessionYosoCurrentToken(input.value);
+   if(token&&!scenarioPcNames(input.value).slice(0,-1).some(n=>normalizeYosoNameKey(n)===normalizeYosoNameKey(token))){
+     commitName(token);
+   }
+   input.value=scenarioPcText(scenarioPcNames(input.value));
+   renderChips();
+   list.classList.add('hidden');
+ },120));
+
  input.addEventListener('keydown',e=>{
    if(e.key==='ArrowDown'&&matches.length){
      e.preventDefault(); index=(index+1)%matches.length; updateActive(); return;
@@ -7985,17 +8093,28 @@ function bindSessionYosoAutocomplete(input){
      e.preventDefault(); index=(index-1+matches.length)%matches.length; updateActive(); return;
    }
    if(e.key==='Escape'){list.classList.add('hidden');return}
-   if(e.key==='Enter'&&matches.length){
+   if(e.key==='Enter'){
      e.preventDefault();
-     const pick=matches[index>=0?index:0];
-     if(pick){
-       sessionYosoInsertName(input,pick.name);
+     const pick=matches.length?matches[index>=0?index:0]:null;
+     const token=sessionYosoCurrentToken(input.value);
+     commitName(pick?.name||token);
+     input.value=scenarioPcText(scenarioPcNames(input.value))+' / ';
+     render();
+     return;
+   }
+   if((e.key==='Backspace'||e.key==='Delete')&&!String(input.value||'').trim()){
+     const names=scenarioPcNames(input.value);
+     if(names.length){
+       names.pop();
+       input.value=scenarioPcText(names);
+       input.dispatchEvent(new Event('input',{bubbles:true}));
        render();
      }
    }
  });
-}
 
+ renderChips();
+}
 async function collectPLSessions(){
  let chars=(await all()).map(ensureShape);
  if(current){
@@ -8075,9 +8194,12 @@ async function renderSessionPL(){
          <td class="col-link"><input class="session-pl-edit-url" value="${esc(r.url||'')}" placeholder="https://"></td>
          <td class="col-title"><input class="session-pl-edit-title" value="${esc(r.title||'')}" placeholder="シナリオ名"></td>
          <td class="col-uchi"><input class="session-pl-edit-uchi" list="sessionPlUchiOptions" value="${esc(r.uchi||'')}" autocomplete="off"></td>
-         <td class="col-yoso"><div class="session-yoso-autocomplete">
-           <input class="session-pl-edit-yoso session-yoso-input" autocomplete="off" value="${esc(r.yoso||'')}" placeholder="同卓PC名">
-           <div class="session-yoso-suggestions hidden" role="listbox"></div>
+         <td class="col-yoso"><div class="session-yoso-multi">
+           <div class="session-yoso-selected"></div>
+           <div class="session-yoso-autocomplete">
+             <input class="session-pl-edit-yoso session-yoso-input" autocomplete="off" value="${esc(r.yoso||'')}" placeholder="同卓PC名を入力">
+             <div class="session-yoso-suggestions hidden" role="listbox"></div>
+           </div>
          </div></td>
          <td class="col-action"><div class="record-actions">
            <button type="button" class="record-icon-btn confirm session-pl-confirm" title="確定" aria-label="確定">✓</button>
@@ -8259,7 +8381,7 @@ async function addPlSessionToCharacter(){
  const date=normalizeScenarioDate($('sessionPlAddDate')?.value||'');
  const title=String($('sessionPlAddTitle')?.value||'').trim();
  const uchi=String($('sessionPlAddUchi')?.value||'').trim();
- const yoso=String($('sessionPlAddYoso')?.value||'').trim();
+ const yoso=scenarioPcText(scenarioPcNames($('sessionPlAddYoso')?.value||''));
  const msg=$('sessionPlAddMessage');
 
  const setMsg=(s,error=false)=>{
@@ -8316,6 +8438,7 @@ async function addPlSessionToCharacter(){
  $('sessionPlAddTitle').value='';
  $('sessionPlAddUchi').value='';
  $('sessionPlAddYoso').value='';
+ $('sessionPlAddYoso').dispatchEvent(new Event('input',{bubbles:true}));
 
  setMsg(`「${ch.name||'名前未設定'}」の通過シナリオへ追加しました。`);
  await renderSessionPL();
@@ -10135,7 +10258,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.0',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -11201,7 +11324,6 @@ $('sessionFilterResetBtn').onclick=()=>{
 };
 $('sessionDeduplicateBtn').onclick=deleteDuplicateSessionRecords;
 $('sessionPlAddBtn').onclick=addPlSessionToCharacter;
-$('sessionPlAddYoso').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addPlSessionToCharacter()}};
 $('sessionDeleteAllBtn').onclick=deleteAllSessionRecords;
 $('addKPSessionBtn').onclick=()=>{
  const edition=$('sessionEditionFilter').value||'6';
