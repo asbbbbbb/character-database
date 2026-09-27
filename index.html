@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.4.7</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.4.8</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5664,6 +5664,35 @@ body.public-viewer-only #logDriveImport{
   }
 }
 
+
+/* v7.4.8 ---------------------------------------------------------- */
+.log-drive-scan-actions{
+  display:flex;
+  gap:5px;
+  align-items:center;
+  justify-content:flex-end;
+}
+.log-drive-last-sync{
+  color:#78858f;
+  font-size:9px;
+  white-space:nowrap;
+}
+.log-drive-modified{
+  display:block;
+  margin-top:2px;
+  color:#8a959d;
+  font-size:7px;
+  white-space:nowrap;
+}
+@media(max-width:900px){
+  .log-drive-scan-actions{
+    justify-content:flex-start;
+  }
+  .log-drive-import-options{
+    gap:7px;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -6191,15 +6220,19 @@ body.public-viewer-only #logDriveImport{
             <label>親フォルダURL
               <input class="control" id="logDriveFolderUrl" placeholder="https://drive.google.com/drive/folders/...">
             </label>
-            <button type="button" class="btn" id="logDriveScanBtn">フォルダを読込</button>
+            <div class="log-drive-scan-actions">
+              <button type="button" class="btn" id="logDriveScanBtn">差分読込</button>
+              <button type="button" class="btn" id="logDriveFullScanBtn">全件再読込</button>
+            </div>
           </div>
           <div class="log-drive-import-options">
             <label><input type="checkbox" id="logDriveOverwrite"> 既存の🔗も上書きする</label>
+            <span class="log-drive-last-sync" id="logDriveLastSync">最終反映：なし</span>
             <button type="button" class="btn primary" id="logDriveApplyBtn" disabled>一致したリンクを反映</button>
           </div>
           <div class="log-drive-import-note">
-            APIキーは不要です。付属のApps Scriptを自分のGoogleアカウントでWebアプリとして公開し、そのURLを入力します。
-            親フォルダ直下の「かな1文字目-PC名」フォルダと、その中のHTMLファイルを照合します。
+            差分読込は、前回反映後に新規作成・更新されたHTMLだけを取得します。既に🔗がある通過シナリオは通常スキップします。
+            必要な場合だけ「全件再読込」を使用してください。
           </div>
           <div class="log-drive-import-status" id="logDriveImportStatus"></div>
           <div class="log-drive-match-wrap hidden" id="logDriveMatchWrap">
@@ -6340,7 +6373,7 @@ body.public-viewer-only #logDriveImport{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.4.7</p>
+    <p class="public-viewer-version">Viewer v7.4.8</p>
   </div>
 </div>
 
@@ -6422,8 +6455,9 @@ const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const DRIVE_LOG_FOLDER_KEY='characterDatabaseV0747DriveLogFolderV1';
 const DRIVE_LOG_SCRIPT_URL_KEY='characterDatabaseV0747DriveLogScriptUrlV1';
+const DRIVE_LOG_LAST_SYNC_KEY='characterDatabaseV0748DriveLogLastSyncV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.4.7';
+const PUBLIC_VIEWER_VERSION='7.4.8';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9509,7 +9543,7 @@ function driveFileTitleInfo(fileName){
  }
  return {title:stem||String(fileName||''),date};
 }
-function appsScriptJsonp(scriptUrl,folderId){
+function appsScriptJsonp(scriptUrl,folderId,options={}){
  return new Promise((resolve,reject)=>{
    const callback='__cdDriveLog_'+Date.now()+'_'+Math.random().toString(36).slice(2);
    const script=document.createElement('script');
@@ -9523,8 +9557,8 @@ function appsScriptJsonp(scriptUrl,folderId){
    };
    const timeout=setTimeout(()=>{
      cleanup();
-     reject(new Error('Apps Scriptから応答がありませんでした。公開設定とURLを確認してください。'));
-   },30000);
+     reject(new Error('Apps Scriptから120秒以内に応答がありませんでした。全件再読込ではなく差分読込を試してください。'));
+   },120000);
 
    window[callback]=payload=>{
      cleanup();
@@ -9539,6 +9573,8 @@ function appsScriptJsonp(scriptUrl,folderId){
    u.searchParams.set('action','scanLogs');
    u.searchParams.set('folderId',folderId);
    u.searchParams.set('callback',callback);
+   if(options.since)u.searchParams.set('since',options.since);
+   if(options.full)u.searchParams.set('full','1');
    u.searchParams.set('_',String(Date.now()));
    script.src=u.toString();
    script.async=true;
@@ -9580,7 +9616,7 @@ function matchDriveFileToScenario(character,file){
  }
  return {status:'unmatched',label:'未一致',scenario:null,scenarioTitle:'—'};
 }
-async function scanDriveLogFolder(){
+async function scanDriveLogFolder(fullScan=false){
  const folderUrl=String($('logDriveFolderUrl')?.value||'').trim();
  const scriptUrl=normalizeAppsScriptUrl($('logDriveScriptUrl')?.value||'');
  const status=$('logDriveImportStatus');
@@ -9603,16 +9639,24 @@ async function scanDriveLogFolder(){
  localStorage.setItem(DRIVE_LOG_FOLDER_KEY,folderUrl);
  localStorage.setItem(DRIVE_LOG_SCRIPT_URL_KEY,scriptUrl);
 
+ const lastSync=String(localStorage.getItem(DRIVE_LOG_LAST_SYNC_KEY)||'').trim();
+ const since=fullScan?'':lastSync;
  status.classList.remove('error');
- status.textContent='Apps Script経由でGoogle Driveを読み込んでいます…';
+ status.textContent=fullScan
+   ? 'Apps Script経由で全件を読み込んでいます…（最大120秒待機）'
+   : (since
+       ? `Apps Script経由で差分を読み込んでいます…（${formatDriveSyncTime(since)} 以降）`
+       : '初回のため全件を読み込んでいます…（最大120秒待機）');
  wrap.classList.add('hidden');
  applyBtn.disabled=true;
  logDriveMatches=[];
 
  try{
-   const payload=await appsScriptJsonp(scriptUrl,folderId);
+   const payload=await appsScriptJsonp(scriptUrl,folderId,{since,full:fullScan});
    const folders=Array.isArray(payload.folders)?payload.folders:[];
    const chars=(await all()).map(ensureShape);
+   const overwrite=!!$('logDriveOverwrite')?.checked;
+   let existingSkipped=0;
 
    for(const folder of folders){
      const pcName=driveFolderPcName(folder.name);
@@ -9627,6 +9671,7 @@ async function scanDriveLogFolder(){
          logDriveMatches.push({
            pcName,folderName:folder.name,fileName:file.name,file,url,
            character:null,scenario:null,scenarioTitle:'—',
+           modifiedTime:file.modifiedTime||'',
            status:pcCandidates.length?'pc-ambiguous':'pc-missing',
            label:pcCandidates.length?'PC複数':'PCなし'
          });
@@ -9635,6 +9680,12 @@ async function scanDriveLogFolder(){
 
        const character=pcCandidates[0];
        const match=matchDriveFileToScenario(character,file);
+
+       if(match.scenario && String(match.scenario.url||'').trim() && !overwrite){
+         existingSkipped++;
+         continue;
+       }
+
        logDriveMatches.push({
          pcName:character.name||pcName,
          folderName:folder.name,
@@ -9642,6 +9693,7 @@ async function scanDriveLogFolder(){
          file,url,character,
          scenario:match.scenario,
          scenarioTitle:match.scenarioTitle,
+         modifiedTime:file.modifiedTime||'',
          status:match.status,
          label:match.label
        });
@@ -9652,19 +9704,27 @@ async function scanDriveLogFolder(){
    const exact=logDriveMatches.filter(x=>x.status==='exact').length;
    const approx=logDriveMatches.filter(x=>x.status==='approx').length;
    const unmatched=logDriveMatches.length-applicable.length;
+   window.__driveLogScanWatermark=String(payload.scannedAt||new Date().toISOString());
 
    body.innerHTML=logDriveMatches.length?logDriveMatches.map(m=>`
      <tr class="drive-match-${esc(m.status)}">
        <td>${esc(m.pcName||'—')}</td>
        <td title="${esc(m.fileName)}">${esc(m.fileName)}</td>
        <td>${esc(m.scenarioTitle||'—')}</td>
-       <td><span class="log-drive-match-badge ${esc(m.status)}">${esc(m.label)}</span></td>
+       <td>
+         <span class="log-drive-match-badge ${esc(m.status)}">${esc(m.label)}</span>
+         ${m.modifiedTime?`<span class="log-drive-modified">${esc(formatDriveSyncTime(m.modifiedTime))}</span>`:''}
+       </td>
      </tr>
-   `).join(''):'<tr><td colspan="4">HTMLファイルが見つかりませんでした。</td></tr>';
+   `).join(''):'<tr><td colspan="4">今回の対象HTMLはありませんでした。</td></tr>';
 
    wrap.classList.remove('hidden');
    applyBtn.disabled=!applicable.length;
-   status.textContent=`${logDriveMatches.length}件を確認：一致 ${exact}件 / 推定 ${approx}件 / 未一致等 ${unmatched}件`;
+
+   const modeText=fullScan?'全件':'差分';
+   const returned=Number(payload.returnedFileCount||0);
+   const examined=Number(payload.examinedFileCount||0);
+   status.textContent=`${modeText}読込：Drive側 ${returned}件返却 / ${examined}件確認。照合 一致 ${exact}件 / 推定 ${approx}件 / 未一致等 ${unmatched}件 / 既存🔗スキップ ${existingSkipped}件`;
  }catch(err){
    console.error(err);
    status.textContent='Google Driveの読み込みに失敗しました：'+(err?.message||err);
@@ -9703,17 +9763,36 @@ async function applyDriveLogMatches(){
    if(current?.id===id)current=ensureShape(structuredClone(ch));
  }
 
+ if(applied>0 && window.__driveLogScanWatermark){
+   localStorage.setItem(DRIVE_LOG_LAST_SYNC_KEY,window.__driveLogScanWatermark);
+ }
+
  status.classList.remove('error');
- status.textContent=`リンクを ${applied}件 反映しました${skipped?`（${skipped}件は既存リンク等のためスキップ）`:''}。`;
+ status.textContent=`リンクを ${applied}件 反映しました${skipped?`（${skipped}件スキップ）`:''}。${applied?' 次回からこの時刻以降の差分だけを取得します。':''}`;
+ updateDriveLogLastSyncLabel();
  if(current)renderScenarios();
  renderList();
  await renderLogHub();
+}
+function formatDriveSyncTime(value){
+ const s=String(value||'').trim();
+ if(!s)return 'なし';
+ const d=new Date(s);
+ if(Number.isNaN(d.getTime()))return s;
+ return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+function updateDriveLogLastSyncLabel(){
+ const el=$('logDriveLastSync');
+ if(!el)return;
+ const value=localStorage.getItem(DRIVE_LOG_LAST_SYNC_KEY)||'';
+ el.textContent=`最終反映：${formatDriveSyncTime(value)}`;
 }
 function initDriveLogImportInputs(){
  const folder=$('logDriveFolderUrl');
  const scriptUrl=$('logDriveScriptUrl');
  if(folder&&!folder.value)folder.value=localStorage.getItem(DRIVE_LOG_FOLDER_KEY)||'';
  if(scriptUrl&&!scriptUrl.value)scriptUrl.value=localStorage.getItem(DRIVE_LOG_SCRIPT_URL_KEY)||'';
+ updateDriveLogLastSyncLabel();
 }
 
 let logPcRows=[];
@@ -11405,7 +11484,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.7',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.4.8',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -12435,7 +12514,8 @@ $('sessionEditionFilter').onchange=renderSessionHub;
 $('sessionSearchInput').oninput=renderSessionHub;
 
 $('logPcSearch').oninput=renderLogPcList;
-$('logDriveScanBtn').onclick=scanDriveLogFolder;
+$('logDriveScanBtn').onclick=()=>scanDriveLogFolder(false);
+$('logDriveFullScanBtn').onclick=()=>scanDriveLogFolder(true);
 $('logDriveApplyBtn').onclick=applyDriveLogMatches;
 
 $('reportLightboxClose').onclick=closeReportLightbox;
