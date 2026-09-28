@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.9.2</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.9.3</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5822,6 +5822,74 @@ body.hub-mode #hubView{
   min-width:150px;
 }
 
+
+/* v7.9.3 ---------------------------------------------------------- */
+/* Smartphone editor polish: BASIC + scenarios only. */
+@media(max-width:700px){
+  body.public-mobile-editor #tab-basic .ability-tables{overflow:visible!important;gap:9px!important}
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:2px}
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table{width:680px!important;min-width:680px!important;max-width:none!important;table-layout:fixed!important}
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table th:first-child,
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table td:first-child{width:64px!important;min-width:64px!important;max-width:64px!important}
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table th:not(:first-child),
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table td:not(:first-child){width:68px!important;min-width:68px!important;max-width:68px!important}
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table input{min-width:0!important;width:100%!important;padding:5px 2px!important;font-size:12px!important}
+
+  body.public-mobile-editor #tab-basic .ability-mobile-fit{width:100%;max-width:100%;overflow:hidden}
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table{width:100%!important;max-width:100%!important;min-width:0!important;table-layout:fixed!important}
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table th,
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table td{min-width:0!important;max-width:none!important;width:auto!important;padding:5px 2px!important;font-size:10px!important}
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table th:first-child,
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table td:first-child{width:58px!important}
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table input{min-width:0!important;width:100%!important;padding:4px 1px!important;font-size:11px!important}
+
+  body.public-mobile-editor #tab-basic #skillsArea .table-wrap{overflow:visible!important;max-width:100%!important}
+  body.public-mobile-editor #tab-basic #skillsArea table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important}
+  body.public-mobile-editor #tab-basic #skillsArea th,
+  body.public-mobile-editor #tab-basic #skillsArea td{min-width:0!important;padding:4px 2px!important;font-size:9px!important;overflow:hidden}
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(1),body.public-mobile-editor #tab-basic #skillsArea td:nth-child(1){width:39%!important}
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(2),body.public-mobile-editor #tab-basic #skillsArea td:nth-child(2),
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(3),body.public-mobile-editor #tab-basic #skillsArea td:nth-child(3),
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(4),body.public-mobile-editor #tab-basic #skillsArea td:nth-child(4),
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(5),body.public-mobile-editor #tab-basic #skillsArea td:nth-child(5),
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(6),body.public-mobile-editor #tab-basic #skillsArea td:nth-child(6),
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(7),body.public-mobile-editor #tab-basic #skillsArea td:nth-child(7){width:8.5%!important}
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(8),body.public-mobile-editor #tab-basic #skillsArea td:nth-child(8){width:10%!important}
+  body.public-mobile-editor #tab-basic #skillsArea input{width:100%!important;min-width:0!important;max-width:100%!important;padding:4px 1px!important;font-size:10px!important;text-align:center}
+  body.public-mobile-editor #tab-basic #skillsArea .skill-combo{width:100%!important;min-width:0!important;max-width:100%!important;gap:2px!important}
+  body.public-mobile-editor #tab-basic #skillsArea .skill-combo.plain{display:block!important}
+  body.public-mobile-editor #tab-basic #skillsArea .skill-combo.has-special{display:grid!important;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)!important;align-items:center}
+  body.public-mobile-editor #tab-basic #skillsArea .skill-label{display:block;min-width:0!important;max-width:100%!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px!important}
+  body.public-mobile-editor #tab-basic #skillsArea .detail-input,
+  body.public-mobile-editor #tab-basic #skillsArea .custom-skill-input{width:100%!important;min-width:0!important}
+  body.public-mobile-editor #tab-basic #skillsArea .row-actions .btn{min-width:0!important;width:24px!important;padding:2px!important;font-size:9px!important}
+
+  body.public-mobile-editor #tab-scenarios .card{padding:12px!important}
+  body.public-mobile-editor #tab-scenarios .section-head{align-items:flex-start!important;gap:7px!important}
+  body.public-mobile-editor #tab-scenarios .section-head .btn{flex:0 0 auto;max-width:42%;padding:6px 7px!important;font-size:9px!important;line-height:1.25}
+  body.public-mobile-editor #tab-scenarios .table-wrap{overflow:visible!important;border:0!important;border-radius:0!important}
+  body.public-mobile-editor #tab-scenarios .scenario-table{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;table-layout:auto!important;background:transparent!important}
+  body.public-mobile-editor #tab-scenarios .scenario-table thead{display:none!important}
+  body.public-mobile-editor #tab-scenarios .scenario-table tbody{display:grid!important;gap:7px!important;width:100%!important}
+  body.public-mobile-editor #tab-scenarios .scenario-table tr{display:grid!important;width:100%!important;min-width:0!important;border:1px solid #d9e1e7;border-radius:8px;background:#fff;overflow:visible!important}
+  body.public-mobile-editor #tab-scenarios .scenario-table td{display:block!important;width:auto!important;min-width:0!important;max-width:none!important;border:0!important;padding:6px!important;font-size:10px!important;overflow:visible!important}
+  body.public-mobile-editor #tab-scenarios .scenario-readonly{grid-template-columns:30px 86px minmax(0,1fr) 58px!important;grid-template-rows:auto auto!important;align-items:center}
+  body.public-mobile-editor #tab-scenarios .scenario-readonly td:nth-child(1){grid-column:1;grid-row:1;text-align:center}
+  body.public-mobile-editor #tab-scenarios .scenario-readonly td:nth-child(2){grid-column:2;grid-row:1;white-space:nowrap}
+  body.public-mobile-editor #tab-scenarios .scenario-readonly td:nth-child(3){grid-column:3;grid-row:1;font-weight:700;line-height:1.35;overflow-wrap:anywhere!important}
+  body.public-mobile-editor #tab-scenarios .scenario-readonly td:nth-child(4){grid-column:1 / -1;grid-row:2;padding-top:2px!important;border-top:1px solid #edf1f4!important}
+  body.public-mobile-editor #tab-scenarios .scenario-readonly td:nth-child(5){grid-column:4;grid-row:1;padding-left:1px!important;padding-right:3px!important}
+  body.public-mobile-editor #tab-scenarios .scenario-row-actions{display:flex!important;gap:3px!important;justify-content:flex-end!important}
+  body.public-mobile-editor #tab-scenarios .record-icon-btn{width:25px!important;height:25px!important;min-width:25px!important;padding:0!important}
+  body.public-mobile-editor #tab-scenarios .scenario-editing{grid-template-columns:88px minmax(0,1fr) 58px!important;grid-template-rows:auto auto auto auto!important}
+  body.public-mobile-editor #tab-scenarios .scenario-editing td:nth-child(1){grid-column:1 / -1;grid-row:1}
+  body.public-mobile-editor #tab-scenarios .scenario-editing td:nth-child(2){grid-column:1;grid-row:2}
+  body.public-mobile-editor #tab-scenarios .scenario-editing td:nth-child(3){grid-column:2 / -1;grid-row:2}
+  body.public-mobile-editor #tab-scenarios .scenario-editing td:nth-child(4){grid-column:1 / -1;grid-row:3}
+  body.public-mobile-editor #tab-scenarios .scenario-editing td:nth-child(5){grid-column:1 / -1;grid-row:4;display:flex!important;justify-content:flex-end;border-top:1px solid #edf1f4!important}
+  body.public-mobile-editor #tab-scenarios .scenario-editing input{width:100%!important;min-width:0!important;max-width:100%!important;padding:6px!important;font-size:10px!important}
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -6478,7 +6546,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.9.2</p>
+    <p class="public-viewer-version">Viewer v7.9.3</p>
   </div>
 </div>
 
@@ -6559,7 +6627,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.9.2';
+const PUBLIC_VIEWER_VERSION='7.9.3';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7857,7 +7925,12 @@ function renderAbilityTable(){
  const cols=abilityColumns();
  const w=document.querySelector('.workspace')?.clientWidth||1000;
  const groups=w<1000?[cols.slice(0,9),cols.slice(9)]:[cols];
- host.innerHTML=groups.map((g,i)=>buildAbilityTable(g,i)).join('');
+ const mobileEditor=document.body.classList.contains('public-mobile-editor');
+ if(mobileEditor&&groups.length===2){
+   host.innerHTML=`<div class="ability-mobile-scroll">${buildAbilityTable(groups[0],0)}</div><div class="ability-mobile-fit">${buildAbilityTable(groups[1],1)}</div>`;
+ }else{
+   host.innerHTML=groups.map((g,i)=>buildAbilityTable(g,i)).join('');
+ }
  host.querySelectorAll('.ability-base').forEach(inp=>inp.oninput=e=>{
    current.stats[e.target.dataset.stat]=num(e.target.value);renderAbilityTable();renderPoints();renderSkills();
  });
@@ -11364,7 +11437,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
