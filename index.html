@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.9.3</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.9.5</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -5890,6 +5890,297 @@ body.hub-mode #hubView{
   body.public-mobile-editor #tab-scenarios .scenario-editing input{width:100%!important;min-width:0!important;max-width:100%!important;padding:6px!important;font-size:10px!important}
 }
 
+
+/* v7.9.4 ---------------------------------------------------------- */
+/* Strong smartphone-editor containment fixes for BASIC / SCENARIOS only. */
+@media(max-width:700px){
+  body.public-mobile-editor,
+  body.public-mobile-editor #editor,
+  body.public-mobile-editor #tab-basic,
+  body.public-mobile-editor #tab-scenarios{
+    max-width:100vw!important;
+    min-width:0!important;
+    overflow-x:hidden!important;
+  }
+
+  body.public-mobile-editor #tab-basic > .card,
+  body.public-mobile-editor #tab-basic .card,
+  body.public-mobile-editor #tab-scenarios > .card,
+  body.public-mobile-editor #tab-scenarios .card{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* ---- ABILITY ---- */
+  body.public-mobile-editor #tab-basic .ability-tables{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow:hidden!important;
+  }
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    touch-action:pan-x pan-y!important;
+    overscroll-behavior-x:contain;
+    box-sizing:border-box!important;
+  }
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table{
+    display:table!important;
+    width:650px!important;
+    min-width:650px!important;
+    max-width:650px!important;
+    table-layout:fixed!important;
+    margin:0!important;
+  }
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table th:first-child,
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table td:first-child{
+    width:64px!important;
+    min-width:64px!important;
+    max-width:64px!important;
+  }
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table th:not(:first-child),
+  body.public-mobile-editor #tab-basic .ability-mobile-scroll .ability-table td:not(:first-child){
+    width:65px!important;
+    min-width:65px!important;
+    max-width:65px!important;
+  }
+
+  body.public-mobile-editor #tab-basic .ability-mobile-fit{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow:hidden!important;
+    margin-top:8px!important;
+  }
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table{
+    display:table!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    table-layout:fixed!important;
+    margin:0!important;
+  }
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table th,
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table td{
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    padding:5px 1px!important;
+    font-size:9px!important;
+  }
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table th:first-child,
+  body.public-mobile-editor #tab-basic .ability-mobile-fit .ability-table td:first-child{
+    width:54px!important;
+    min-width:54px!important;
+    max-width:54px!important;
+  }
+
+  /* ---- SKILLS ----
+     One category column on phones. All columns through 合計 fit without horizontal scroll. */
+  body.public-mobile-editor #tab-basic #skillsArea.skills-two-column{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea .skill-column{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea .skill-column .card{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-bottom:10px!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea .table-wrap{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow:hidden!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea table{
+    display:table!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    table-layout:fixed!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea th,
+  body.public-mobile-editor #tab-basic #skillsArea td{
+    min-width:0!important;
+    max-width:none!important;
+    padding:4px 1px!important;
+    font-size:8px!important;
+    box-sizing:border-box!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(1),
+  body.public-mobile-editor #tab-basic #skillsArea td:nth-child(1){width:38%!important}
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(2),
+  body.public-mobile-editor #tab-basic #skillsArea td:nth-child(2),
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(3),
+  body.public-mobile-editor #tab-basic #skillsArea td:nth-child(3),
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(4),
+  body.public-mobile-editor #tab-basic #skillsArea td:nth-child(4),
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(5),
+  body.public-mobile-editor #tab-basic #skillsArea td:nth-child(5),
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(6),
+  body.public-mobile-editor #tab-basic #skillsArea td:nth-child(6),
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(7),
+  body.public-mobile-editor #tab-basic #skillsArea td:nth-child(7){width:8.2%!important}
+  body.public-mobile-editor #tab-basic #skillsArea th:nth-child(8),
+  body.public-mobile-editor #tab-basic #skillsArea td:nth-child(8){width:12.8%!important}
+
+  body.public-mobile-editor #tab-basic #skillsArea input{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    min-height:28px!important;
+    padding:3px 0!important;
+    border-radius:5px!important;
+    font-size:9px!important;
+    box-sizing:border-box!important;
+    text-align:center!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea .skill-combo,
+  body.public-mobile-editor #tab-basic #skillsArea .skill-combo.plain,
+  body.public-mobile-editor #tab-basic #skillsArea .skill-combo.has-special{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea .skill-combo.has-special{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(38px,.62fr)!important;
+    gap:2px!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea .skill-label{
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    font-size:9px!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea .detail-input{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea td.row-actions{
+    padding:2px 1px!important;
+  }
+  body.public-mobile-editor #tab-basic #skillsArea td.row-actions .btn{
+    width:22px!important;
+    min-width:22px!important;
+    height:24px!important;
+    min-height:24px!important;
+    padding:0!important;
+    font-size:9px!important;
+  }
+
+  /* ---- SCENARIOS ---- */
+  body.public-mobile-editor #tab-scenarios .table-wrap{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow:visible!important;
+    border:0!important;
+  }
+  body.public-mobile-editor #tab-scenarios .scenario-table{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    table-layout:auto!important;
+    overflow:visible!important;
+  }
+  body.public-mobile-editor #tab-scenarios .scenario-table thead{
+    display:none!important;
+  }
+  body.public-mobile-editor #tab-scenarios .scenario-table tbody{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  body.public-mobile-editor #tab-scenarios .scenario-table tr{
+    display:grid!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    margin:0 0 7px!important;
+    border:1px solid #d9e1e7!important;
+    border-radius:8px!important;
+    background:#fff!important;
+  }
+  body.public-mobile-editor #tab-scenarios .scenario-table td{
+    display:block!important;
+    width:auto!important;
+    max-width:none!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    border:0!important;
+    padding:6px!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  body.public-mobile-editor #tab-scenarios .scenario-readonly{
+    grid-template-columns:26px 82px minmax(0,1fr) 56px!important;
+    grid-template-rows:auto auto!important;
+  }
+  body.public-mobile-editor #tab-scenarios .scenario-readonly td:nth-child(1){grid-column:1!important;grid-row:1!important}
+  body.public-mobile-editor #tab-scenarios .scenario-readonly td:nth-child(2){grid-column:2!important;grid-row:1!important;font-size:9px!important}
+  body.public-mobile-editor #tab-scenarios .scenario-readonly td:nth-child(3){grid-column:3!important;grid-row:1!important;font-size:10px!important;font-weight:700!important}
+  body.public-mobile-editor #tab-scenarios .scenario-readonly td:nth-child(4){
+    grid-column:1 / -1!important;
+    grid-row:2!important;
+    border-top:1px solid #edf1f4!important;
+    padding-top:5px!important;
+  }
+  body.public-mobile-editor #tab-scenarios .scenario-readonly td:nth-child(5){
+    grid-column:4!important;
+    grid-row:1!important;
+    padding:4px 2px!important;
+  }
+
+  body.public-mobile-editor #tab-scenarios .scenario-editing{
+    grid-template-columns:82px minmax(0,1fr)!important;
+    grid-template-rows:auto auto auto auto!important;
+  }
+  body.public-mobile-editor #tab-scenarios .scenario-editing td:nth-child(1){grid-column:1 / -1!important;grid-row:1!important}
+  body.public-mobile-editor #tab-scenarios .scenario-editing td:nth-child(2){grid-column:1!important;grid-row:2!important}
+  body.public-mobile-editor #tab-scenarios .scenario-editing td:nth-child(3){grid-column:2!important;grid-row:2!important}
+  body.public-mobile-editor #tab-scenarios .scenario-editing td:nth-child(4){grid-column:1 / -1!important;grid-row:3!important}
+  body.public-mobile-editor #tab-scenarios .scenario-editing td:nth-child(5){
+    grid-column:1 / -1!important;
+    grid-row:4!important;
+    border-top:1px solid #edf1f4!important;
+    padding-top:5px!important;
+  }
+  body.public-mobile-editor #tab-scenarios .scenario-editing input{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -6546,7 +6837,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.9.3</p>
+    <p class="public-viewer-version">Viewer v7.9.5</p>
   </div>
 </div>
 
@@ -6627,7 +6918,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.9.3';
+const PUBLIC_VIEWER_VERSION='7.9.5';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7821,7 +8112,10 @@ function chatPaletteText(){
 }
 function pieceJsonText(){
  if(!current)return '';
+ syncFormToModel();
  const s=currentStats(), d=derived();
+ const colorInput=$('editor')?.elements?.ccPicker?.value||$('editor')?.elements?.cc?.value||current.cc||'';
+ const pieceColor=/^#[0-9a-fA-F]{6}$/.test(String(colorInput).trim())?String(colorInput).trim().toUpperCase():'#8AA0B6';
  const memo=[
    current.occupation?`職業：${current.occupation}`:'',
    current.age?`年齢：${current.age}`:'',
@@ -7833,12 +8127,12 @@ function pieceJsonText(){
    name:current.name||'名前未設定',
    initiative:num(s.DEX),
    memo,
-   color:/^#[0-9a-fA-F]{6}$/.test(current.cc||'')?current.cc:'#8AA0B6',
+   color:pieceColor,
    commands:chatPaletteText(),
    status:[
      {label:'HP',value:num(d.HP),max:num(d.HP)},
      {label:'MP',value:num(d.MP),max:num(d.MP)},
-     {label:'SAN',value:num(current.sanCurrent),max:num(sanMax())}
+     {label:'SAN',value:num(current.sanCurrent),max:num(current.sanCurrent)}
    ]
  };
  return JSON.stringify({kind:'character',data});
@@ -11437,7 +11731,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.5',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -12669,7 +12963,7 @@ document.addEventListener('paste',e=>{
 });
 
 $('copyChatPaletteBtn').onclick=()=>{if(current)copyPlainText(chatPaletteText(),'チャットパレットをコピーしました')};
-$('copyPieceJsonBtn').onclick=()=>{if(current)copyPlainText(pieceJsonText(),'駒データ(JSON)をコピーしました')};
+$('copyPieceJsonBtn').onclick=()=>{if(current){syncFormToModel();copyPlainText(pieceJsonText(),'駒データ(JSON)をコピーしました')}};
 $('new6Btn').onclick=()=>makeNewCharacter('6');
 $('mobileNew6Btn').onclick=()=>makeNewCharacter('6');
 $('mobileNew7Btn').onclick=()=>makeNewCharacter('7');
