@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.9.6</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.9.7</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6232,6 +6232,114 @@ body.hub-mode #hubView{
   }
 }
 
+
+/* v7.9.7 ---------------------------------------------------------- */
+
+/* Number inputs: keep numeric entry, remove browser increment/decrement arrows. */
+input[type="number"]{
+  -moz-appearance:textfield;
+  appearance:textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button{
+  -webkit-appearance:none;
+  margin:0;
+}
+
+/* OTHER > TASTE */
+.taste-table-note{
+  margin:0 0 8px;
+  color:#72808a;
+  font-size:10px;
+}
+.taste-table-wrap{
+  width:100%;
+  overflow:visible;
+  border:1px solid #d4dde4;
+  border-radius:8px;
+  background:#fff;
+}
+.taste-table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.taste-table th,
+.taste-table td{
+  border-right:1px solid #dfe5ea;
+  border-bottom:1px solid #dfe5ea;
+  padding:5px;
+  text-align:center;
+}
+.taste-table thead th{
+  background:#26343e;
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+}
+.taste-table .taste-name-head{
+  width:32%;
+}
+.taste-table .taste-pc-name{
+  background:#f7f9fa;
+  text-align:left;
+}
+.taste-pc-open{
+  width:100%;
+  min-width:0;
+  border:0;
+  background:transparent;
+  padding:2px 4px;
+  color:#2c3a45;
+  font:inherit;
+  font-size:10px;
+  font-weight:800;
+  text-align:left;
+  cursor:pointer;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.taste-pc-open:hover{
+  text-decoration:underline;
+}
+.taste-table-input{
+  width:100%;
+  min-width:0;
+  max-width:76px;
+  height:30px;
+  padding:4px 5px;
+  border:1px solid #cbd5dd;
+  border-radius:5px;
+  background:#fff;
+  color:#273640;
+  font-size:11px;
+  text-align:center;
+  box-sizing:border-box;
+}
+.taste-table-input:disabled{
+  background:#f3f5f6;
+  color:#7a858e;
+}
+@media(max-width:700px){
+  .taste-table th,
+  .taste-table td{
+    padding:4px 2px;
+  }
+  .taste-table .taste-name-head{
+    width:38%;
+  }
+  .taste-pc-open{
+    font-size:9px;
+  }
+  .taste-table-input{
+    max-width:none;
+    height:28px;
+    padding:3px 1px;
+    font-size:10px;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -6727,6 +6835,7 @@ body.hub-mode #hubView{
         <nav class="hub-tabs other-subtabs" id="otherSubTabs">
           <button type="button" class="hub-tab active" id="otherTallyTabBtn" data-other-tab="tally">TALLY</button>
           <button type="button" class="hub-tab" id="otherBirthTabBtn" data-other-tab="birth">BIRTH</button>
+          <button type="button" class="hub-tab" id="otherTasteTabBtn" data-other-tab="taste">TASTE</button>
           <button type="button" class="hub-tab" id="otherLinkTabBtn" data-other-tab="link">LINK</button>
         </nav>
 
@@ -6754,6 +6863,11 @@ body.hub-mode #hubView{
             <div class="features-note">6版の特徴表を、横軸1～6・縦軸1～10で集計します。特徴表1・特徴表2の両方を数えます。</div>
             <div class="features-distribution-wrap" id="featuresDistributionWrap"></div>
           </div>
+        </section>
+
+        <section class="other-tab-panel hidden" id="otherTastePanel">
+          <div class="taste-table-note">個別編集画面の「酸・苦・甘・辛・鹹」と連動します。1～100を直接入力できます。</div>
+          <div class="taste-table-wrap" id="tasteTableWrap"></div>
         </section>
 
         <section class="other-tab-panel hidden" id="otherLinkPanel">
@@ -6895,7 +7009,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.9.6</p>
+    <p class="public-viewer-version">Viewer v7.9.7</p>
   </div>
 </div>
 
@@ -6976,7 +7090,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.9.6';
+const PUBLIC_VIEWER_VERSION='7.9.7';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -10044,10 +10158,92 @@ async function renderBirthCalendar(){
    btn.onclick=()=>openBirthCharacter(btn.dataset.id||'');
  });
 }
+
+const TASTE_KEYS=[
+ ['acid','酸'],
+ ['bitter','苦'],
+ ['sweet','甘'],
+ ['spicy','辛'],
+ ['salty','鹹']
+];
+function clampTasteValue(value){
+ const raw=String(value??'').trim();
+ if(raw==='')return '';
+ const n=Math.round(Number(raw));
+ if(!Number.isFinite(n))return '';
+ return Math.max(1,Math.min(100,n));
+}
+async function saveTasteValue(characterId,key,value){
+ const chars=await otherSourceCharacters();
+ const ch=chars.find(x=>x.id===characterId);
+ if(!ch)return;
+ ch.taste=ch.taste&&typeof ch.taste==='object'?ch.taste:{};
+ ch.taste[key]=clampTasteValue(value);
+ ch.updatedAt=new Date().toISOString();
+
+ if(current&&current.id===ch.id){
+   current.taste=current.taste&&typeof current.taste==='object'?current.taste:{};
+   current.taste[key]=ch.taste[key];
+   const fieldMap={acid:'tasteAcid',bitter:'tasteBitter',sweet:'tasteSweet',spicy:'tasteSpicy',salty:'tasteSalty'};
+   const field=$('editor')?.elements?.[fieldMap[key]];
+   if(field)field.value=ch.taste[key];
+ }
+
+ await put(ensureShape(structuredClone(ch)));
+}
+async function renderTasteTable(){
+ const wrap=$('tasteTableWrap');
+ if(!wrap)return;
+
+ const chars=(await otherSourceCharacters())
+   .sort((a,b)=>compareText(a.number||'',b.number||'')||compareText(a.reading||a.name,b.reading||b.name)||compareText(a.name,b.name));
+ const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
+
+ if(!chars.length){
+   wrap.innerHTML='<div class="database-empty">探索者がいません。</div>';
+   return;
+ }
+
+ wrap.innerHTML=`<table class="taste-table">
+   <thead><tr>
+     <th class="taste-name-head">探索者名</th>
+     ${TASTE_KEYS.map(([,label])=>`<th>${label}</th>`).join('')}
+   </tr></thead>
+   <tbody>
+     ${chars.map(ch=>`
+       <tr data-id="${esc(ch.id)}">
+         <th class="taste-pc-name">
+           <button type="button" class="taste-pc-open" data-open-id="${esc(ch.id)}">${esc(ch.name||'名前未設定')}</button>
+         </th>
+         ${TASTE_KEYS.map(([key,label])=>`<td>
+           <input class="taste-table-input" type="number" min="1" max="100" inputmode="numeric"
+             data-taste-key="${key}" value="${esc(ch.taste?.[key]??'')}" aria-label="${esc((ch.name||'名前未設定')+' '+label)}"
+             ${editable?'':'disabled'}>
+         </td>`).join('')}
+       </tr>`).join('')}
+   </tbody>
+ </table>`;
+
+ wrap.querySelectorAll('.taste-table-input').forEach(inp=>{
+   const tr=inp.closest('tr');
+   const commit=async()=>{
+     const v=clampTasteValue(inp.value);
+     inp.value=v;
+     await saveTasteValue(tr.dataset.id,inp.dataset.tasteKey,v);
+   };
+   inp.addEventListener('change',commit);
+   inp.addEventListener('blur',commit);
+ });
+
+ wrap.querySelectorAll('.taste-pc-open').forEach(btn=>{
+   btn.onclick=()=>openBirthCharacter(btn.dataset.openId||'');
+ });
+}
 async function renderOtherHub(){
  const ids={
    tally:['otherTallyPanel','otherTallyTabBtn'],
    birth:['otherBirthPanel','otherBirthTabBtn'],
+   taste:['otherTastePanel','otherTasteTabBtn'],
    link:['otherLinkPanel','otherLinkTabBtn']
  };
  for(const [tab,[panelId,btnId]] of Object.entries(ids)){
@@ -10060,6 +10256,8 @@ async function renderOtherHub(){
    await renderFeaturesDistribution();
  }else if(activeOtherTab==='birth'){
    await renderBirthCalendar();
+ }else if(activeOtherTab==='taste'){
+   await renderTasteTable();
  }else{
    renderLinks();
  }
@@ -11809,7 +12007,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.7',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -12901,6 +13099,10 @@ $('otherTallyTabBtn').onclick=async()=>{
 };
 $('otherBirthTabBtn').onclick=async()=>{
  activeOtherTab='birth';
+ await renderOtherHub();
+};
+$('otherTasteTabBtn').onclick=async()=>{
+ activeOtherTab='taste';
  await renderOtherHub();
 };
 $('otherLinkTabBtn').onclick=async()=>{
