@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.9.5</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.9.6</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6181,6 +6181,57 @@ body.hub-mode #hubView{
   }
 }
 
+
+/* v7.9.6 ---------------------------------------------------------- */
+/* Five taste values above chat-palette copy button. */
+.taste-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:4px;
+  margin-bottom:5px;
+}
+.taste-grid label{
+  display:grid;
+  gap:2px;
+  min-width:0;
+  text-align:center;
+}
+.taste-grid label > span{
+  color:#5f6d78;
+  font-size:8px;
+  font-weight:800;
+  line-height:1;
+}
+.taste-grid input{
+  width:100%;
+  min-width:0;
+  height:25px;
+  padding:2px 3px;
+  border:1px solid #ccd5dc;
+  border-radius:5px;
+  background:#fff;
+  color:#26343e;
+  font-size:10px;
+  text-align:center;
+  box-sizing:border-box;
+}
+.taste-grid input:focus{
+  outline:2px solid rgba(90,126,154,.18);
+  border-color:#8198aa;
+}
+@media(max-width:700px){
+  body.public-mobile-editor .taste-grid{
+    gap:3px;
+  }
+  body.public-mobile-editor .taste-grid label > span{
+    font-size:9px;
+  }
+  body.public-mobile-editor .taste-grid input{
+    height:29px;
+    font-size:11px;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -6301,6 +6352,13 @@ body.hub-mode #hubView{
             </div>
 
             <div class="chat-palette-box compact">
+              <div class="taste-grid" aria-label="味覚">
+                <label><span>酸</span><input name="tasteAcid" type="number" min="1" max="100" inputmode="numeric"></label>
+                <label><span>苦</span><input name="tasteBitter" type="number" min="1" max="100" inputmode="numeric"></label>
+                <label><span>甘</span><input name="tasteSweet" type="number" min="1" max="100" inputmode="numeric"></label>
+                <label><span>辛</span><input name="tasteSpicy" type="number" min="1" max="100" inputmode="numeric"></label>
+                <label><span>鹹</span><input name="tasteSalty" type="number" min="1" max="100" inputmode="numeric"></label>
+              </div>
               <div class="chat-palette-actions">
                 <button type="button" class="btn small" id="copyChatPaletteBtn">チャットパレットをコピー</button>
                 <button type="button" class="btn small" id="copyPieceJsonBtn">駒を出力</button>
@@ -6837,7 +6895,7 @@ body.hub-mode #hubView{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.9.5</p>
+    <p class="public-viewer-version">Viewer v7.9.6</p>
   </div>
 </div>
 
@@ -6918,7 +6976,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.9.5';
+const PUBLIC_VIEWER_VERSION='7.9.6';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7184,7 +7242,9 @@ function blank(ed){
    cc:'#8AA0B6',sanCurrent:0,luck7:0,dFeaturePoints:0,occPointAdjust:0,interestPointAdjust:0,stats:Object.fromEntries(STAT_KEYS.map(k=>[k,0])),
    statMods:Object.fromEntries(STAT_KEYS.map(k=>[k,0])),
    occFormula:0,skills:skillTemplate(ed),insanities:[],weapons:[],items:[],cash:'',assets:'',spending:'',magic:[],
-   backs:{},conditions:'',scenarios:[],createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()
+   backs:{},conditions:'',scenarios:[],
+   taste:{acid:'',bitter:'',sweet:'',spicy:'',salty:''},
+   createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()
  };
 }
 
@@ -7931,6 +7991,13 @@ function ensureShape(x){
  x.dFeaturePoints=num(x.dFeaturePoints);
  x.occPointAdjust=num(x.occPointAdjust);
  x.interestPointAdjust=num(x.interestPointAdjust);
+ x.taste=x.taste&&typeof x.taste==='object'?x.taste:{};
+ for(const k of ['acid','bitter','sweet','spicy','salty']){
+   const raw=x.taste[k];
+   if(raw===''||raw==null){x.taste[k]='';continue}
+   const v=Math.max(1,Math.min(100,Math.round(Number(raw)||0)));
+   x.taste[k]=v||'';
+ }
  if(x.edition==='6'){
    const normalizeFeature=v=>{
      const m=String(v||'').match(/^([1-6]-\d{1,2})/);
@@ -8060,6 +8127,12 @@ function syncFormToModel(){
  ['number','name','reading','status','occupation','age','gender','birthplace','birthday','height','weight','feature1','feature2','cc','sanCurrent'].forEach(k=>{
    if(f[k]) current[k]=f[k].value;
  });
+ current.taste=current.taste&&typeof current.taste==='object'?current.taste:{};
+ const tasteFields={tasteAcid:'acid',tasteBitter:'bitter',tasteSweet:'sweet',tasteSpicy:'spicy',tasteSalty:'salty'};
+ for(const [field,key] of Object.entries(tasteFields)){
+   const raw=f[field]?.value??'';
+   current.taste[key]=raw===''?'':Math.max(1,Math.min(100,Math.round(Number(raw)||1)));
+ }
  current.sanCurrent=num(current.sanCurrent); current.age=f.age.value;
  current.occFormula=num(f.occFormula.value);
  if(f.noteBasic) current.notes.basic=f.noteBasic.value;
@@ -8829,6 +8902,11 @@ function renderAll(){
  setFormValue('age',current.age);setFormValue('gender',current.gender);setFormValue('birthplace',current.birthplace);setFormValue('birthday',current.birthday);
  setFormValue('height',current.height);setFormValue('weight',current.weight);setFormValue('cc',current.cc);setFormValue('ccPicker',current.cc);
  setFormValue('sanCurrent',current.sanCurrent);
+ setFormValue('tasteAcid',current.taste?.acid??'');
+ setFormValue('tasteBitter',current.taste?.bitter??'');
+ setFormValue('tasteSweet',current.taste?.sweet??'');
+ setFormValue('tasteSpicy',current.taste?.spicy??'');
+ setFormValue('tasteSalty',current.taste?.salty??'');
  renderFeatureSelects();renderHeader();renderAbilityTable();renderPoints();renderSkills();renderTables();renderStory();renderBackstory();renderList();
 }
 function rollAll(){
@@ -11731,7 +11809,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.5',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
