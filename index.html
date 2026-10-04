@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.10.2</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.10.3</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6605,6 +6605,75 @@ input[type="number"]::-webkit-inner-spin-button{
   }
 }
 
+
+/* v7.10.3 --------------------------------------------------------- */
+/* SESSION filter alignment fix */
+.session-filter-bar{
+  grid-template-columns:90px minmax(180px,1fr) 132px 52px 78px 68px 60px!important;
+  gap:6px!important;
+  align-items:end!important;
+}
+.session-unlinked-filter{
+  display:grid!important;
+  grid-template-columns:16px minmax(0,1fr) auto!important;
+  align-items:center!important;
+  justify-items:start!important;
+  column-gap:5px!important;
+  width:100%!important;
+  min-width:0!important;
+  height:32px!important;
+  padding:4px 7px!important;
+  box-sizing:border-box!important;
+  white-space:nowrap!important;
+}
+.session-unlinked-filter input{
+  width:14px!important;
+  height:14px!important;
+  margin:0!important;
+}
+.session-unlinked-filter > span:not(.session-unlinked-count){
+  display:block!important;
+  width:auto!important;
+  min-width:0!important;
+  overflow:visible!important;
+  white-space:nowrap!important;
+  line-height:1!important;
+}
+.session-unlinked-count{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:20px!important;
+  height:20px!important;
+  padding:0 5px!important;
+  margin:0!important;
+  border-radius:999px!important;
+  box-sizing:border-box!important;
+  line-height:1!important;
+}
+.session-filter-count{
+  align-self:center!important;
+  justify-self:end!important;
+  width:60px!important;
+  min-width:60px!important;
+  text-align:right!important;
+  padding:0!important;
+}
+@media(max-width:900px){
+  .session-filter-bar{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .session-unlinked-filter{
+    grid-template-columns:16px minmax(0,1fr) auto!important;
+  }
+  .session-filter-count{
+    width:auto!important;
+    min-width:0!important;
+    justify-self:start!important;
+    text-align:left!important;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -7312,7 +7381,7 @@ input[type="number"]::-webkit-inner-spin-button{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.10.2</p>
+    <p class="public-viewer-version">Viewer v7.10.3</p>
   </div>
 </div>
 
@@ -7393,7 +7462,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.10.2';
+const PUBLIC_VIEWER_VERSION='7.10.3';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -12527,7 +12596,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
