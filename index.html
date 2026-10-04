@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.10</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.10.1</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6388,14 +6388,6 @@ input[type="number"]::-webkit-inner-spin-button{
   background:#fff8f2!important;
 }
 
-/* PC LIST updated timestamp */
-.database-table .db-updated{
-  white-space:nowrap;
-  color:#64727d;
-  font-size:9px!important;
-  font-variant-numeric:tabular-nums;
-}
-
 /* TASTE summary */
 .taste-summary{
   display:grid;
@@ -6522,6 +6514,41 @@ input[type="number"]::-webkit-inner-spin-button{
   .link-editor{grid-template-columns:1fr!important}
   .check-item{grid-template-columns:82px minmax(0,1fr)}
   .check-item .check-open{grid-column:1 / -1}
+}
+
+
+/* v7.10.1 --------------------------------------------------------- */
+
+/* Individual page: subtle last-updated timestamp. */
+.profile-updated-at{
+  margin-top:2px;
+  color:#9aa4ab;
+  font-size:7px;
+  line-height:1.2;
+  text-align:right;
+  letter-spacing:.01em;
+}
+@media(max-width:700px){
+  body.public-mobile-editor .profile-updated-at{
+    font-size:8px;
+    text-align:center;
+  }
+}
+
+/* LINK visible edit mode */
+.link-editor-actions{
+  display:flex;
+  align-items:end;
+  gap:5px;
+}
+#linkEditCancelBtn{
+  display:none;
+}
+#linkEditCancelBtn.active{
+  display:inline-flex;
+}
+.link-card-memo{
+  min-height:0;
 }
 
 </style>
@@ -6656,6 +6683,7 @@ input[type="number"]::-webkit-inner-spin-button{
                 <button type="button" class="btn small" id="copyPieceJsonBtn">駒を出力</button>
               </div>
               <div id="copyStatus" class="copy-status"></div>
+              <div id="profileUpdatedAt" class="profile-updated-at"></div>
             </div>
           </div>
         </div>
@@ -7093,7 +7121,10 @@ input[type="number"]::-webkit-inner-spin-button{
             <label class="link-memo-field">メモ
               <textarea class="control" id="linkMemoInput" rows="2" placeholder="用途・補足など"></textarea>
             </label>
-            <button type="button" class="btn primary" id="linkAddBtn">＋ 追加</button>
+            <div class="link-editor-actions">
+              <button type="button" class="btn" id="linkEditCancelBtn">編集を取消</button>
+              <button type="button" class="btn primary" id="linkAddBtn">＋ 追加</button>
+            </div>
           </div>
           <div class="link-grid" id="linkGrid"></div>
         </section>
@@ -7227,7 +7258,7 @@ input[type="number"]::-webkit-inner-spin-button{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.10</p>
+    <p class="public-viewer-version">Viewer v7.10.1</p>
   </div>
 </div>
 
@@ -7308,7 +7339,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.10';
+const PUBLIC_VIEWER_VERSION='7.10.1';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9239,6 +9270,7 @@ function renderAll(){
  setFormValue('tasteSweet',current.taste?.sweet??'');
  setFormValue('tasteSpicy',current.taste?.spicy??'');
  setFormValue('tasteSalty',current.taste?.salty??'');
+ if($('profileUpdatedAt'))$('profileUpdatedAt').textContent=`最終更新 ${formatUpdatedAtShort(current.updatedAt||current.createdAt)}`;
  renderFeatureSelects();renderHeader();renderAbilityTable();renderPoints();renderSkills();renderTables();renderStory();renderBackstory();renderList();
 }
 function rollAll(){
@@ -9463,6 +9495,7 @@ function showHomeWorkspace(){
 let activeSessionTab='pl';
 let sessionUnlinkedOnly=false;
 let activeOtherTab='tally';
+let editingLinkId='';
 const editingPLSessionKeys=new Set();
 const editingKPSessionIds=new Set();
 let viewerSkillSortMode='category';
@@ -10697,28 +10730,31 @@ function renderLinks(){
    const rec=rows.find(x=>x.id===card.dataset.id);
    if(!rec)return;
    card.querySelector('.link-edit')?.addEventListener('click',()=>{
-     const title=prompt('タイトル',rec.title||'');
-     if(title===null)return;
-     const url=prompt('LINK',rec.url||'');
-     if(url===null)return;
-     const normalized=normalizeLinkUrl(url);
-     if(!normalized){alert('LINKが正しくありません。');return}
-     const memo=prompt('メモ',rec.memo||'');
-     if(memo===null)return;
-     rec.title=String(title).trim();
-     rec.url=normalized;
-     rec.memo=String(memo);
-     rec.updatedAt=new Date().toISOString();
-     saveAppData();
-     renderLinks();
+     editingLinkId=rec.id;
+     $('linkTitleInput').value=rec.title||'';
+     $('linkUrlInput').value=rec.url||'';
+     $('linkMemoInput').value=rec.memo||'';
+     $('linkAddBtn').textContent='✓ 更新';
+     $('linkEditCancelBtn').classList.add('active');
+     $('linkMemoInput')?.focus();
+     $('linkEditor')?.scrollIntoView({block:'nearest',behavior:'smooth'});
    });
    card.querySelector('.link-delete')?.addEventListener('click',()=>{
      if(!confirm(`「${rec.title||rec.url||'このLINK'}」を削除しますか？`))return;
      appData.links=rows.filter(x=>x.id!==rec.id);
+     if(editingLinkId===rec.id)resetLinkEditor();
      saveAppData();
      renderLinks();
    });
  });
+}
+function resetLinkEditor(){
+ editingLinkId='';
+ if($('linkTitleInput'))$('linkTitleInput').value='';
+ if($('linkUrlInput'))$('linkUrlInput').value='';
+ if($('linkMemoInput'))$('linkMemoInput').value='';
+ if($('linkAddBtn'))$('linkAddBtn').textContent='＋ 追加';
+ $('linkEditCancelBtn')?.classList.remove('active');
 }
 function addLinkRecord(){
  if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
@@ -10730,18 +10766,28 @@ function addLinkRecord(){
    $('linkUrlInput')?.focus();
    return;
  }
- appData.links.push({
-   id:uid(),
-   title:title||linkDomain(url)||'無題',
-   url,
-   memo,
-   createdAt:new Date().toISOString(),
-   updatedAt:new Date().toISOString()
- });
+
+ if(editingLinkId){
+   const rec=(appData.links||[]).find(x=>x.id===editingLinkId);
+   if(rec){
+     rec.title=title||linkDomain(url)||'無題';
+     rec.url=url;
+     rec.memo=memo;
+     rec.updatedAt=new Date().toISOString();
+   }
+ }else{
+   appData.links.push({
+     id:uid(),
+     title:title||linkDomain(url)||'無題',
+     url,
+     memo,
+     createdAt:new Date().toISOString(),
+     updatedAt:new Date().toISOString()
+   });
+ }
+
  saveAppData();
- $('linkTitleInput').value='';
- $('linkUrlInput').value='';
- $('linkMemoInput').value='';
+ resetLinkEditor();
  renderLinks();
  $('linkTitleInput')?.focus();
 }
@@ -11990,10 +12036,10 @@ async function renderDatabaseView(){
  const skillNames=databaseCanonicalSkillNames(edition);
 
  const commonColumns=databaseValueMode==='skill'
-   ? [{key:'no',label:'No.'},{key:'name',label:'名前'},{key:'updated',label:'最終更新'}]
+   ? [{key:'no',label:'No.'},{key:'name',label:'名前'}]
    : [
        {key:'no',label:'No.'},{key:'status',label:'状態'},{key:'cc',label:'CC'},{key:'passed',label:'通過'},
-       {key:'name',label:'名前'},{key:'updated',label:'最終更新'}
+       {key:'name',label:'名前'}
      ];
  const abilityColumns=[
    {key:'gender',label:'性別'},{key:'age',label:'年齢'},{key:'birthday',label:'誕生日'},
@@ -12065,7 +12111,6 @@ async function renderDatabaseView(){
    if(key==='cc')return 5.3;
    if(key==='passed')return 3.6;
    if(key==='name')return Math.min(13.2,Math.max(8.0,len*.72));
-   if(key==='updated')return 8.0;
    if(key==='gender')return Math.min(4.0,Math.max(3.0,len*.62));
    if(key==='age')return 3.0;
    if(key==='birthday')return Math.min(5.2,Math.max(4.2,len*.48));
@@ -12085,14 +12130,12 @@ async function renderDatabaseView(){
    const cc=x.cc||'#8AA0B6';
    const common=databaseValueMode==='skill'
      ? `<td class="db-no"><div class="db-no-tools"><button type="button" class="db-no-open">${esc(values.no)}</button><button type="button" class="db-no-share" title="共有URL">🔗</button></div></td>
-        <td class="db-name" title="${esc(values.name)}">${esc(values.name)}</td>
-        <td class="db-updated">${esc(values.updated)}</td>`
+        <td class="db-name" title="${esc(values.name)}">${esc(values.name)}</td>`
      : `<td class="db-no"><div class="db-no-tools"><button type="button" class="db-no-open">${esc(values.no)}</button><button type="button" class="db-no-share" title="共有URL">🔗</button></div></td>
         <td>${esc(values.status)}</td>
         <td class="db-cc" style="background:${esc(cc)};color:${colorTextForBg(cc)}">${esc(values.cc)}</td>
         <td class="db-num">${esc(values.passed)}</td>
-        <td class="db-name" title="${esc(values.name)}">${esc(values.name)}</td>
-        <td class="db-updated">${esc(values.updated)}</td>`;
+        <td class="db-name" title="${esc(values.name)}">${esc(values.name)}</td>`;
 
    let detail='';
    if(databaseValueMode==='skill'){
@@ -12430,7 +12473,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -13551,6 +13594,9 @@ $('linkSearchResetBtn').onclick=()=>{
  renderLinks();
 };
 $('linkAddBtn').onclick=addLinkRecord;
+$('linkEditCancelBtn').onclick=()=>{
+ resetLinkEditor();
+};
 $('linkUrlInput').onkeydown=e=>{
  if(e.key==='Enter'){
    e.preventDefault();
