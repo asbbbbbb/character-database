@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.9.8</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.9.9</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6340,6 +6340,24 @@ input[type="number"]::-webkit-inner-spin-button{
   }
 }
 
+
+/* v7.9.9 ---------------------------------------------------------- */
+
+/* SESSION yoso suggestions: keep the popup compact. */
+.session-yoso-suggestions{
+  max-height:116px!important;
+}
+.session-yoso-suggestions .scenario-pc-suggestion{
+  padding:5px 7px!important;
+  min-height:27px!important;
+}
+.session-yoso-suggestions .scenario-pc-suggestion-name{
+  font-size:9px!important;
+}
+.session-yoso-suggestions .scenario-pc-suggestion-sub{
+  font-size:7px!important;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -7009,7 +7027,7 @@ input[type="number"]::-webkit-inner-spin-button{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.9.8</p>
+    <p class="public-viewer-version">Viewer v7.9.9</p>
   </div>
 </div>
 
@@ -7090,7 +7108,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.9.8';
+const PUBLIC_VIEWER_VERSION='7.9.9';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -8552,7 +8570,7 @@ function renderSkills(){
 }function updateSkillRow(tr,sk){tr.querySelector('.total').value=skillTotal(sk);renderPoints();renderHeader()}
 function makeRow(body,arr,idx,fields){
  const item=arr[idx], tr=document.createElement('tr');
- tr.innerHTML=fields.map(f=>`<td>${f.type==='select'?`<select data-k="${f.k}">${f.options.map(o=>`<option ${item[f.k]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`:`<input data-k="${f.k}" ${f.type==='date'?'type="date"':''} value="${esc(item[f.k]||'')}" placeholder="${esc(f.ph||'')}">`}</td>`).join('')+`<td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
+ tr.innerHTML=fields.map(f=>`<td>${f.type==='select'?`<select data-k="${f.k}">${f.options.map(o=>`<option ${item[f.k]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`:`<input data-k="${f.k}" ${f.type==='date'?'type="date" min="1000-01-01" max="9999-12-31"':''} value="${esc(item[f.k]||'')}" placeholder="${esc(f.ph||'')}">`}</td>`).join('')+`<td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
  tr.querySelectorAll('[data-k]').forEach(e=>e.oninput=()=>item[e.dataset.k]=e.value);
  tr.querySelector('button').onclick=()=>{arr.splice(idx,1);renderTables()};
  body.appendChild(tr);
@@ -8663,8 +8681,8 @@ function normalizeScenarioDate(value){
  if(m)return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
  m=/^(\d{8})$/.exec(s);
  if(m)return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`;
- // 既存値に6桁の年がある場合は末尾4桁に補正
- m=/^(\d{6})-(\d{1,2})-(\d{1,2})$/.exec(s);
+ // 既存値や入力値の年が5桁以上なら末尾4桁へ補正
+ m=/^(\d{5,})-(\d{1,2})-(\d{1,2})$/.exec(s);
  if(m)return `${m[1].slice(-4)}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
  return s;
 }
@@ -8843,7 +8861,7 @@ function renderScenarios(){
      const renderSuggestions=()=>{
        const q=String(acInput.value||'').trim().toLowerCase();
        if(!q){
-         acMatches=selectable.slice(0,10);
+         acMatches=selectable.slice(0,4);
        }else{
          acMatches=selectable.filter(r=>{
            const hay=`${r.name} ${r.kana} ${r.pl}`.toLowerCase();
@@ -9895,7 +9913,7 @@ function renderSessionKP(){
            <select data-field="edition"><option value="6" ${r.edition==='6'?'selected':''}>6版</option><option value="7" ${r.edition==='7'?'selected':''}>7版</option></select>
            <span class="session-auto-no">${esc(r.no||'—')}</span>
          </div></td>
-         <td class="col-date"><input data-field="date" type="date" value="${esc(r.date||'')}"></td>
+         <td class="col-date"><input data-field="date" type="date" min="1000-01-01" max="9999-12-31" value="${esc(normalizeScenarioDate(r.date||''))}"></td>
          <td class="col-link"><span class="session-link disabled">—</span></td>
          <td class="col-title"><input data-field="title" value="${esc(r.title||'')}"></td>
          <td class="col-uchi">—</td>
@@ -9931,11 +9949,14 @@ function renderSessionKP(){
    if(!rec)return;
    tr.querySelectorAll('[data-field]').forEach(inp=>{
      inp.oninput=e=>{
-       rec[e.target.dataset.field]=e.target.value;
+       const field=e.target.dataset.field;
+       rec[field]=field==='date'?normalizeScenarioDate(e.target.value):e.target.value;
        rec.edited=true;
      };
      inp.onchange=e=>{
-       rec[e.target.dataset.field]=e.target.value;
+       const field=e.target.dataset.field;
+       rec[field]=field==='date'?normalizeScenarioDate(e.target.value):e.target.value;
+       if(field==='date')e.target.value=rec[field];
        rec.edited=true;
      };
    });
@@ -9944,6 +9965,7 @@ function renderSessionKP(){
      renderSessionKP();
    });
    tr.querySelector('.kp-confirm')?.addEventListener('click',()=>{
+     rec.date=normalizeScenarioDate(rec.date||'');
      rec.yoso=scenarioPcText(scenarioPcNames(rec.yoso||''));
      ensureYosoNames(rec.yoso||'');
      rec.draft=false;
@@ -12037,7 +12059,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.8',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
