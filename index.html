@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.9.7</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.9.8</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6727,7 +6727,7 @@ input[type="number"]::-webkit-inner-spin-button{
           <span class="session-filter-count" id="sessionFilterCount"></span>
         </div>
         <section class="hub-tab-panel active" id="sessionTabPL">
-          <div class="session-note">探索者の「通過シナリオ」を参照して表示します。ここから追加した記録も、uchiで指定したPCの「通過シナリオ」へ反映されます。</div>
+          <div class="session-note">探索者の「通過シナリオ」を参照して表示します。uchiを指定するとPCの「通過シナリオ」へ反映し、uchi未入力ならSESSIONだけに一旦追加できます。</div>
 
           <div class="session-pl-add-box" id="sessionPlAddBox">
             <div class="session-pl-add-title">＋ PL SESSIONを追加</div>
@@ -7009,7 +7009,7 @@ input[type="number"]::-webkit-inner-spin-button{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.9.7</p>
+    <p class="public-viewer-version">Viewer v7.9.8</p>
   </div>
 </div>
 
@@ -7090,7 +7090,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.9.7';
+const PUBLIC_VIEWER_VERSION='7.9.8';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9545,7 +9545,7 @@ async function collectPLSessions(){
      date:x.date||'',
      url:x.url||'',
      title:x.title||'',
-     uchi:x.uchi||x.sourceName||'未登録PC',
+     uchi:String(x.uchi||x.sourceName||'').trim()||'—',
      yoso:x.yoso||x.pcs||'',
      edition:String(x.edition||'6'),
      reportImage:x.reportImage||'',
@@ -9786,14 +9786,48 @@ async function addPlSessionToCharacter(){
    msg.classList.toggle('error',!!error);
  };
 
+ if(!date){
+   setMsg('日付を入力してください。',true);
+   $('sessionPlAddDate')?.focus();
+   return;
+ }
  if(!title){
    setMsg('シナリオ名を入力してください。',true);
    $('sessionPlAddTitle')?.focus();
    return;
  }
+
+ const clearAddForm=()=>{
+   $('sessionPlAddDate').value='';
+   $('sessionPlAddTitle').value='';
+   $('sessionPlAddUchi').value='';
+   $('sessionPlAddYoso').value='';
+   $('sessionPlAddYoso').dispatchEvent(new Event('input',{bubbles:true}));
+ };
+
  if(!uchi){
-   setMsg('uchi（反映先PC）を入力してください。',true);
-   $('sessionPlAddUchi')?.focus();
+   const extra={
+     id:uid(),
+     no:'',
+     date,
+     url:'',
+     title,
+     uchi:'',
+     yoso:scenarioPcText(scenarioPcNames(yoso)),
+     edition:'6',
+     reportImage:'',
+     edited:true,
+     createdAt:new Date().toISOString(),
+     updatedAt:new Date().toISOString()
+   };
+   appData.plExtraSessions=Array.isArray(appData.plExtraSessions)?appData.plExtraSessions:[];
+   appData.plExtraSessions.push(extra);
+   ensureYosoNames(extra.yoso||'');
+   saveAppData();
+   clearAddForm();
+   setMsg('SESSIONに追加しました。uchiは後から編集できます。');
+   await renderSessionPL();
+   await renderReport();
    return;
  }
 
@@ -9802,11 +9836,11 @@ async function addPlSessionToCharacter(){
  const matched=chars.filter(ch=>normalizePcLinkName(ch.name||'')===key);
 
  if(!matched.length){
-   setMsg('一致するPCが見つかりません。uchiはPC名の候補から選択してください。',true);
+   setMsg('一致するPCが見つかりません。uchiを空欄にすればSESSIONだけに追加できます。',true);
    return;
  }
  if(matched.length>1){
-   setMsg('同じPC名が複数あります。PC名を一意にしてから追加してください。',true);
+   setMsg('同じPC名が複数あります。PC名を一意にするか、uchiを空欄にして追加してください。',true);
    return;
  }
 
@@ -9830,11 +9864,7 @@ async function addPlSessionToCharacter(){
    current=ensureShape(structuredClone(ch));
  }
 
- $('sessionPlAddDate').value='';
- $('sessionPlAddTitle').value='';
- $('sessionPlAddUchi').value='';
- $('sessionPlAddYoso').value='';
- $('sessionPlAddYoso').dispatchEvent(new Event('input',{bubbles:true}));
+ clearAddForm();
 
  setMsg(`「${ch.name||'名前未設定'}」の通過シナリオへ追加しました。`);
  await renderSessionPL();
@@ -12007,7 +12037,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.7',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.9.8',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
