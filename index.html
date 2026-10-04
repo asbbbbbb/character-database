@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.10.1</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.10.2</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6551,6 +6551,60 @@ input[type="number"]::-webkit-inner-spin-button{
   min-height:0;
 }
 
+
+/* v7.10.2 --------------------------------------------------------- */
+/* SESSION filter: keep "未紐付けのみ" horizontal and use the empty width efficiently. */
+.session-filter-bar{
+  grid-template-columns:105px minmax(180px,1fr) 118px 52px 78px 68px auto!important;
+  gap:6px!important;
+  align-items:end!important;
+}
+.session-unlinked-filter{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  min-width:0!important;
+  width:100%!important;
+  height:32px!important;
+  min-height:32px!important;
+  padding:4px 6px!important;
+  box-sizing:border-box!important;
+  white-space:nowrap!important;
+}
+.session-unlinked-filter > span{
+  display:inline-block!important;
+  width:auto!important;
+  min-width:0!important;
+  white-space:nowrap!important;
+  line-height:1!important;
+}
+.session-unlinked-filter input{
+  flex:0 0 auto!important;
+}
+.session-unlinked-count{
+  flex:0 0 auto!important;
+  min-width:18px!important;
+  padding:2px 5px!important;
+}
+.session-filter-count{
+  align-self:center!important;
+  justify-self:end!important;
+  padding-right:2px!important;
+}
+@media(max-width:900px){
+  .session-filter-bar{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .session-unlinked-filter{
+    justify-content:flex-start!important;
+  }
+  .session-filter-count{
+    justify-self:start!important;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -7258,7 +7312,7 @@ input[type="number"]::-webkit-inner-spin-button{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.10.1</p>
+    <p class="public-viewer-version">Viewer v7.10.2</p>
   </div>
 </div>
 
@@ -7339,7 +7393,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.10.1';
+const PUBLIC_VIEWER_VERSION='7.10.2';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -12473,7 +12527,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
