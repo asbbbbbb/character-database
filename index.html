@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.10.3</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.10.5</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6674,6 +6674,27 @@ input[type="number"]::-webkit-inner-spin-button{
   }
 }
 
+
+/* v7.10.4 --------------------------------------------------------- */
+
+/* Individual PC: keep last-updated metadata subtle and outside PC LIST. */
+.profile-updated-at{
+  opacity:.72;
+}
+
+/* LINK editing: visibly show that the upper form contains the existing record. */
+.link-editor.editing{
+  border-color:#8ea8bb!important;
+  box-shadow:0 0 0 2px rgba(91,127,154,.10);
+}
+.link-editor.editing .link-memo-field{
+  font-weight:800;
+}
+.link-editor.editing #linkMemoInput{
+  min-height:64px;
+  background:#fff;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -7381,7 +7402,7 @@ input[type="number"]::-webkit-inner-spin-button{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.10.3</p>
+    <p class="public-viewer-version">Viewer v7.10.5</p>
   </div>
 </div>
 
@@ -7462,7 +7483,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.10.3';
+const PUBLIC_VIEWER_VERSION='7.10.5';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -8334,7 +8355,34 @@ function getEffectiveShareBaseUrl(){
  if(saved)return saved;
  return location.href.split('#')[0];
 }
+function currentPublicPageBaseUrl(){
+ try{
+   if(!/^https?:$/i.test(location.protocol))return '';
+   const u=new URL(location.href);
+   u.search='';
+   u.hash='';
+   return u.toString();
+ }catch(_){
+   return '';
+ }
+}
+function canUseCurrentPublicPcLinks(){
+ return PUBLIC_VIEWER_ONLY
+   &&['mobile-editor','database'].includes(publicRemoteMode)
+   &&!!currentPublicPageBaseUrl();
+}
+function fixedPublicPcUrl(characterId){
+ const base=currentPublicPageBaseUrl();
+ if(!base||!characterId)return '';
+ const u=new URL(base);
+ u.searchParams.set('pc',String(characterId));
+ return u.toString();
+}
 async function buildCharacterShareUrl(source,baseOverride=''){
+ if(canUseCurrentPublicPcLinks()){
+   return fixedPublicPcUrl(source.id);
+ }
+
  const online=loadOnlineSyncConfig();
  const base=normalizeShareBaseUrl(baseOverride)||getEffectiveShareBaseUrl();
 
@@ -8371,9 +8419,9 @@ async function refreshCharacterShareUrl(){
    $('characterShareCopyBtn').disabled=false;
 
    if(/^https?:\/\//i.test(currentCharacterShareUrl)){
-     const online=onlineSyncConfigured(loadOnlineSyncConfig());
+     const online=canUseCurrentPublicPcLinks()||onlineSyncConfigured(loadOnlineSyncConfig());
      let msg=online
-       ? '固定共有URLです。PCで保存して公開同期されると、この同じURLの内容も最新になります。'
+       ? '固定共有URLです。短い ?pc= 形式で、スマホ編集用の秘密トークンは含みません。'
        : 'このURLはスマホや他の人から開けます。共有先では探索者1人の閲覧専用1ページ表示になります。';
      if(!online&&currentCharacterShareUrl.length>60000)msg+=' 共有URLが長いため、送信先によってはURLが途中で切れる場合があります。';
      $('characterShareNote').textContent=msg;
@@ -10859,6 +10907,7 @@ function renderLinks(){
      $('linkMemoInput').value=rec.memo||'';
      $('linkAddBtn').textContent='✓ 更新';
      $('linkEditCancelBtn').classList.add('active');
+     $('linkEditor')?.classList.add('editing');
      $('linkMemoInput')?.focus();
      $('linkEditor')?.scrollIntoView({block:'nearest',behavior:'smooth'});
    });
@@ -10878,6 +10927,7 @@ function resetLinkEditor(){
  if($('linkMemoInput'))$('linkMemoInput').value='';
  if($('linkAddBtn'))$('linkAddBtn').textContent='＋ 追加';
  $('linkEditCancelBtn')?.classList.remove('active');
+ $('linkEditor')?.classList.remove('editing');
 }
 function addLinkRecord(){
  if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
@@ -11932,12 +11982,8 @@ let databaseVisibleRows=[];
 function fixedPcShareUrlForList(character){
  if(!character?.id)return '';
 
- if(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='database'){
-   const u=new URL(location.href);
-   u.search='';
-   u.hash='';
-   u.searchParams.set('pc',character.id);
-   return u.toString();
+ if(canUseCurrentPublicPcLinks()){
+   return fixedPublicPcUrl(character.id);
  }
 
  const base=normalizeShareBaseUrl(getSavedShareBaseUrl());
@@ -11954,7 +12000,7 @@ async function copyVisiblePcShareLinks(){
    return;
  }
 
- if(!(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='database')){
+ if(!canUseCurrentPublicPcLinks()){
    const base=normalizeShareBaseUrl(getSavedShareBaseUrl());
    const cfg=loadOnlineSyncConfig();
    if(!base||!onlineSyncConfigured(cfg)){
@@ -12596,7 +12642,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.5',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
