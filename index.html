@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.10.10</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.10.13</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6910,6 +6910,74 @@ body.session-fill-dragging{
   .session-fill-handle::after{display:none}
 }
 
+
+/* v7.10.11 -------------------------------------------------------- */
+.yoso-add-actions{
+  display:flex!important;
+  justify-content:flex-end!important;
+  gap:6px!important;
+  align-items:center!important;
+}
+.yoso-csv-note{
+  margin:-2px 0 6px;
+  color:#7a8790;
+  font-size:8px;
+  text-align:right;
+}
+@media(max-width:700px){
+  .yoso-add-actions{
+    flex-wrap:wrap;
+  }
+}
+
+
+/* v7.10.12 -------------------------------------------------------- */
+/* OTHER > TODAY: same visual language as REPORT cards. */
+.today-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.today-head h3{
+  margin:0 0 3px;
+  font-size:18px;
+}
+.today-note{
+  color:#77848e;
+  font-size:9px;
+}
+.today-count{
+  flex:0 0 auto;
+  padding:5px 9px;
+  border:1px solid #d9e0e5;
+  border-radius:999px;
+  background:#fff;
+  color:#66737d;
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.today-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:12px;
+  padding-bottom:28px;
+}
+.today-grid .report-card{
+  margin:0;
+}
+.today-grid .report-image-button:not(:has(img)){
+  cursor:default;
+}
+@media(max-width:700px){
+  .today-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -7397,7 +7465,12 @@ body.session-fill-dragging{
           <button type="button" class="btn small danger hub-bulk-delete" id="yosoDeleteAllBtn">一括削除</button>
           <span class="yoso-filter-count" id="yosoFilterCount"></span>
         </div>
-        <div class="hub-add-between"><button type="button" class="btn primary" id="addYosoBtn">＋ 追加</button></div>
+        <div class="hub-add-between yoso-add-actions">
+          <button type="button" class="btn" id="yosoCsvImportBtn">CSV取込</button>
+          <input type="file" id="yosoCsvImportFile" accept=".csv,text/csv" hidden>
+          <button type="button" class="btn primary" id="addYosoBtn">＋ 追加</button>
+        </div>
+        <div class="yoso-csv-note">CSV列：PL / かな / 名前 / URL　※空欄は既存データを消しません</div>
         <div class="session-table-wrap" id="yosoTable"></div>
       </div>
 
@@ -7413,6 +7486,7 @@ body.session-fill-dragging{
           <button type="button" class="hub-tab active" id="otherTallyTabBtn" data-other-tab="tally">TALLY</button>
           <button type="button" class="hub-tab" id="otherBirthTabBtn" data-other-tab="birth">BIRTH</button>
           <button type="button" class="hub-tab" id="otherTasteTabBtn" data-other-tab="taste">TASTE</button>
+          <button type="button" class="hub-tab" id="otherTodayTabBtn" data-other-tab="today">TODAY</button>
           <button type="button" class="hub-tab" id="otherLinkTabBtn" data-other-tab="link">LINK</button>
           <button type="button" class="hub-tab" id="otherCheckTabBtn" data-other-tab="check">CHECK</button>
         </nav>
@@ -7459,6 +7533,17 @@ body.session-fill-dragging{
             </label>
           </div>
           <div class="taste-table-wrap" id="tasteTableWrap"></div>
+        </section>
+
+        <section class="other-tab-panel hidden" id="otherTodayPanel">
+          <div class="today-head">
+            <div>
+              <h3>TODAY</h3>
+              <div class="today-note" id="todayNote">今日と同じ月日に遊んだシナリオを表示します。</div>
+            </div>
+            <div class="today-count" id="todayCount">0件</div>
+          </div>
+          <div class="today-grid" id="todayGrid"></div>
         </section>
 
         <section class="other-tab-panel hidden" id="otherLinkPanel">
@@ -7633,7 +7718,7 @@ body.session-fill-dragging{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.10.10</p>
+    <p class="public-viewer-version">Viewer v7.10.13</p>
   </div>
 </div>
 
@@ -7714,7 +7799,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.10.10';
+const PUBLIC_VIEWER_VERSION='7.10.13';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -11351,6 +11436,7 @@ async function renderOtherHub(){
    tally:['otherTallyPanel','otherTallyTabBtn'],
    birth:['otherBirthPanel','otherBirthTabBtn'],
    taste:['otherTastePanel','otherTasteTabBtn'],
+   today:['otherTodayPanel','otherTodayTabBtn'],
    link:['otherLinkPanel','otherLinkTabBtn'],
    check:['otherCheckPanel','otherCheckTabBtn']
  };
@@ -11366,6 +11452,8 @@ async function renderOtherHub(){
    await renderBirthCalendar();
  }else if(activeOtherTab==='taste'){
    await renderTasteTable();
+ }else if(activeOtherTab==='today'){
+   await renderTodayAnniversary();
  }else if(activeOtherTab==='check'){
    await renderIntegrityCheck();
  }else{
@@ -11471,7 +11559,151 @@ function addLinkRecord(){
  $('linkTitleInput')?.focus();
 }
 
+function parseCsvRows(textValue){
+ const text=String(textValue||'').replace(/^\uFEFF/,'');
+ const rows=[];
+ let row=[],cell='',quoted=false;
+ for(let i=0;i<text.length;i++){
+   const ch=text[i];
+   if(quoted){
+     if(ch==='"'){
+       if(text[i+1]==='"'){cell+='"';i++}
+       else quoted=false;
+     }else cell+=ch;
+     continue;
+   }
+   if(ch==='"'){quoted=true;continue}
+   if(ch===','){row.push(cell);cell='';continue}
+   if(ch==='\r'){
+     if(text[i+1]==='\n')i++;
+     row.push(cell);cell='';
+     rows.push(row);row=[];
+     continue;
+   }
+   if(ch==='\n'){
+     row.push(cell);cell='';
+     rows.push(row);row=[];
+     continue;
+   }
+   cell+=ch;
+ }
+ if(cell!==''||row.length){
+   row.push(cell);
+   rows.push(row);
+ }
+ return rows;
+}
+function decodeYosoCsv(buffer){
+ const bytes=new Uint8Array(buffer);
+ let utf8='';
+ try{utf8=new TextDecoder('utf-8',{fatal:false}).decode(bytes)}catch(_){}
+ const utfRows=parseCsvRows(utf8);
+ const utfHeader=(utfRows[0]||[]).map(v=>String(v||'').trim().replace(/^\uFEFF/,''));
+ const wanted=['PL','かな','名前','URL'];
+ if(wanted.every(h=>utfHeader.includes(h))&&!utf8.includes('\uFFFD'))return utf8;
+ try{
+   const sjis=new TextDecoder('shift_jis',{fatal:false}).decode(bytes);
+   const sjRows=parseCsvRows(sjis);
+   const sjHeader=(sjRows[0]||[]).map(v=>String(v||'').trim().replace(/^\uFEFF/,''));
+   if(wanted.every(h=>sjHeader.includes(h)))return sjis;
+ }catch(_){}
+ return utf8;
+}
+function normalizeYosoCsvKey(value){
+ return String(value||'').normalize('NFKC').trim();
+}
+async function importYosoCsvFile(file){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ if(!file)return;
+
+ try{
+   const buffer=await file.arrayBuffer();
+   const textValue=decodeYosoCsv(buffer);
+   const rows=parseCsvRows(textValue).filter(row=>row.some(v=>String(v||'').trim()!==''));
+   if(!rows.length)throw new Error('CSVが空です。');
+
+   const header=rows[0].map(v=>String(v||'').trim().replace(/^\uFEFF/,''));
+   const required=['PL','かな','名前','URL'];
+   const index={};
+   required.forEach(h=>{index[h]=header.indexOf(h)});
+   const missing=required.filter(h=>index[h]<0);
+   if(missing.length)throw new Error(`列が見つかりません：${missing.join(' / ')}`);
+
+   const incoming=[];
+   for(let i=1;i<rows.length;i++){
+     const cols=rows[i];
+     const rec={
+       pl:String(cols[index.PL]??'').trim(),
+       kana:String(cols[index['かな']]??'').trim(),
+       name:String(cols[index['名前']]??'').trim(),
+       url:String(cols[index.URL]??'').trim()
+     };
+     if(!rec.pl&&!rec.kana&&!rec.name&&!rec.url)continue;
+     if(!rec.name)continue;
+     incoming.push(rec);
+   }
+   if(!incoming.length)throw new Error('取り込めるデータがありません。名前列を確認してください。');
+
+   const existing=appData.yosoRecords||[];
+   const keyOf=r=>normalizeYosoNameKey(r.name);
+   const map=new Map();
+   for(const r of existing){
+     const key=keyOf(r);
+     if(key&&!map.has(key))map.set(key,r);
+   }
+   let added=0,updated=0,unchanged=0;
+
+   for(const rec of incoming){
+     const key=keyOf(rec);
+     const hit=map.get(key);
+     if(hit){
+       const nextPl=rec.pl||String(hit.pl||'');
+       const nextKana=rec.kana||String(hit.kana||'');
+       const nextUrl=rec.url||String(hit.url||'');
+       const changed=
+         String(hit.pl||'')!==nextPl||
+         String(hit.kana||'')!==nextKana||
+         String(hit.url||'')!==nextUrl;
+       if(changed){
+         hit.pl=nextPl;
+         hit.kana=nextKana;
+         hit.url=nextUrl;
+         hit.updatedAt=new Date().toISOString();
+         updated++;
+       }else unchanged++;
+       continue;
+     }
+     const fresh={
+       id:uid(),
+       pl:rec.pl,
+       kana:rec.kana,
+       name:rec.name,
+       url:rec.url,
+       source:'csv',
+       createdAt:new Date().toISOString(),
+       updatedAt:new Date().toISOString()
+     };
+     existing.push(fresh);
+     map.set(key,fresh);
+     added++;
+   }
+
+   appData.yosoRecords=existing;
+   saveAppData();
+   renderYoso();
+   alert(`YOSONOKO CSV取込完了\n追加 ${added}件 / 更新 ${updated}件 / 変更なし ${unchanged}件`);
+ }catch(err){
+   console.error(err);
+   alert('YOSONOKO CSVを取り込めませんでした。\n'+(err?.message||err));
+ }finally{
+   if($('yosoCsvImportFile'))$('yosoCsvImportFile').value='';
+ }
+}
+
 function renderYoso(){
+ const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
+ $('yosoCsvImportBtn')?.classList.toggle('hidden',!editable);
+ $('addYosoBtn')?.classList.toggle('hidden',!editable);
  const allRows=[...appData.yosoRecords];
  const plSel=$('yosoPlFilter');
  const keepPl=plSel?.value||'';
@@ -11622,6 +11854,14 @@ function reportDateParts(date){
  if(!m)return {year:'日付未設定',month:'',day:''};
  return {year:m[1],month:String(Number(m[2])),day:m[3]};
 }
+function todayMonthDay(){
+ const d=new Date();
+ return {
+   month:String(d.getMonth()+1).padStart(2,'0'),
+   day:String(d.getDate()).padStart(2,'0'),
+   label:`${d.getMonth()+1}月${d.getDate()}日`
+ };
+}
 async function collectReportRows(){
  const pl=await collectPLSessions();
  const kp=(appData.kpSessions||[]).map(r=>({
@@ -11641,6 +11881,82 @@ async function collectReportRows(){
    .filter(r=>String(r.title||'').trim()&&!hidden.has(r.reportKey))
    .sort((a,b)=>String(b.date||'0000-00-00').localeCompare(String(a.date||'0000-00-00'))||
                 String(b.no||'').localeCompare(String(a.no||''),undefined,{numeric:true}));
+}
+
+async function renderTodayAnniversary(){
+ const grid=$('todayGrid');
+ if(!grid)return;
+
+ const md=todayMonthDay();
+ const allRows=await collectReportRows();
+ const imageRows=await allReportImages();
+ const imageMap=new Map(imageRows.map(x=>[x.id,x.data]));
+ const rows=allRows
+   .filter(r=>{
+     const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(r.date||''));
+     return !!m&&m[2]===md.month&&m[3]===md.day;
+   })
+   .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||
+                compareText(a.title||'',b.title||''));
+
+ if($('todayNote'))$('todayNote').textContent=`${md.label}と同じ月日に遊んだシナリオ（年は問わず）`;
+ if($('todayCount'))$('todayCount').textContent=`${rows.length}件`;
+
+ if(!rows.length){
+   grid.innerHTML=`<div class="database-empty">${esc(md.label)}に遊んだシナリオはまだありません。</div>`;
+   return;
+ }
+
+ grid.innerHTML=rows.map(r=>{
+   const img=imageMap.get(r.reportKey)||r.reportImage||'';
+   const imgUrls=reportImageUrls(img);
+   return `<article class="report-card today-card" data-report-key="${esc(r.reportKey)}">
+     <div class="report-card-top">
+       <span>${esc(r.date||'日付未設定')}</span>
+       <span class="session-edition-badge">${esc(r.edition||'6')}版</span>
+     </div>
+     <div class="report-image-shell">
+       <button type="button" class="report-image-button today-image-button" title="${imgUrls.primary?'画像を拡大':'画像なし'}">
+         ${imgUrls.primary?`<img data-primary="${esc(imgUrls.primary)}" data-fallback="${esc(imgUrls.fallback)}" data-fallback2="${esc(imgUrls.fallback2)}" data-fallback3="${esc(imgUrls.fallback3)}" alt="">`:'<span>NO IMAGE</span>'}
+       </button>
+     </div>
+     <div class="report-title">${esc(r.title||'—')}</div>
+     <div class="report-uchi">${esc(r.uchi||'—')}</div>
+     <div class="report-yoso">${esc(r.yoso||'')}</div>
+   </article>`;
+ }).join('');
+
+ grid.querySelectorAll('.today-image-button img').forEach(img=>{
+   const sources=[
+     img.dataset.primary||'',
+     img.dataset.fallback||'',
+     img.dataset.fallback2||'',
+     img.dataset.fallback3||''
+   ].filter(Boolean);
+   let sourceIndex=0;
+   img.onerror=()=>{
+     sourceIndex++;
+     if(sourceIndex<sources.length){
+       img.src=sources[sourceIndex];
+       return;
+     }
+     const btn=img.closest('.today-image-button');
+     if(btn)btn.innerHTML='<span>NO IMAGE</span>';
+   };
+   if(sources.length)img.src=sources[0];
+ });
+
+ grid.querySelectorAll('.today-card').forEach(card=>{
+   const row=rows.find(r=>r.reportKey===card.dataset.reportKey);
+   const imageBtn=card.querySelector('.today-image-button');
+   if(!imageBtn||!row)return;
+   imageBtn.onclick=()=>{
+     const liveImg=imageBtn.querySelector('img');
+     if(liveImg&&liveImg.complete&&liveImg.naturalWidth>0){
+       openReportLightbox(liveImg,row);
+     }
+   };
+ });
 }
 
 function reportPostText(row){
@@ -13156,7 +13472,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.10',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.13',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -14263,6 +14579,10 @@ $('otherTasteTabBtn').onclick=async()=>{
  activeOtherTab='taste';
  await renderOtherHub();
 };
+$('otherTodayTabBtn').onclick=async()=>{
+ activeOtherTab='today';
+ await renderOtherHub();
+};
 $('otherLinkTabBtn').onclick=async()=>{
  activeOtherTab='link';
  await renderOtherHub();
@@ -14297,6 +14617,11 @@ $('yosoFilterResetBtn').onclick=()=>{
 };
 $('yosoDeduplicateBtn').onclick=deleteDuplicateYosoRecords;
 $('yosoDeleteAllBtn').onclick=deleteAllYosoRecords;
+$('yosoCsvImportBtn').onclick=()=>$('yosoCsvImportFile').click();
+$('yosoCsvImportFile').onchange=e=>{
+ const file=e.target.files?.[0];
+ if(file)importYosoCsvFile(file);
+};
 $('addYosoBtn').onclick=()=>{
  const rec={id:uid(),pl:'',kana:'',name:'',url:'',source:'manual',draft:true};
  appData.yosoRecords.push(rec);
