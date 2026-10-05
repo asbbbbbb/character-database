@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.10.8</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.10.9</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6737,7 +6737,7 @@ input[type="number"]::-webkit-inner-spin-button{
 /* v7.10.8 --------------------------------------------------------- */
 /* SESSION PL: keep yoso / yosoPL / actions as three distinct columns. */
 #sessionPLTable .session-table{
-  width:1044px!important;
+  width:100%!important;
   min-width:1044px!important;
   table-layout:fixed!important;
 }
@@ -6803,6 +6803,28 @@ input[type="number"]::-webkit-inner-spin-button{
 #sessionPLTable .session-table .col-action{
   position:relative;
   z-index:2;
+}
+
+
+/* v7.10.9 --------------------------------------------------------- */
+/* SESSION table fills the scroll container; no blank strip beside the table. */
+#sessionPLTable{
+  overflow:auto!important;
+}
+#sessionPLTable .session-table .col-title{
+  width:auto!important;
+  min-width:260px!important;
+  max-width:none!important;
+}
+#sessionPLTable .session-table .col-yoso{
+  width:auto!important;
+  min-width:200px!important;
+  max-width:none!important;
+}
+#sessionPLTable .session-table .col-yoso-pl{
+  width:auto!important;
+  min-width:150px!important;
+  max-width:none!important;
 }
 
 </style>
@@ -7528,7 +7550,7 @@ input[type="number"]::-webkit-inner-spin-button{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.10.8</p>
+    <p class="public-viewer-version">Viewer v7.10.9</p>
   </div>
 </div>
 
@@ -7609,7 +7631,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.10.8';
+const PUBLIC_VIEWER_VERSION='7.10.9';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9557,6 +9579,12 @@ function renderAll(){
  document.body.classList.remove('viewer-mode','database-mode','hub-mode','choice-mode');
  setTopNav('');
  $('databaseView').classList.add('hidden');
+ $('choiceView').classList.add('hidden');
+ $('hubView').classList.add('hidden');
+ $('sessionHub').classList.add('hidden');
+ $('reportHub').classList.add('hidden');
+ $('yosoHub').classList.add('hidden');
+ $('linkHub').classList.add('hidden');
  $('emptyState').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').classList.remove('hidden');
  setFormValue('number',current.number);setFormValue('name',current.name);setFormValue('reading',current.reading);setFormValue('status',current.status);setFormValue('occupation',current.occupation);
  setFormValue('age',current.age);setFormValue('gender',current.gender);setFormValue('birthplace',current.birthplace);setFormValue('birthday',current.birthday);
@@ -12644,9 +12672,16 @@ async function renderDatabaseView(){
 
 function showViewer(){
  syncFormToModel();
- document.body.classList.remove('database-mode','hub-mode');
+ document.body.classList.remove('database-mode','hub-mode','choice-mode');
  setTopNav('');
  document.body.classList.add('viewer-mode');
+ $('databaseView').classList.add('hidden');
+ $('choiceView').classList.add('hidden');
+ $('hubView').classList.add('hidden');
+ $('sessionHub').classList.add('hidden');
+ $('reportHub').classList.add('hidden');
+ $('yosoHub').classList.add('hidden');
+ $('linkHub').classList.add('hidden');
  $('editor').classList.add('hidden');
  const v=$('viewer');
  v.classList.remove('hidden');
@@ -12909,7 +12944,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.8',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
