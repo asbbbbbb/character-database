@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.10.9</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.10.10</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6827,6 +6827,89 @@ input[type="number"]::-webkit-inner-spin-button{
   max-width:none!important;
 }
 
+
+/* v7.10.10 -------------------------------------------------------- */
+/* Excel-like autofill for SESSION uchi / yoso. */
+.session-fill-cell{
+  position:relative;
+  display:flex;
+  align-items:center;
+  min-width:0;
+  min-height:24px;
+  padding-right:8px;
+}
+.session-fill-value{
+  width:100%;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.session-fill-handle{
+  position:absolute;
+  right:-4px;
+  bottom:-4px;
+  width:11px;
+  height:11px;
+  padding:0;
+  border:1px solid #728a9a;
+  border-radius:2px;
+  background:#fff;
+  color:#526a7a;
+  font-size:0;
+  line-height:0;
+  cursor:crosshair;
+  opacity:.16;
+  z-index:8;
+}
+.session-fill-cell:hover .session-fill-handle,
+.session-fill-handle:focus-visible{
+  opacity:1;
+}
+.session-fill-handle::after{
+  content:'';
+  display:block;
+  width:5px;
+  height:5px;
+  margin:2px;
+  background:#526a7a;
+}
+body.session-fill-dragging{
+  user-select:none!important;
+  cursor:crosshair!important;
+}
+#sessionPLTable tr.session-fill-source td{
+  box-shadow:inset 0 0 0 1px #537b94;
+}
+#sessionPLTable tr.session-fill-target td.col-uchi,
+#sessionPLTable tr.session-fill-target td.col-yoso{
+  background:#eaf4f8!important;
+}
+@media(pointer:coarse){
+  .session-fill-cell{padding-right:24px}
+  .session-fill-handle{
+    right:1px;
+    bottom:50%;
+    transform:translateY(50%);
+    width:20px;
+    height:20px;
+    border-radius:5px;
+    opacity:.88;
+    cursor:pointer;
+  }
+  .session-fill-handle::before{
+    content:'↓';
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:100%;
+    color:#49687b;
+    font-size:12px;
+    line-height:1;
+    font-weight:800;
+  }
+  .session-fill-handle::after{display:none}
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -7550,7 +7633,7 @@ input[type="number"]::-webkit-inner-spin-button{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.10.9</p>
+    <p class="public-viewer-version">Viewer v7.10.10</p>
   </div>
 </div>
 
@@ -7631,7 +7714,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.10.9';
+const PUBLIC_VIEWER_VERSION='7.10.10';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -10272,6 +10355,127 @@ async function collectPLSessions(){
  assignSessionDisplayNos(rows);
  return rows;
 }
+function sessionAutofillValue(row,field){
+ if(field==='uchi'){
+   const v=String(row?.uchi||'').trim();
+   return v==='—'?'':v;
+ }
+ if(field==='yoso')return scenarioPcText(scenarioPcNames(row?.yoso||''));
+ return '';
+}
+function sessionAutofillValues(row){
+ return {
+   date:normalizeScenarioDate(row?.date||''),
+   url:String(row?.url||'').trim(),
+   title:String(row?.title||'').trim(),
+   uchi:sessionAutofillValue(row,'uchi'),
+   yoso:sessionAutofillValue(row,'yoso')
+ };
+}
+async function applySessionAutofill(rows,sourceIndex,targetIndex,field){
+ if(!Array.isArray(rows)||!rows.length)return;
+ if(!['uchi','yoso'].includes(field))return;
+ if(sourceIndex<0||targetIndex<0||sourceIndex>=rows.length||targetIndex>=rows.length)return;
+ if(sourceIndex===targetIndex)return;
+
+ const sourceValue=sessionAutofillValue(rows[sourceIndex],field);
+ if(!sourceValue){
+   alert(`${field} が空欄のためオートフィルできません。`);
+   return;
+ }
+
+ const step=targetIndex>sourceIndex?1:-1;
+ let changed=0;
+ for(let i=sourceIndex+step;;i+=step){
+   const row=rows[i];
+   const values=sessionAutofillValues(row);
+   values[field]=sourceValue;
+   const result=await updatePlSessionRecord(row,values);
+   if(!result.ok){
+     alert(`${field} のオートフィルを途中で中止しました。\n${result.message||'更新できませんでした。'}`);
+     break;
+   }
+   changed++;
+   if(i===targetIndex)break;
+ }
+ if(changed){
+   await renderSessionHub();
+   await renderReport();
+ }
+}
+function clearSessionAutofillHighlights(){
+ $('sessionPLTable')?.querySelectorAll('.session-fill-source,.session-fill-target').forEach(el=>{
+   el.classList.remove('session-fill-source','session-fill-target');
+ });
+ document.body.classList.remove('session-fill-dragging');
+}
+function highlightSessionAutofillRange(sourceIndex,targetIndex){
+ clearSessionAutofillHighlights();
+ document.body.classList.add('session-fill-dragging');
+ const els=[...($('sessionPLTable')?.querySelectorAll('tbody tr[data-fill-index]')||[])];
+ const lo=Math.min(sourceIndex,targetIndex),hi=Math.max(sourceIndex,targetIndex);
+ els.forEach(tr=>{
+   const idx=Number(tr.dataset.fillIndex);
+   if(idx===sourceIndex)tr.classList.add('session-fill-source');
+   else if(idx>=lo&&idx<=hi)tr.classList.add('session-fill-target');
+ });
+}
+function bindSessionAutofill(rows){
+ const table=$('sessionPLTable');
+ if(!table)return;
+ table.querySelectorAll('.session-fill-handle').forEach(handle=>{
+   const field=handle.dataset.fillField;
+   const sourceIndex=Number(handle.dataset.fillIndex);
+
+   handle.onclick=async e=>{
+     e.preventDefault();
+     e.stopPropagation();
+     if(!matchMedia('(pointer:coarse)').matches)return;
+     if(sourceIndex>=rows.length-1){
+       alert('下にコピーできる表示行がありません。');
+       return;
+     }
+     await applySessionAutofill(rows,sourceIndex,sourceIndex+1,field);
+   };
+
+   handle.onpointerdown=e=>{
+     if(matchMedia('(pointer:coarse)').matches)return;
+     e.preventDefault();
+     e.stopPropagation();
+
+     let targetIndex=sourceIndex;
+     highlightSessionAutofillRange(sourceIndex,targetIndex);
+
+     const move=ev=>{
+       const el=document.elementFromPoint(ev.clientX,ev.clientY);
+       const tr=el?.closest?.('#sessionPLTable tbody tr[data-fill-index]');
+       if(!tr)return;
+       const idx=Number(tr.dataset.fillIndex);
+       if(!Number.isFinite(idx)||idx===targetIndex)return;
+       targetIndex=idx;
+       highlightSessionAutofillRange(sourceIndex,targetIndex);
+     };
+     const cleanup=()=>{
+       document.removeEventListener('pointermove',move,true);
+       document.removeEventListener('pointerup',up,true);
+       document.removeEventListener('pointercancel',cancel,true);
+       clearSessionAutofillHighlights();
+     };
+     const up=async()=>{
+       cleanup();
+       if(targetIndex!==sourceIndex){
+         await applySessionAutofill(rows,sourceIndex,targetIndex,field);
+       }
+     };
+     const cancel=()=>cleanup();
+
+     document.addEventListener('pointermove',move,true);
+     document.addEventListener('pointerup',up,true);
+     document.addEventListener('pointercancel',cancel,true);
+   };
+ });
+}
+
 async function renderSessionPL(){
  const chars=(await all()).map(ensureShape);
  const uchiOptions=$('sessionPlUchiOptions');
@@ -10289,6 +10493,7 @@ async function renderSessionPL(){
  if($('sessionUnlinkedOnly'))$('sessionUnlinkedOnly').checked=sessionUnlinkedOnly;
  sessionFilterContextRows=filterSessionRowsBase(allRows);
  const rows=sortSessionRows(filterSessionRows(allRows));
+ const sessionEditable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
  $('sessionFilterCount').textContent=`${rows.length} / ${allRows.length}件`;
 
  $('sessionPLTable').innerHTML=rows.length?`<table class="session-table">
@@ -10302,10 +10507,10 @@ async function renderSessionPL(){
      <th class="col-yoso-pl">${sessionSortHead('yosoPL','yosoPl')}</th>
      <th class="col-action"></th>
    </tr></thead>
-   <tbody>${rows.map(r=>{
+   <tbody>${rows.map((r,rowIndex)=>{
      const editing=editingPLSessionKeys.has(r.reportKey);
      if(editing){
-       return `<tr class="${r.unlinked?'session-unlinked-row':''}" data-report-key="${esc(r.reportKey)}" data-source="${esc(r.source)}" data-char-id="${esc(r.charId||'')}" data-scenario-id="${esc(r.scenarioId||'')}">
+       return `<tr class="${r.unlinked?'session-unlinked-row':''}" data-fill-index="${rowIndex}" data-report-key="${esc(r.reportKey)}" data-source="${esc(r.source)}" data-char-id="${esc(r.charId||'')}" data-scenario-id="${esc(r.scenarioId||'')}">
          <td class="col-no"><span class="session-edition-badge">${esc(r.edition||'6')}版</span>${esc(r.no)}</td>
          <td class="col-date"><input class="session-pl-edit-date" type="date" min="1000-01-01" max="9999-12-31" value="${esc(normalizeScenarioDate(r.date||''))}"></td>
          <td class="col-link"><input class="session-pl-edit-url" value="${esc(r.url||'')}" placeholder="https://"></td>
@@ -10326,13 +10531,19 @@ async function renderSessionPL(){
        </tr>`;
      }
 
-     return `<tr class="${r.unlinked?'session-unlinked-row':''}" data-report-key="${esc(r.reportKey)}" data-source="${esc(r.source)}" data-char-id="${esc(r.charId||'')}" data-scenario-id="${esc(r.scenarioId||'')}">
+     return `<tr class="${r.unlinked?'session-unlinked-row':''}" data-fill-index="${rowIndex}" data-report-key="${esc(r.reportKey)}" data-source="${esc(r.source)}" data-char-id="${esc(r.charId||'')}" data-scenario-id="${esc(r.scenarioId||'')}">
        <td class="col-no"><span class="session-edition-badge">${esc(r.edition||'6')}版</span>${esc(r.no)}</td>
        <td class="col-date">${esc(r.date||'—')}</td>
        <td class="col-link">${sessionLinkCell(r.url)}</td>
        <td class="col-title">${esc(r.title)}</td>
-       <td class="col-uchi">${r.charId?`<button type="button" class="session-uchi-open" data-char-id="${esc(r.charId)}" title="このPCの編集画面を開く">${esc(r.uchi||'—')}</button>`:esc(r.uchi||'—')}</td>
-       <td class="col-yoso">${esc(r.yoso||'—')}</td>
+       <td class="col-uchi"><div class="session-fill-cell">
+         <div class="session-fill-value">${r.charId?`<button type="button" class="session-uchi-open" data-char-id="${esc(r.charId)}" title="このPCの編集画面を開く">${esc(r.uchi||'—')}</button>`:esc(r.uchi||'—')}</div>
+         ${sessionEditable&&sessionAutofillValue(r,'uchi')?`<button type="button" class="session-fill-handle" data-fill-field="uchi" data-fill-index="${rowIndex}" title="ドラッグでuchiをオートフィル。スマホはタップで次の行へコピー">■</button>`:''}
+       </div></td>
+       <td class="col-yoso"><div class="session-fill-cell">
+         <div class="session-fill-value">${esc(r.yoso||'—')}</div>
+         ${sessionEditable&&sessionAutofillValue(r,'yoso')?`<button type="button" class="session-fill-handle" data-fill-field="yoso" data-fill-index="${rowIndex}" title="ドラッグでyosoをオートフィル。スマホはタップで次の行へコピー">■</button>`:''}
+       </div></td>
        <td class="col-yoso-pl">${esc(r.yosoPl||'—')}</td>
        <td class="col-action"><div class="record-actions">
          <button type="button" class="record-icon-btn session-pl-edit" title="編集" aria-label="編集">✎</button>
@@ -10343,6 +10554,7 @@ async function renderSessionPL(){
  </table>`:'<div class="database-empty">条件に合うPL記録はありません。</div>';
 
  bindSessionSortHeaders($('sessionPLTable'));
+ bindSessionAutofill(rows);
  $('sessionPLTable').querySelectorAll('.session-yoso-input').forEach(bindSessionYosoAutocomplete);
  bindSessionYosoAutocomplete($('sessionPlAddYoso'));
 
@@ -12944,7 +13156,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.10',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
