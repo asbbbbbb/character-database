@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.10.5</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.10.8</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6695,6 +6695,116 @@ input[type="number"]::-webkit-inner-spin-button{
   background:#fff;
 }
 
+
+/* v7.10.6 --------------------------------------------------------- */
+/* SESSION displayed CSV export */
+.session-filter-bar{
+  grid-template-columns:86px minmax(140px,1fr) 124px 48px 72px 62px 72px 56px!important;
+}
+.session-csv-btn{
+  white-space:nowrap!important;
+  min-width:0!important;
+  padding-left:6px!important;
+  padding-right:6px!important;
+}
+@media(max-width:900px){
+  .session-filter-bar{
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+
+/* v7.10.7 --------------------------------------------------------- */
+.session-table .col-yoso-pl{
+  min-width:92px;
+}
+.session-column-head.filtered{
+  color:#0f6e88!important;
+}
+.session-column-head.filtered span{
+  color:#0f6e88!important;
+}
+#sessionFilterPopover{
+  z-index:2600;
+}
+@media(max-width:900px){
+  .session-table .col-yoso-pl{
+    min-width:82px;
+  }
+}
+
+
+/* v7.10.8 --------------------------------------------------------- */
+/* SESSION PL: keep yoso / yosoPL / actions as three distinct columns. */
+#sessionPLTable .session-table{
+  width:1044px!important;
+  min-width:1044px!important;
+  table-layout:fixed!important;
+}
+#sessionPLTable .session-table .col-no{
+  width:58px!important;
+  min-width:58px!important;
+  max-width:58px!important;
+}
+#sessionPLTable .session-table .col-date{
+  width:112px!important;
+  min-width:112px!important;
+  max-width:112px!important;
+}
+#sessionPLTable .session-table .col-link{
+  width:46px!important;
+  min-width:46px!important;
+  max-width:46px!important;
+}
+#sessionPLTable .session-table .col-title{
+  width:260px!important;
+  min-width:260px!important;
+  max-width:260px!important;
+}
+#sessionPLTable .session-table .col-uchi{
+  width:160px!important;
+  min-width:160px!important;
+  max-width:160px!important;
+}
+#sessionPLTable .session-table .col-yoso{
+  width:200px!important;
+  min-width:200px!important;
+  max-width:200px!important;
+}
+#sessionPLTable .session-table .col-yoso-pl{
+  width:150px!important;
+  min-width:150px!important;
+  max-width:150px!important;
+  overflow-wrap:anywhere;
+}
+#sessionPLTable .session-table .col-action{
+  width:58px!important;
+  min-width:58px!important;
+  max-width:58px!important;
+  padding-left:4px!important;
+  padding-right:4px!important;
+  background-clip:padding-box;
+}
+#sessionPLTable .session-table .record-actions{
+  width:50px!important;
+  min-width:50px!important;
+  max-width:50px!important;
+  margin:0 auto!important;
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  justify-content:center!important;
+  gap:4px!important;
+}
+#sessionPLTable .session-table .col-yoso,
+#sessionPLTable .session-table .col-yoso-pl{
+  position:relative;
+  z-index:1;
+}
+#sessionPLTable .session-table .col-action{
+  position:relative;
+  z-index:2;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -7085,6 +7195,7 @@ input[type="number"]::-webkit-inner-spin-button{
           <button type="button" class="btn small" id="sessionFilterResetBtn">解除</button>
           <button type="button" class="btn small" id="sessionDeduplicateBtn">重複を削除</button>
           <button type="button" class="btn small danger hub-bulk-delete" id="sessionDeleteAllBtn">一括削除</button>
+          <button type="button" class="btn small session-csv-btn" id="sessionCsvDownloadBtn">表示CSV</button>
           <span class="session-filter-count" id="sessionFilterCount"></span>
         </div>
         <section class="hub-tab-panel active" id="sessionTabPL">
@@ -7313,6 +7424,21 @@ input[type="number"]::-webkit-inner-spin-button{
   </div>
 </div>
 
+<div class="db-filter-popover hidden" id="sessionFilterPopover">
+  <div class="db-filter-title" id="sessionFilterPopoverTitle">SESSION列フィルター</div>
+  <div class="db-filter-sort">
+    <button type="button" class="btn small" id="sessionSortAscBtn">昇順</button>
+    <button type="button" class="btn small" id="sessionSortDescBtn">降順</button>
+  </div>
+  <input class="control" id="sessionColumnFilterSearch" placeholder="この列の値を検索">
+  <label class="db-filter-all"><input type="checkbox" id="sessionColumnFilterAll"> すべて選択</label>
+  <div class="db-filter-values" id="sessionColumnFilterValues"></div>
+  <div class="db-filter-actions">
+    <button type="button" class="btn small" id="sessionColumnFilterClearBtn">この列を解除</button>
+    <button type="button" class="btn small primary" id="sessionColumnFilterApplyBtn">適用</button>
+  </div>
+</div>
+
 <div class="pl-unmatched-modal hidden" id="plUnmatchedModal" role="dialog" aria-modal="true" aria-labelledby="plUnmatchedTitle">
   <div class="pl-unmatched-dialog">
     <div class="pl-unmatched-head">
@@ -7402,7 +7528,7 @@ input[type="number"]::-webkit-inner-spin-button{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.10.5</p>
+    <p class="public-viewer-version">Viewer v7.10.8</p>
   </div>
 </div>
 
@@ -7483,7 +7609,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.10.5';
+const PUBLIC_VIEWER_VERSION='7.10.8';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9671,6 +9797,9 @@ const editingPLSessionKeys=new Set();
 const editingKPSessionIds=new Set();
 let viewerSkillSortMode='category';
 const sessionSortState={key:'date',dir:'desc'};
+const sessionColumnFilters={};
+let sessionFilterContextRows=[];
+let activeSessionFilterKey='';
 const yosoSortState={key:'pl',dir:'asc'};
 
 function compareText(a,b){
@@ -9684,6 +9813,7 @@ function compareSessionRows(a,b,key){
  if(key==='title')return compareText(a.title||'',b.title||'');
  if(key==='uchi')return compareText(a.uchi||'',b.uchi||'');
  if(key==='yoso')return compareText(a.yoso||'',b.yoso||'');
+ if(key==='yosoPl')return compareText(a.yosoPl||'',b.yosoPl||'');
  return 0;
 }
 function sortSessionRows(rows){
@@ -9692,19 +9822,90 @@ function sortSessionRows(rows){
 }
 function sessionSortHead(label,key,className=''){
  const active=sessionSortState.key===key;
+ const filtered=!!sessionColumnFilters[key];
  const arrow=active?(sessionSortState.dir==='asc'?'▲':'▼'):'↕';
- return `<button type="button" class="hub-sort-head${active?' active':''}" data-session-sort="${esc(key)}" title="${esc(label)}を昇順／降順で並び替え">${esc(label)} <span>${arrow}</span></button>`;
+ return `<button type="button" class="hub-sort-head session-column-head${active?' active':''}${filtered?' filtered':''}" data-session-sort="${esc(key)}" title="${esc(label)}を並び替え・絞り込み">${esc(label)} <span>${arrow}${filtered?' ●':''}</span></button>`;
+}
+function closeSessionFilterPopover(){
+ $('sessionFilterPopover')?.classList.add('hidden');
+ activeSessionFilterKey='';
+}
+function openSessionFilterPopover(button,key){
+ const pop=$('sessionFilterPopover');
+ if(!pop)return;
+ activeSessionFilterKey=key;
+ const labels={no:'No.',date:'日付',title:'シナリオ名',uchi:'uchi',yoso:'yoso',yosoPl:'yosoPL'};
+ $('sessionFilterPopoverTitle').textContent=`${labels[key]||key} のフィルター`;
+ $('sessionColumnFilterSearch').value='';
+
+ const allValues=[...new Set(sessionFilterContextRows.map(r=>String(r[key]??'')))]
+   .sort((a,b)=>compareText(a,b));
+ const selected=sessionColumnFilters[key]
+   ? new Set(sessionColumnFilters[key])
+   : new Set(allValues);
+
+ const renderValues=()=>{
+   const q=$('sessionColumnFilterSearch').value.trim().toLowerCase();
+   const visible=allValues.filter(v=>!q||v.toLowerCase().includes(q));
+   $('sessionColumnFilterValues').innerHTML=visible.map(v=>`<label class="db-filter-value" title="${esc(v||'(空白)')}">
+     <input type="checkbox" value="${esc(v)}" ${selected.has(v)?'checked':''}>
+     <span>${esc(v||'(空白)')}</span>
+   </label>`).join('');
+   const boxes=[...$('sessionColumnFilterValues').querySelectorAll('input')];
+   $('sessionColumnFilterAll').checked=boxes.length>0&&boxes.every(b=>b.checked);
+   $('sessionColumnFilterAll').indeterminate=boxes.some(b=>b.checked)&&!$('sessionColumnFilterAll').checked;
+   boxes.forEach(box=>box.onchange=e=>{
+     if(e.target.checked)selected.add(e.target.value);else selected.delete(e.target.value);
+     const bs=[...$('sessionColumnFilterValues').querySelectorAll('input')];
+     $('sessionColumnFilterAll').checked=bs.length>0&&bs.every(b=>b.checked);
+     $('sessionColumnFilterAll').indeterminate=bs.some(b=>b.checked)&&!$('sessionColumnFilterAll').checked;
+   });
+ };
+ renderValues();
+
+ $('sessionColumnFilterSearch').oninput=renderValues;
+ $('sessionColumnFilterAll').onchange=e=>{
+   [...$('sessionColumnFilterValues').querySelectorAll('input')].forEach(box=>{
+     box.checked=e.target.checked;
+     if(box.checked)selected.add(box.value);else selected.delete(box.value);
+   });
+ };
+ $('sessionSortAscBtn').onclick=()=>{
+   sessionSortState.key=key;
+   sessionSortState.dir='asc';
+   closeSessionFilterPopover();
+   renderSessionPL();
+ };
+ $('sessionSortDescBtn').onclick=()=>{
+   sessionSortState.key=key;
+   sessionSortState.dir='desc';
+   closeSessionFilterPopover();
+   renderSessionPL();
+ };
+ $('sessionColumnFilterClearBtn').onclick=()=>{
+   delete sessionColumnFilters[key];
+   closeSessionFilterPopover();
+   renderSessionPL();
+ };
+ $('sessionColumnFilterApplyBtn').onclick=()=>{
+   if(selected.size===allValues.length)delete sessionColumnFilters[key];
+   else sessionColumnFilters[key]=new Set(selected);
+   closeSessionFilterPopover();
+   renderSessionPL();
+ };
+
+ const r=button.getBoundingClientRect();
+ const popWidth=280;
+ const desired=r.left+(r.width/2)-(popWidth/2);
+ pop.style.left=Math.max(8,Math.min(window.innerWidth-popWidth-8,desired))+'px';
+ pop.style.top=Math.max(8,Math.min(window.innerHeight-445,r.bottom+4))+'px';
+ pop.classList.remove('hidden');
 }
 function bindSessionSortHeaders(container){
  container?.querySelectorAll('[data-session-sort]').forEach(btn=>{
-   btn.onclick=()=>{
-     const key=btn.dataset.sessionSort;
-     if(sessionSortState.key===key)sessionSortState.dir=sessionSortState.dir==='asc'?'desc':'asc';
-     else{
-       sessionSortState.key=key;
-       sessionSortState.dir=key==='date'?'desc':'asc';
-     }
-     if(activeSessionTab==='pl')renderSessionPL();else renderSessionKP();
+   btn.onclick=e=>{
+     e.stopPropagation();
+     openSessionFilterPopover(btn,btn.dataset.sessionSort);
    };
  });
 }
@@ -9744,19 +9945,78 @@ function bindYosoSortHeaders(){
 const editingYosoIds=new Set();
 const editingYosoOriginalNames=new Map();
 const editingScenarioIds=new Set();
+function sessionYosoPlText(value,lookup=buildYosoPlLookup()){
+ const result=new Set();
+ for(const name of scenarioPcNames(value)){
+   const pls=lookup.get(normalizePcLinkName(name));
+   if(!pls)continue;
+   for(const pl of pls){
+     const clean=String(pl||'').trim();
+     if(clean)result.add(clean);
+   }
+ }
+ return [...result].sort(compareText).join(' / ');
+}
 function sessionFilterValues(){
  return {
    edition:$('sessionEditionFilter')?.value||'',
    q:($('sessionSearchInput')?.value||'').trim().toLowerCase()
  };
 }
-function filterSessionRows(rows){
+function filterSessionRowsBase(rows){
  const f=sessionFilterValues();
  return rows.filter(r=>{
-   const hay=`${r.title||''} ${r.uchi||''} ${r.yoso||''} ${r.date||''} ${r.no||''}`.toLowerCase();
+   const hay=`${r.title||''} ${r.uchi||''} ${r.yoso||''} ${r.yosoPl||''} ${r.date||''} ${r.no||''}`.toLowerCase();
    const unmatchedOk=!(activeSessionTab==='pl'&&sessionUnlinkedOnly)||!!r.unlinked;
    return unmatchedOk&&(!f.edition||String(r.edition||'6')===f.edition)&&(!f.q||hay.includes(f.q));
  });
+}
+function filterSessionRows(rows){
+ return filterSessionRowsBase(rows).filter(r=>{
+   for(const [key,selected] of Object.entries(sessionColumnFilters)){
+     if(!selected.has(String(r[key]??'')))return false;
+   }
+   return true;
+ });
+}
+
+function csvCell(value){
+ const s=String(value??'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+ return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;
+}
+function sessionCsvFileName(){
+ const d=new Date();
+ const p=n=>String(n).padStart(2,'0');
+ return `SESSION_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.csv`;
+}
+async function downloadDisplayedSessionCsv(){
+ if(activeSessionTab!=='pl')return;
+
+ const allRows=await collectPLSessions();
+ const rows=sortSessionRows(filterSessionRows(allRows));
+ if(!rows.length){
+   alert('CSVに出力する表示データがありません。');
+   return;
+ }
+
+ const lines=[
+   ['日付','シナリオ名','uchi','yoso'],
+   ...rows.map(r=>[
+     String(r.date||''),
+     String(r.title||''),
+     String(r.uchi||''),
+     String(r.yoso||'')
+   ])
+ ];
+ const csv='\uFEFF'+lines.map(row=>row.map(csvCell).join(',')).join('\r\n');
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download=sessionCsvFileName();
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
 
@@ -9979,6 +10239,8 @@ async function collectPLSessions(){
      unlinked:!String(x.uchi||x.sourceName||'').trim()
    });
  }
+ const yosoPlLookup=buildYosoPlLookup();
+ rows.forEach(r=>{r.yosoPl=sessionYosoPlText(r.yoso||'',yosoPlLookup)});
  assignSessionDisplayNos(rows);
  return rows;
 }
@@ -9997,6 +10259,7 @@ async function renderSessionPL(){
  const unlinkedCount=allRows.filter(r=>r.unlinked).length;
  if($('sessionUnlinkedCount'))$('sessionUnlinkedCount').textContent=String(unlinkedCount);
  if($('sessionUnlinkedOnly'))$('sessionUnlinkedOnly').checked=sessionUnlinkedOnly;
+ sessionFilterContextRows=filterSessionRowsBase(allRows);
  const rows=sortSessionRows(filterSessionRows(allRows));
  $('sessionFilterCount').textContent=`${rows.length} / ${allRows.length}件`;
 
@@ -10008,6 +10271,7 @@ async function renderSessionPL(){
      <th class="col-title">${sessionSortHead('シナリオ名','title')}</th>
      <th class="col-uchi">${sessionSortHead('uchi','uchi')}</th>
      <th class="col-yoso">${sessionSortHead('yoso','yoso')}</th>
+     <th class="col-yoso-pl">${sessionSortHead('yosoPL','yosoPl')}</th>
      <th class="col-action"></th>
    </tr></thead>
    <tbody>${rows.map(r=>{
@@ -10026,6 +10290,7 @@ async function renderSessionPL(){
              <div class="session-yoso-suggestions hidden" role="listbox"></div>
            </div>
          </div></td>
+         <td class="col-yoso-pl">${esc(r.yosoPl||'—')}</td>
          <td class="col-action"><div class="record-actions">
            <button type="button" class="record-icon-btn confirm session-pl-confirm" title="確定" aria-label="確定">✓</button>
            <button type="button" class="record-icon-btn danger session-pl-delete" title="削除" aria-label="削除">×</button>
@@ -10040,6 +10305,7 @@ async function renderSessionPL(){
        <td class="col-title">${esc(r.title)}</td>
        <td class="col-uchi">${r.charId?`<button type="button" class="session-uchi-open" data-char-id="${esc(r.charId)}" title="このPCの編集画面を開く">${esc(r.uchi||'—')}</button>`:esc(r.uchi||'—')}</td>
        <td class="col-yoso">${esc(r.yoso||'—')}</td>
+       <td class="col-yoso-pl">${esc(r.yosoPl||'—')}</td>
        <td class="col-action"><div class="record-actions">
          <button type="button" class="record-icon-btn session-pl-edit" title="編集" aria-label="編集">✎</button>
          <button type="button" class="record-icon-btn danger session-pl-delete" title="削除" aria-label="削除">×</button>
@@ -11680,6 +11946,7 @@ async function renderSessionHub(){
  $('sessionTabPL').classList.toggle('active',activeSessionTab==='pl');
  $('sessionTabKP').classList.toggle('active',activeSessionTab==='kp');
  $('sessionUnlinkedFilterWrap')?.classList.toggle('hidden',activeSessionTab!=='pl');
+ $('sessionCsvDownloadBtn')?.classList.toggle('hidden',activeSessionTab!=='pl');
  if(activeSessionTab==='pl')await renderSessionPL();else renderSessionKP();
 }
 async function showHubView(kind){
@@ -12642,7 +12909,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.5',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.8',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -13715,10 +13982,13 @@ $('sessionFilterResetBtn').onclick=()=>{
  $('sessionEditionFilter').value='';
  $('sessionSearchInput').value='';
  sessionUnlinkedOnly=false;
+ Object.keys(sessionColumnFilters).forEach(k=>delete sessionColumnFilters[k]);
+ closeSessionFilterPopover();
  if($('sessionUnlinkedOnly'))$('sessionUnlinkedOnly').checked=false;
  renderSessionHub();
 };
 $('sessionDeduplicateBtn').onclick=deleteDuplicateSessionRecords;
+$('sessionCsvDownloadBtn').onclick=downloadDisplayedSessionCsv;
 $('sessionPlAddBtn').onclick=addPlSessionToCharacter;
 $('sessionDeleteAllBtn').onclick=deleteAllSessionRecords;
 $('addKPSessionBtn').onclick=()=>{
@@ -13791,6 +14061,8 @@ $('addYosoBtn').onclick=()=>{
 document.addEventListener('click',e=>{
  const pop=$('dbFilterPopover');
  if(pop&&!pop.classList.contains('hidden')&&!e.target.closest('#dbFilterPopover')&&!e.target.closest('.db-col-head'))closeDbFilterPopover();
+ const sessionPop=$('sessionFilterPopover');
+ if(sessionPop&&!sessionPop.classList.contains('hidden')&&!e.target.closest('#sessionFilterPopover')&&!e.target.closest('.session-column-head'))closeSessionFilterPopover();
 });
 $('onlineSyncSettingsBtn').onclick=openOnlineSyncModal;
 $('onlineSyncCloseBtn').onclick=closeOnlineSyncModal;
