@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.10.13</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.11</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6978,6 +6978,319 @@ body.session-fill-dragging{
   }
 }
 
+
+/* v7.11 ----------------------------------------------------------- */
+/* TASK kanban */
+.task-content{
+  width:94%!important;
+  max-width:1540px!important;
+  min-width:880px!important;
+  margin:0 auto!important;
+}
+.task-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:10px;
+}
+.task-head h2{margin:0;font-size:28px;letter-spacing:.03em}
+.task-head-note{margin-top:3px;color:#71808b;font-size:10px}
+.task-head-actions{display:flex;gap:7px;flex-wrap:wrap}
+.task-toolbar{
+  display:grid;
+  grid-template-columns:150px minmax(220px,1fr) 170px auto;
+  gap:8px;
+  align-items:end;
+  margin-bottom:9px;
+  padding:9px;
+  border:1px solid #d8e0e6;
+  border-radius:10px;
+  background:#fff;
+}
+.task-toolbar label,
+.task-editor label{
+  display:grid;
+  gap:3px;
+  min-width:0;
+  color:#687680;
+  font-size:9px;
+  font-weight:800;
+}
+.task-total-count{
+  align-self:center;
+  justify-self:end;
+  padding:5px 9px;
+  border:1px solid #d9e0e5;
+  border-radius:999px;
+  color:#687680;
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.task-calendar-strip{
+  display:flex;
+  align-items:stretch;
+  min-height:66px;
+  margin-bottom:12px;
+  overflow-x:auto;
+  border:1px solid #d7dfe5;
+  border-radius:10px;
+  background:#fff;
+}
+.task-cal-month{
+  position:sticky;
+  left:0;
+  z-index:3;
+  flex:0 0 92px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border-right:1px solid #e0e5e9;
+  background:#fff;
+  font-size:12px;
+}
+.task-cal-month span{font-size:16px;font-weight:800}
+.task-cal-days{
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:42px;
+  align-items:stretch;
+  min-width:max-content;
+}
+.task-cal-day{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  border-right:1px solid #edf0f2;
+  color:#43525d;
+  font-size:9px;
+}
+.task-cal-day b{font-size:12px}
+.task-cal-day span{color:#87939b;font-size:8px}
+.task-cal-day.today b{
+  display:flex;align-items:center;justify-content:center;
+  width:25px;height:25px;border-radius:50%;
+  background:#2f78aa;color:#fff;
+}
+.task-cal-day.has-task::after{
+  content:'';
+  position:absolute;bottom:5px;
+  width:4px;height:4px;border-radius:50%;
+  background:#477f9f;
+}
+.task-cal-day i{
+  position:absolute;top:3px;right:3px;
+  min-width:12px;height:12px;padding:0 3px;border-radius:7px;
+  background:#edf4f7;color:#5c788a;
+  font-size:7px;font-style:normal;text-align:center;line-height:12px;
+}
+.task-board{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(170px,1fr));
+  gap:10px;
+  align-items:start;
+  padding-bottom:26px;
+}
+.task-lane{
+  min-width:0;
+  border:1px solid #d9e0e5;
+  border-radius:11px;
+  overflow:hidden;
+  background:#f7f9fa;
+}
+.task-lane-head{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:7px;
+  min-height:46px;
+  padding:8px 10px;
+  border-bottom:1px solid #dce2e7;
+  font-size:12px;
+}
+.task-lane-head>b{
+  min-width:22px;height:22px;padding:0 6px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.72);
+  font-size:9px;
+}
+.task-lane-thisweek .task-lane-head{background:#fde7e8}
+.task-lane-nextweek .task-lane-head{background:#fff0d8}
+.task-lane-prep .task-lane-head{background:#fff3cf}
+.task-lane-confirm .task-lane-head{background:#e2effb}
+.task-lane-done .task-lane-head{background:#dff3e8}
+.task-lane-body{
+  display:grid;
+  gap:8px;
+  padding:8px;
+  min-height:220px;
+}
+.task-lane-empty{
+  padding:34px 8px;
+  color:#9aa5ad;
+  text-align:center;
+  font-size:9px;
+}
+.task-card{
+  position:relative;
+  min-width:0;
+  padding:9px;
+  border:1px solid #dce3e8;
+  border-left:4px solid #9aa8b1;
+  border-radius:9px;
+  background:#fff;
+  box-shadow:0 1px 3px rgba(34,51,64,.04);
+}
+.task-card:has(.task-role.pl){border-left-color:#e85c68}
+.task-card:has(.task-role.kp){border-left-color:#27a675}
+.task-card:has(.task-role.kppl){border-left-color:#3d79b6}
+.task-card-top{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+.task-card-date{font-size:10px;font-weight:800;color:#4c5d69}
+.task-role{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+  padding:3px 7px;
+  border-radius:5px;
+  color:#fff;
+  font-size:9px;
+  font-weight:900;
+}
+.task-role.pl{background:#e84255}
+.task-role.kp{background:#15936c}
+.task-role.kppl{background:#3375af}
+.task-card-menu{
+  margin-left:auto;
+  border:0;background:transparent;
+  color:#71818d;font-size:13px;font-weight:900;cursor:pointer;
+}
+.task-card-title{
+  margin:8px 0 7px;
+  min-height:2.5em;
+  color:#24323d;
+  font-size:11px;
+  font-weight:900;
+  line-height:1.3;
+  overflow-wrap:anywhere;
+}
+.task-mini-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:3px;
+}
+.task-mini{
+  min-width:0;
+  display:grid;
+  gap:2px;
+  text-align:center;
+}
+.task-mini>span{
+  color:#667681;
+  font-size:7px;
+  font-weight:800;
+}
+.task-status{
+  display:block;
+  min-width:0;
+  padding:3px 2px;
+  border-radius:5px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:8px;
+}
+.task-status.done{background:#dff6e8;color:#16754e}
+.task-status.pending{background:#fde3e6;color:#b5323d}
+.task-status.deadline{background:#ffe7cf;color:#b0601f}
+.task-status.none{background:#eef2f4;color:#7d8991}
+.task-card-memo{
+  margin-top:7px;
+  padding-top:6px;
+  border-top:1px dashed #e0e5e8;
+  color:#71808a;
+  font-size:8px;
+  line-height:1.4;
+}
+.task-editor{
+  margin:0 0 12px;
+  padding:10px;
+  border:1px solid #9db5c6;
+  border-radius:10px;
+  background:#fff;
+  box-shadow:0 4px 18px rgba(37,58,72,.08);
+}
+.task-editor-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:9px;
+}
+.task-editor-grid{
+  display:grid;
+  grid-template-columns:100px 150px minmax(220px,1fr) repeat(4,minmax(90px,.6fr));
+  gap:7px;
+  align-items:end;
+}
+.task-edit-title-field{grid-column:span 2}
+.task-confirm-field{
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  min-height:31px;
+}
+.task-confirm-field input{width:15px;height:15px}
+.task-edit-memo-field{grid-column:1 / -1}
+.task-editor-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:7px;
+  margin-top:9px;
+}
+body.public-online-database .task-head-actions,
+body.public-online-database .task-card-menu,
+body.public-viewer-only .task-head-actions,
+body.public-viewer-only .task-card-menu{
+  display:none!important;
+}
+@media(max-width:1100px){
+  .task-content{width:100%!important;min-width:0!important}
+  .task-board{
+    grid-template-columns:repeat(5,230px);
+    overflow-x:auto;
+    padding-bottom:12px;
+  }
+  .task-editor-grid{grid-template-columns:1fr 1fr}
+  .task-edit-title-field,.task-edit-memo-field{grid-column:1 / -1}
+}
+@media(max-width:700px){
+  .task-head{align-items:flex-start;flex-direction:column}
+  .task-toolbar{grid-template-columns:1fr 1fr}
+  .task-total-count{justify-self:start}
+  .task-calendar-strip{margin-bottom:9px}
+  .task-board{
+    grid-template-columns:repeat(5,minmax(245px,82vw));
+    gap:8px;
+    scroll-snap-type:x proximity;
+  }
+  .task-lane{scroll-snap-align:start}
+  .task-editor-grid{grid-template-columns:1fr}
+  .task-edit-title-field,.task-edit-memo-field{grid-column:auto}
+  body.public-mobile-editor .app-nav-btn{
+    min-width:74px!important;
+    padding-left:7px!important;
+    padding-right:7px!important;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -6989,6 +7302,7 @@ body.session-fill-dragging{
     <button type="button" class="app-nav-btn" id="sessionViewBtn">SESSION</button>
     <button type="button" class="app-nav-btn" id="reportViewBtn">REPORT</button>
     <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSONOKO</button>
+    <button type="button" class="app-nav-btn" id="taskViewBtn">TASK</button>
     <button type="button" class="app-nav-btn" id="linkViewBtn">OTHER</button>
   </nav>
   <div class="mobile-editor-sync-status" id="mobileEditorSyncStatus">クラウド接続</div>
@@ -7474,6 +7788,88 @@ body.session-fill-dragging{
         <div class="session-table-wrap" id="yosoTable"></div>
       </div>
 
+      <div id="taskHub" class="hub-content task-content hidden">
+        <div class="task-head">
+          <div>
+            <div class="hub-kicker">CHARACTER DATABASE</div>
+            <h2>TASK</h2>
+            <div class="task-head-note">今日以降のセッションに向けた準備タスクを管理します。</div>
+          </div>
+          <div class="task-head-actions">
+            <button type="button" class="btn" id="taskImportSessionBtn">SESSIONから追加</button>
+            <button type="button" class="btn primary" id="taskAddBtn">＋ 追加</button>
+          </div>
+        </div>
+
+        <div class="task-toolbar">
+          <label>KP / PL
+            <select class="control" id="taskRoleFilter">
+              <option value="">すべて</option>
+              <option value="KP">KP</option>
+              <option value="PL">PL</option>
+              <option value="KPPL">KPPL</option>
+            </select>
+          </label>
+          <label class="task-search-field">検索
+            <input class="control" id="taskSearchInput" placeholder="タイトルで検索…">
+          </label>
+          <label>表示月
+            <select class="control" id="taskMonthFilter"><option value="">すべての月</option></select>
+          </label>
+          <span class="task-total-count" id="taskTotalCount">0件</span>
+        </div>
+
+        <div class="task-calendar-strip" id="taskCalendarStrip"></div>
+
+        <div class="task-editor hidden" id="taskEditor">
+          <div class="task-editor-head">
+            <strong id="taskEditorTitle">TASKを追加</strong>
+            <button type="button" class="btn small" id="taskEditorCloseBtn">×</button>
+          </div>
+          <div class="task-editor-grid">
+            <label>KP / PL
+              <select class="control" id="taskEditRole">
+                <option value="PL">PL</option>
+                <option value="KP">KP</option>
+                <option value="KPPL">KPPL</option>
+              </select>
+            </label>
+            <label>日付
+              <input class="control" id="taskEditDate" type="date" min="1000-01-01" max="9999-12-31">
+            </label>
+            <label class="task-edit-title-field">シナリオ名
+              <input class="control" id="taskEditTitle" placeholder="シナリオ名">
+            </label>
+            <label>CS
+              <input class="control" id="taskEditCs" placeholder="済 / 未 / 期限 / -">
+            </label>
+            <label>立ち絵
+              <input class="control" id="taskEditStanding" placeholder="済 / 未 / 期限 / -">
+            </label>
+            <label>差分
+              <input class="control" id="taskEditDiff" placeholder="済 / 未 / 期限 / -">
+            </label>
+            <label>部屋
+              <input class="control" id="taskEditRoom" placeholder="済 / 未 / 期限 / -">
+            </label>
+            <label class="task-confirm-field">
+              <input type="checkbox" id="taskEditConfirm">
+              <span>確認待ちにする</span>
+            </label>
+            <label class="task-edit-memo-field">メモ
+              <textarea class="control" id="taskEditMemo" rows="2" placeholder="補足・連絡事項"></textarea>
+            </label>
+          </div>
+          <div class="task-editor-actions">
+            <button type="button" class="btn danger hidden" id="taskDeleteBtn">削除</button>
+            <button type="button" class="btn" id="taskEditorCancelBtn">キャンセル</button>
+            <button type="button" class="btn primary" id="taskSaveBtn">保存</button>
+          </div>
+        </div>
+
+        <div class="task-board" id="taskBoard"></div>
+      </div>
+
       <div id="linkHub" class="hub-content link-content hidden">
         <div class="hub-view-head other-head">
           <div>
@@ -7718,7 +8114,7 @@ body.session-fill-dragging{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.10.13</p>
+    <p class="public-viewer-version">Viewer v7.11</p>
   </div>
 </div>
 
@@ -7799,7 +8195,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.10.13';
+const PUBLIC_VIEWER_VERSION='7.11';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -7809,10 +8205,11 @@ function loadAppData(){
      yosoRecords:Array.isArray(raw.yosoRecords)?raw.yosoRecords:[],
      plExtraSessions:Array.isArray(raw.plExtraSessions)?raw.plExtraSessions:[],
      reportHiddenKeys:Array.isArray(raw.reportHiddenKeys)?raw.reportHiddenKeys:[],
-     links:Array.isArray(raw.links)?raw.links:[]
+     links:Array.isArray(raw.links)?raw.links:[],
+     taskRecords:Array.isArray(raw.taskRecords)?raw.taskRecords:[]
    };
  }catch(_){
-   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[]};
+   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[]};
  }
 }
 function saveAppData(){
@@ -7827,6 +8224,7 @@ function saveAppData(){
 let appData=loadAppData();
 if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
 if(!Array.isArray(appData.links))appData.links=[];
+if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
 const STAT_KEYS=['STR','CON','POW','DEX','APP','SIZ','INT','EDU'];
 const STATUS=['新規','継続','継続不可','ロスト'];
 
@@ -8473,7 +8871,8 @@ function normalizePublicPayload(payload){
      yosoRecords:Array.isArray(payload.appData?.yosoRecords)?payload.appData.yosoRecords:[],
      plExtraSessions:Array.isArray(payload.appData?.plExtraSessions)?payload.appData.plExtraSessions:[],
      reportHiddenKeys:Array.isArray(payload.appData?.reportHiddenKeys)?payload.appData.reportHiddenKeys:[],
-     links:Array.isArray(payload.appData?.links)?payload.appData.links:[]
+     links:Array.isArray(payload.appData?.links)?payload.appData.links:[],
+     taskRecords:Array.isArray(payload.appData?.taskRecords)?payload.appData.taskRecords:[]
    },
    reportImages:Array.isArray(payload.reportImages)?payload.reportImages:[]
  };
@@ -8545,6 +8944,7 @@ async function startMobileEditor(ownerSecret,viewerSecret){
  appData=structuredClone(publicRemoteData.appData);
  if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
  if(!Array.isArray(appData.links))appData.links=[];
+ if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
 
  publicRemoteMode='mobile-editor';
  document.body.classList.add('public-mobile-editor');
@@ -9752,6 +10152,7 @@ function renderAll(){
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
+ $('taskHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
  $('emptyState').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').classList.remove('hidden');
  setFormValue('number',current.number);setFormValue('name',current.name);setFormValue('reading',current.reading);setFormValue('status',current.status);setFormValue('occupation',current.occupation);
@@ -9980,10 +10381,11 @@ function setTopNav(active){
  if(active==='session')$('sessionViewBtn')?.classList.add('active');
  if(active==='report')$('reportViewBtn')?.classList.add('active');
  if(active==='other')$('otherPcViewBtn')?.classList.add('active');
+ if(active==='task')$('taskViewBtn')?.classList.add('active');
  if(active==='link')$('linkViewBtn')?.classList.add('active');
 }
 function showHomeWorkspace(){
- document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').style.display='';if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
+ document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('taskHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').style.display='';if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
 }
 let activeSessionTab='pl';
 let sessionUnlinkedOnly=false;
@@ -11431,6 +11833,295 @@ async function renderIntegrityCheck(){
    };
  });
 }
+let editingTaskId='';
+
+function taskTodayIso(){
+ const d=new Date();
+ const p=n=>String(n).padStart(2,'0');
+ return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
+function taskDateObj(value){
+ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value||''));
+ if(!m)return null;
+ const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));
+ return Number.isNaN(d.getTime())?null:d;
+}
+function taskRoleClass(role){
+ return role==='KP'?'kp':role==='KPPL'?'kppl':'pl';
+}
+function taskStatusInfo(value){
+ const raw=String(value??'').trim();
+ if(!raw||raw==='未')return {kind:'pending',label:'未'};
+ if(raw==='済')return {kind:'done',label:'済'};
+ if(raw==='-'||raw==='—')return {kind:'none',label:'-'};
+ return {kind:'deadline',label:raw};
+}
+function taskAllDone(rec){
+ return ['cs','standing','diff','room'].every(k=>{
+   const kind=taskStatusInfo(rec[k]).kind;
+   return kind==='done'||kind==='none';
+ });
+}
+function taskWeekBounds(baseDate=new Date()){
+ const d=new Date(baseDate.getFullYear(),baseDate.getMonth(),baseDate.getDate());
+ const day=d.getDay();
+ const mondayOffset=day===0?-6:1-day;
+ const start=new Date(d);start.setDate(d.getDate()+mondayOffset);
+ const end=new Date(start);end.setDate(start.getDate()+6);
+ const nextStart=new Date(start);nextStart.setDate(start.getDate()+7);
+ const nextEnd=new Date(start);nextEnd.setDate(start.getDate()+13);
+ return {start,end,nextStart,nextEnd};
+}
+function taskLane(rec){
+ if(taskAllDone(rec))return 'done';
+ if(rec.confirmPending)return 'confirm';
+ const d=taskDateObj(rec.date);
+ if(!d)return 'prep';
+ const {start,end,nextStart,nextEnd}=taskWeekBounds(new Date());
+ const t=d.getTime();
+ if(t>=start.getTime()&&t<=end.getTime())return 'thisweek';
+ if(t>=nextStart.getTime()&&t<=nextEnd.getTime())return 'nextweek';
+ return 'prep';
+}
+function taskLaneMeta(){
+ return [
+   ['thisweek','今週','⏰'],
+   ['nextweek','来週','◷'],
+   ['prep','準備中','⚙'],
+   ['confirm','確認待ち','⌛'],
+   ['done','完了','●']
+ ];
+}
+function taskMonthKey(date){
+ const m=/^(\d{4})-(\d{2})/.exec(String(date||''));
+ return m?`${m[1]}-${m[2]}`:'';
+}
+function taskDateLabel(date){
+ const d=taskDateObj(date);
+ if(!d)return '日付未設定';
+ return `${d.getMonth()+1}/${d.getDate()} (${['日','月','火','水','木','金','土'][d.getDay()]})`;
+}
+function taskNormalizeRecord(rec={}){
+ return {
+   id:rec.id||uid(),
+   role:['KP','PL','KPPL'].includes(rec.role)?rec.role:'PL',
+   date:String(rec.date||''),
+   title:String(rec.title||''),
+   cs:String(rec.cs??'未'),
+   standing:String(rec.standing??'未'),
+   diff:String(rec.diff??'未'),
+   room:String(rec.room??'未'),
+   confirmPending:!!rec.confirmPending,
+   memo:String(rec.memo||''),
+   source:String(rec.source||'manual'),
+   createdAt:rec.createdAt||new Date().toISOString(),
+   updatedAt:rec.updatedAt||new Date().toISOString()
+ };
+}
+function taskFilteredRows(){
+ const today=taskTodayIso();
+ const role=$('taskRoleFilter')?.value||'';
+ const q=String($('taskSearchInput')?.value||'').trim().toLowerCase();
+ const month=$('taskMonthFilter')?.value||'';
+ return (appData.taskRecords||[])
+   .map(taskNormalizeRecord)
+   .filter(r=>r.date>=today)
+   .filter(r=>!role||r.role===role)
+   .filter(r=>!month||taskMonthKey(r.date)===month)
+   .filter(r=>!q||`${r.title} ${r.role} ${r.memo}`.toLowerCase().includes(q))
+   .sort((a,b)=>String(a.date).localeCompare(String(b.date))||compareText(a.title,b.title));
+}
+function taskChipHtml(label,value){
+ const info=taskStatusInfo(value);
+ return `<div class="task-mini"><span>${esc(label)}</span><b class="task-status ${info.kind}">${esc(info.label)}</b></div>`;
+}
+function taskCardHtml(rec){
+ const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
+ return `<article class="task-card" data-task-id="${esc(rec.id)}">
+   <div class="task-card-top">
+     <span class="task-card-date">${esc(taskDateLabel(rec.date))}</span>
+     <span class="task-role ${taskRoleClass(rec.role)}">${esc(rec.role)}</span>
+     ${editable?`<button type="button" class="task-card-menu" title="編集">•••</button>`:''}
+   </div>
+   <div class="task-card-title">${esc(rec.title||'無題')}</div>
+   <div class="task-mini-grid">
+     ${taskChipHtml('CS',rec.cs)}
+     ${taskChipHtml('立ち絵',rec.standing)}
+     ${taskChipHtml('差分',rec.diff)}
+     ${taskChipHtml('部屋',rec.room)}
+   </div>
+   ${rec.memo?`<div class="task-card-memo">${esc(rec.memo)}</div>`:''}
+ </article>`;
+}
+function renderTaskCalendar(rows){
+ const wrap=$('taskCalendarStrip');
+ if(!wrap)return;
+ const monthFilter=$('taskMonthFilter')?.value||'';
+ let base=new Date();
+ if(monthFilter){
+   const m=/^(\d{4})-(\d{2})$/.exec(monthFilter);
+   if(m)base=new Date(Number(m[1]),Number(m[2])-1,1);
+ }
+ const y=base.getFullYear(),mo=base.getMonth();
+ const days=new Date(y,mo+1,0).getDate();
+ const today=taskTodayIso();
+ const countByDate=new Map();
+ rows.forEach(r=>countByDate.set(r.date,(countByDate.get(r.date)||0)+1));
+ const dayNames=['日','月','火','水','木','金','土'];
+ wrap.innerHTML=`<div class="task-cal-month"><strong>${y}年</strong><span>${mo+1}月</span></div>
+   <div class="task-cal-days">${Array.from({length:days},(_,i)=>{
+     const d=i+1;
+     const iso=`${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+     const dt=new Date(y,mo,d);
+     const has=countByDate.get(iso)||0;
+     return `<div class="task-cal-day${iso===today?' today':''}${has?' has-task':''}">
+       <b>${d}</b><span>${dayNames[dt.getDay()]}</span>${has?`<i>${has}</i>`:''}
+     </div>`;
+   }).join('')}</div>`;
+}
+function refreshTaskMonthOptions(){
+ const sel=$('taskMonthFilter');
+ if(!sel)return;
+ const keep=sel.value||'';
+ const months=[...new Set((appData.taskRecords||[]).map(r=>taskMonthKey(r.date)).filter(Boolean))]
+   .sort();
+ sel.innerHTML='<option value="">すべての月</option>'+months.map(m=>{
+   const [y,mo]=m.split('-');
+   return `<option value="${m}">${y}年${Number(mo)}月</option>`;
+ }).join('');
+ sel.value=months.includes(keep)?keep:'';
+}
+async function renderTaskHub(){
+ if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
+ refreshTaskMonthOptions();
+ const rows=taskFilteredRows();
+ $('taskTotalCount').textContent=`${rows.length}件`;
+ renderTaskCalendar(rows);
+
+ const grouped=new Map(taskLaneMeta().map(([key])=>[key,[]]));
+ rows.forEach(r=>grouped.get(taskLane(r)).push(r));
+
+ $('taskBoard').innerHTML=taskLaneMeta().map(([key,label,icon])=>{
+   const list=grouped.get(key)||[];
+   return `<section class="task-lane task-lane-${key}">
+     <div class="task-lane-head"><span>${icon}</span><strong>${label}</strong><b>${list.length}</b></div>
+     <div class="task-lane-body">${list.length?list.map(taskCardHtml).join(''):'<div class="task-lane-empty">該当なし</div>'}</div>
+   </section>`;
+ }).join('');
+
+ $('taskBoard').querySelectorAll('.task-card-menu').forEach(btn=>{
+   btn.onclick=()=>{
+     const rec=(appData.taskRecords||[]).find(r=>r.id===btn.closest('.task-card')?.dataset.taskId);
+     if(rec)openTaskEditor(rec);
+   };
+ });
+
+ const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
+ $('taskAddBtn')?.classList.toggle('hidden',!editable);
+ $('taskImportSessionBtn')?.classList.toggle('hidden',!editable);
+}
+function openTaskEditor(rec=null){
+ const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
+ if(!editable)return;
+ editingTaskId=rec?.id||'';
+ const r=taskNormalizeRecord(rec||{
+   role:'PL',date:taskTodayIso(),title:'',cs:'未',standing:'未',diff:'未',room:'未'
+ });
+ $('taskEditorTitle').textContent=editingTaskId?'TASKを編集':'TASKを追加';
+ $('taskEditRole').value=r.role;
+ $('taskEditDate').value=r.date;
+ $('taskEditTitle').value=r.title;
+ $('taskEditCs').value=r.cs;
+ $('taskEditStanding').value=r.standing;
+ $('taskEditDiff').value=r.diff;
+ $('taskEditRoom').value=r.room;
+ $('taskEditConfirm').checked=!!r.confirmPending;
+ $('taskEditMemo').value=r.memo||'';
+ $('taskDeleteBtn').classList.toggle('hidden',!editingTaskId);
+ $('taskEditor').classList.remove('hidden');
+ $('taskEditTitle').focus();
+ $('taskEditor').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeTaskEditor(){
+ editingTaskId='';
+ $('taskEditor').classList.add('hidden');
+}
+function saveTaskEditor(){
+ const date=String($('taskEditDate').value||'').trim();
+ const title=String($('taskEditTitle').value||'').trim();
+ if(!date){alert('日付を入力してください。');return}
+ if(!title){alert('シナリオ名を入力してください。');return}
+ const values={
+   role:$('taskEditRole').value||'PL',
+   date,title,
+   cs:String($('taskEditCs').value||'').trim()||'未',
+   standing:String($('taskEditStanding').value||'').trim()||'未',
+   diff:String($('taskEditDiff').value||'').trim()||'未',
+   room:String($('taskEditRoom').value||'').trim()||'未',
+   confirmPending:!!$('taskEditConfirm').checked,
+   memo:String($('taskEditMemo').value||'').trim()
+ };
+ if(editingTaskId){
+   const rec=(appData.taskRecords||[]).find(r=>r.id===editingTaskId);
+   if(rec)Object.assign(rec,values,{updatedAt:new Date().toISOString()});
+ }else{
+   appData.taskRecords.push(taskNormalizeRecord({...values,source:'manual'}));
+ }
+ saveAppData();
+ closeTaskEditor();
+ renderTaskHub();
+}
+function deleteTaskEditor(){
+ if(!editingTaskId)return;
+ const rec=(appData.taskRecords||[]).find(r=>r.id===editingTaskId);
+ if(!rec)return;
+ if(!confirm(`「${rec.title||'このTASK'}」を削除しますか？`))return;
+ appData.taskRecords=appData.taskRecords.filter(r=>r.id!==editingTaskId);
+ saveAppData();
+ closeTaskEditor();
+ renderTaskHub();
+}
+async function importUpcomingSessionsToTasks(){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const today=taskTodayIso();
+ const candidates=[];
+ const seen=new Set();
+
+ const pl=await collectPLSessions();
+ for(const r of pl){
+   if(!r.date||r.date<today||!String(r.title||'').trim())continue;
+   const key=`PL|${r.date}|${normalizeSessionDuplicateText(r.title)}`;
+   if(seen.has(key))continue;
+   seen.add(key);
+   candidates.push({role:'PL',date:r.date,title:r.title});
+ }
+ for(const r of appData.kpSessions||[]){
+   const date=normalizeScenarioDate(r.date||'');
+   if(!date||date<today||!String(r.title||'').trim())continue;
+   const key=`KP|${date}|${normalizeSessionDuplicateText(r.title)}`;
+   if(seen.has(key))continue;
+   seen.add(key);
+   candidates.push({role:'KP',date,title:String(r.title||'').trim()});
+ }
+
+ const existing=new Set((appData.taskRecords||[]).map(r=>
+   `${r.role}|${r.date}|${normalizeSessionDuplicateText(r.title)}`
+ ));
+ let added=0;
+ for(const c of candidates){
+   const key=`${c.role}|${c.date}|${normalizeSessionDuplicateText(c.title)}`;
+   if(existing.has(key))continue;
+   appData.taskRecords.push(taskNormalizeRecord({
+     ...c,cs:'未',standing:'未',diff:'未',room:'未',source:'session'
+   }));
+   existing.add(key);
+   added++;
+ }
+ saveAppData();
+ await renderTaskHub();
+ alert(added?`SESSIONから${added}件追加しました。`:'追加できる新しい予定はありません。');
+}
+
 async function renderOtherHub(){
  const ids={
    tally:['otherTallyPanel','otherTallyTabBtn'],
@@ -12523,6 +13214,7 @@ async function showHubView(kind){
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
+ $('taskHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
 
  if(kind==='session'){
@@ -12537,6 +13229,10 @@ async function showHubView(kind){
    setTopNav('other');
    $('yosoHub').classList.remove('hidden');
    renderYoso();
+ }else if(kind==='task'){
+   setTopNav('task');
+   $('taskHub').classList.remove('hidden');
+   await renderTaskHub();
  }else if(kind==='link'){
    setTopNav('link');
    $('linkHub').classList.remove('hidden');
@@ -12557,6 +13253,7 @@ async function showDatabaseView(){
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
+ $('taskHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
  $('databaseView').style.display='';
  $('databaseView').classList.remove('hidden');
@@ -13209,6 +13906,7 @@ function showViewer(){
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
+ $('taskHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
  $('editor').classList.add('hidden');
  const v=$('viewer');
@@ -13472,7 +14170,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.10.13',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.11',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -13489,7 +14187,8 @@ function importBackup(file){
          yosoRecords:Array.isArray(j.appData.yosoRecords)?j.appData.yosoRecords:[],
          plExtraSessions:Array.isArray(j.appData.plExtraSessions)?j.appData.plExtraSessions:[],
          reportHiddenKeys:Array.isArray(j.appData.reportHiddenKeys)?j.appData.reportHiddenKeys:[],
-         links:Array.isArray(j.appData.links)?j.appData.links:[]
+         links:Array.isArray(j.appData.links)?j.appData.links:[],
+         taskRecords:Array.isArray(j.appData.taskRecords)?j.appData.taskRecords:[]
        };
        saveAppData();
      }
@@ -14473,6 +15172,7 @@ $('choiceViewBtn').onclick=showChoiceView;
 $('sessionViewBtn').onclick=()=>showHubView('session');
 $('reportViewBtn').onclick=()=>showHubView('report');
 $('otherPcViewBtn').onclick=()=>showHubView('other');
+$('taskViewBtn').onclick=()=>showHubView('task');
 $('linkViewBtn').onclick=()=>showHubView('link');
 $('backFromDatabaseBtn').onclick=leaveDatabaseView;
 $('databaseEditionFilter').onchange=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
@@ -14566,6 +15266,16 @@ $('addKPSessionBtn').onclick=()=>{
 };
 $('yosoPlFilter').onchange=renderYoso;
 $('yosoSearchInput').oninput=renderYoso;
+
+$('taskRoleFilter').onchange=renderTaskHub;
+$('taskSearchInput').oninput=renderTaskHub;
+$('taskMonthFilter').onchange=renderTaskHub;
+$('taskAddBtn').onclick=()=>openTaskEditor();
+$('taskImportSessionBtn').onclick=importUpcomingSessionsToTasks;
+$('taskEditorCloseBtn').onclick=closeTaskEditor;
+$('taskEditorCancelBtn').onclick=closeTaskEditor;
+$('taskSaveBtn').onclick=saveTaskEditor;
+$('taskDeleteBtn').onclick=deleteTaskEditor;
 
 $('otherTallyTabBtn').onclick=async()=>{
  activeOtherTab='tally';
@@ -14827,6 +15537,7 @@ async function initCharacterDatabase(){
        appData=structuredClone(publicRemoteData.appData);
        if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
        if(!Array.isArray(appData.links))appData.links=[];
+       if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
        publicRemoteMode='report';
        document.body.classList.add('public-online-report');
        await showHubView('report');
@@ -14842,6 +15553,7 @@ async function initCharacterDatabase(){
        appData=structuredClone(publicRemoteData.appData);
        if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
        if(!Array.isArray(appData.links))appData.links=[];
+       if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
        publicRemoteMode='database';
        document.body.classList.add('public-online-database');
        await showDatabaseView();
