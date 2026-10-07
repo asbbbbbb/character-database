@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.11.1</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.1</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -7353,6 +7353,451 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
   .task-content{min-width:0!important}.task-calendar-strip{min-height:62px!important}.task-workspace{display:block;overflow:visible}.task-filter-panel{grid-template-columns:1fr 1fr;margin-bottom:9px}.task-filter-panel h3,.task-filter-legend,.task-sync-btn{grid-column:1 / -1}.task-today-panel{margin-bottom:9px}.task-today-row{grid-template-columns:1fr}.task-inline-memo{grid-column:1}.task-future-panel{margin-bottom:18px}.task-today-list,.task-future-list{max-height:none}.task-section-head h3{font-size:16px}.task-calendar-strip{overflow-x:auto!important}
 }
 
+
+/* v7.12 ----------------------------------------------------------- */
+.task-content{
+  width:96%!important;
+  max-width:1620px!important;
+  min-width:940px!important;
+}
+.reminder-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:6px;
+}
+.reminder-head h2{margin:0;font-size:27px}
+.reminder-subtabs{margin-bottom:9px}
+.reminder-panel.hidden{display:none!important}
+.task-toolbar-v712{
+  display:grid;
+  grid-template-columns:150px minmax(220px,420px) auto minmax(220px,1fr);
+  gap:8px;
+  align-items:end;
+  margin-bottom:9px;
+  padding:9px;
+  border:1px solid #d9e0e5;
+  border-radius:10px;
+  background:#fff;
+}
+.task-toolbar-v712 label{
+  display:grid;
+  gap:3px;
+  color:#667681;
+  font-size:9px;
+  font-weight:800;
+}
+.task-sync-note{
+  align-self:center;
+  color:#82909a;
+  font-size:8px;
+  line-height:1.35;
+}
+.task-calendar-strip{
+  min-height:66px!important;
+  margin-bottom:10px!important;
+}
+.task-cal-pill.lane-today i{background:#e34b55!important}
+.task-cal-pill.lane-next i{background:#e5a236!important}
+.task-cal-pill.lane-backlog i{background:#40a6d8!important}
+.task-cal-pill.lane-someday i{background:#8b98a2!important}
+.task-cal-pill.lane-done i{background:#1f9a65!important}
+.task-board-v712{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(185px,1fr))!important;
+  gap:10px!important;
+  align-items:start!important;
+  overflow:visible!important;
+}
+.task-lane{
+  min-width:0!important;
+  border:1px solid #d9e0e5!important;
+  border-radius:11px!important;
+  overflow:hidden!important;
+  background:#f7f9fa!important;
+}
+.task-lane-today .task-lane-head{background:#fde2e5!important}
+.task-lane-next .task-lane-head{background:#fff0d7!important}
+.task-lane-backlog .task-lane-head{background:#e1f2fb!important}
+.task-lane-someday .task-lane-head{background:#edf0f3!important}
+.task-lane-done .task-lane-head{background:#dff3e8!important}
+.task-lane-head{
+  display:grid!important;
+  grid-template-columns:auto 1fr auto!important;
+  align-items:center!important;
+  gap:7px!important;
+  min-height:46px!important;
+  padding:8px 10px!important;
+  border-bottom:1px solid #dce2e7!important;
+}
+.task-lane-head strong{font-size:12px}
+.task-lane-head>b{
+  min-width:22px;height:22px;padding:0 6px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.72);font-size:9px;
+}
+.task-lane-icon{font-size:16px}
+.task-lane-body{
+  display:grid!important;
+  gap:8px!important;
+  min-height:260px!important;
+  padding:8px!important;
+}
+.task-lane-body.drag-over{
+  outline:2px dashed #5c91af;
+  outline-offset:-5px;
+  background:#eef7fb!important;
+}
+.task-kanban-card{
+  padding:9px!important;
+  border:1px solid #dce3e8!important;
+  border-left:4px solid #9aa8b1!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  box-shadow:0 1px 3px rgba(34,51,64,.05)!important;
+}
+.task-kanban-card:has(.task-role.pl){border-left-color:#e85c68!important}
+.task-kanban-card:has(.task-role.kp){border-left-color:#27a675!important}
+.task-kanban-card:has(.task-role.kppl){border-left-color:#3d79b6!important}
+.task-kanban-card.dragging{opacity:.45}
+.task-card-top{
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+}
+.task-card-date{font-size:9px!important;font-weight:800!important;color:#4c5d69!important}
+.task-lane-select{
+  margin-left:auto;
+  width:78px;
+  height:24px;
+  border:1px solid #d4dde3;
+  border-radius:5px;
+  background:#fff;
+  color:#5e6d77;
+  font-size:7px;
+}
+.task-card-title{
+  margin:7px 0 6px!important;
+  min-height:2.5em!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  line-height:1.3!important;
+}
+.task-card-memo-input{
+  width:100%;
+  min-height:42px;
+  max-height:86px;
+  resize:vertical;
+  margin-bottom:7px;
+  padding:6px 7px;
+  border:1px solid #d7dfe5;
+  border-radius:6px;
+  font:inherit;
+  font-size:8px;
+  line-height:1.35;
+}
+.task-card-status-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:3px;
+}
+.task-mini-status{
+  display:grid;
+  gap:2px;
+  text-align:center;
+}
+.task-mini-status>span{
+  color:#657580;
+  font-size:7px;
+  font-weight:800;
+}
+.task-status-toggle{
+  min-height:26px!important;
+  padding:2px!important;
+  font-size:8px!important;
+}
+.task-lane-empty{
+  padding:30px 5px!important;
+  color:#9aa5ad!important;
+  text-align:center!important;
+  font-size:9px!important;
+}
+.reminder-memo-card{
+  border:1px solid #d9e0e5;
+  border-radius:11px;
+  background:#fff;
+  padding:14px;
+}
+.reminder-memo-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:12px;
+  margin-bottom:10px;
+}
+.reminder-memo-head h3{margin:0;font-size:18px}
+.reminder-memo-head p{margin:3px 0 0;color:#7b8790;font-size:9px}
+#reminderMemoStatus{color:#7b8790;font-size:8px}
+.reminder-memo-text{
+  width:100%;
+  min-height:420px;
+  resize:vertical;
+  padding:12px;
+  font:inherit;
+  line-height:1.65;
+}
+@media(max-width:1100px){
+  .task-content{width:100%!important;min-width:0!important}
+  .task-board-v712{
+    grid-template-columns:repeat(5,235px)!important;
+    overflow-x:auto!important;
+    padding-bottom:10px;
+  }
+  .task-toolbar-v712{
+    grid-template-columns:140px minmax(180px,1fr) auto;
+  }
+  .task-sync-note{grid-column:1 / -1}
+}
+@media(max-width:700px){
+  .reminder-head{align-items:flex-start;flex-direction:column}
+  .task-toolbar-v712{grid-template-columns:1fr 1fr}
+  .task-sync-btn,.task-sync-note{grid-column:1 / -1}
+  .task-board-v712{
+    grid-template-columns:repeat(5,minmax(250px,84vw))!important;
+    scroll-snap-type:x proximity;
+  }
+  .task-lane{scroll-snap-align:start}
+  .reminder-memo-text{min-height:300px}
+}
+
+
+/* v7.12.1 --------------------------------------------------------- */
+/* REMINDER > MEMO: pre-session idea / invitation kanban */
+.memo-toolbar{
+  display:grid;
+  grid-template-columns:minmax(240px,1fr) 190px auto;
+  gap:8px;
+  align-items:end;
+  margin-bottom:10px;
+  padding:9px;
+  border:1px solid #d9e0e5;
+  border-radius:10px;
+  background:#fff;
+}
+.memo-toolbar label{
+  display:grid;
+  gap:3px;
+  color:#667681;
+  font-size:9px;
+  font-weight:800;
+}
+.memo-editor{
+  margin-bottom:10px;
+  padding:10px;
+  border:1px solid #9db5c6;
+  border-radius:10px;
+  background:#fff;
+  box-shadow:0 4px 18px rgba(37,58,72,.08);
+}
+.memo-editor-head{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;
+}
+.memo-editor-grid{
+  display:grid;
+  grid-template-columns:150px 180px minmax(260px,1fr);
+  gap:8px;
+  align-items:start;
+}
+.memo-editor-grid label,
+.memo-member-editor{
+  display:grid;
+  gap:4px;
+  color:#667681;
+  font-size:9px;
+  font-weight:800;
+}
+.memo-edit-title-field{grid-column:auto}
+.memo-member-editor{grid-column:1 / -1}
+.memo-edit-remarks-field{grid-column:1 / -1}
+.memo-member-options{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  padding:7px;
+  min-height:38px;
+  border:1px solid #d8e0e6;
+  border-radius:7px;
+  background:#fafcfd;
+}
+.memo-member-option{
+  display:inline-flex!important;
+  align-items:center;
+  gap:4px!important;
+  padding:4px 7px;
+  border:1px solid #dce4ea;
+  border-radius:999px;
+  background:#fff;
+  font-size:9px!important;
+  font-weight:700!important;
+  color:#50606b!important;
+  cursor:pointer;
+}
+.memo-member-option input{width:13px;height:13px}
+.memo-no-members{color:#98a3aa;font-size:9px}
+.memo-editor-actions{
+  display:flex;justify-content:flex-end;gap:7px;margin-top:9px;
+}
+.memo-board{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(185px,1fr));
+  gap:10px;
+  align-items:start;
+}
+.memo-lane{
+  min-width:0;
+  border:1px solid #d9e0e5;
+  border-radius:11px;
+  overflow:hidden;
+  background:#f7f9fa;
+}
+.memo-lane-head{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:7px;
+  min-height:46px;
+  padding:8px 10px;
+  border-bottom:1px solid #dce2e7;
+}
+.memo-lane-head strong{font-size:12px}
+.memo-lane-head>b{
+  min-width:22px;height:22px;padding:0 6px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.72);font-size:9px;
+}
+.memo-lane-action .memo-lane-head{background:#fde7ee}
+.memo-lane-wait .memo-lane-head{background:#e6f2fd}
+.memo-lane-later .memo-lane-head{background:#eee6fb}
+.memo-lane-coord .memo-lane-head{background:#dff5e9}
+.memo-lane-recruit .memo-lane-head{background:#fff0d3}
+.memo-lane-body{
+  display:grid;
+  gap:8px;
+  min-height:260px;
+  padding:8px;
+}
+.memo-lane-body.drag-over{
+  outline:2px dashed #5c91af;
+  outline-offset:-5px;
+  background:#eef7fb;
+}
+.memo-lane-empty{
+  padding:30px 5px;
+  color:#9aa5ad;
+  text-align:center;
+  font-size:9px;
+}
+.memo-card{
+  padding:9px;
+  border:1px solid #dce3e8;
+  border-radius:9px;
+  background:#fff;
+  box-shadow:0 1px 3px rgba(34,51,64,.05);
+}
+.memo-card.dragging{opacity:.45}
+.memo-card-top{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+.memo-card-date{
+  color:#687884;
+  font-size:8px;
+  font-weight:800;
+}
+.memo-card-date.muted{color:#a0a9af}
+.memo-lane-select{
+  margin-left:auto;
+  width:82px;
+  height:24px;
+  border:1px solid #d4dde3;
+  border-radius:5px;
+  background:#fff;
+  color:#5e6d77;
+  font-size:7px;
+}
+.memo-card-title{
+  display:block;
+  width:100%;
+  margin:7px 0 6px;
+  padding:0;
+  border:0;
+  background:none;
+  color:#263540;
+  text-align:left;
+  font-size:11px;
+  font-weight:900;
+  line-height:1.3;
+  cursor:pointer;
+  overflow-wrap:anywhere;
+}
+.memo-card-members{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  min-height:20px;
+  margin-bottom:6px;
+}
+.memo-member-tag{
+  display:inline-flex;
+  align-items:center;
+  max-width:100%;
+  padding:3px 6px;
+  border-radius:999px;
+  font-size:8px;
+  font-weight:800;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.memo-member-tag.tone-0{background:#fde3e8;color:#a43b4e}
+.memo-member-tag.tone-1{background:#e4f2ff;color:#356d9a}
+.memo-member-tag.tone-2{background:#fff0d6;color:#9a651c}
+.memo-member-tag.tone-3{background:#e4f5e9;color:#357452}
+.memo-member-tag.tone-4{background:#efe5fb;color:#77509b}
+.memo-member-tag.tone-5{background:#fbe9dc;color:#9b6041}
+.memo-member-empty{color:#a1abb2;font-size:8px}
+.memo-card-remarks{
+  padding-top:6px;
+  border-top:1px dashed #e1e6ea;
+  color:#667681;
+  font-size:8px;
+  line-height:1.45;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+.memo-card-remarks.muted{color:#a3adb4}
+@media(max-width:1100px){
+  .memo-board{
+    grid-template-columns:repeat(5,235px);
+    overflow-x:auto;
+    padding-bottom:10px;
+  }
+}
+@media(max-width:700px){
+  .memo-toolbar{grid-template-columns:1fr 1fr}
+  .memo-search-field{grid-column:1 / -1}
+  .memo-editor-grid{grid-template-columns:1fr}
+  .memo-edit-title-field,.memo-member-editor,.memo-edit-remarks-field{grid-column:auto}
+  .memo-board{
+    grid-template-columns:repeat(5,minmax(250px,84vw));
+    scroll-snap-type:x proximity;
+  }
+  .memo-lane{scroll-snap-align:start}
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -7364,7 +7809,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <button type="button" class="app-nav-btn" id="sessionViewBtn">SESSION</button>
     <button type="button" class="app-nav-btn" id="reportViewBtn">REPORT</button>
     <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSONOKO</button>
-    <button type="button" class="app-nav-btn" id="taskViewBtn">TASK</button>
+    <button type="button" class="app-nav-btn" id="taskViewBtn">REMINDER</button>
     <button type="button" class="app-nav-btn" id="linkViewBtn">OTHER</button>
   </nav>
   <div class="mobile-editor-sync-status" id="mobileEditorSyncStatus">クラウド接続</div>
@@ -7839,6 +8284,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
           </label>
           <button type="button" class="btn small" id="yosoFilterResetBtn">解除</button>
           <button type="button" class="btn small" id="yosoDeduplicateBtn">重複を削除</button>
+          <button type="button" class="btn small" id="yosoBulkPlRenameBtn">PL一括変更</button>
           <button type="button" class="btn small danger hub-bulk-delete" id="yosoDeleteAllBtn">一括削除</button>
           <span class="yoso-filter-count" id="yosoFilterCount"></span>
         </div>
@@ -7852,19 +8298,21 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
       </div>
 
       <div id="taskHub" class="hub-content task-content hidden">
-        <div class="task-head compact">
+        <div class="reminder-head">
           <div>
             <div class="hub-kicker">CHARACTER DATABASE</div>
-            <h2>TASK</h2>
-            <div class="task-head-note">セッション準備を「今日のタスク」と「今後のセッション」で整理します。</div>
+            <h2>REMINDER</h2>
+            <div class="task-head-note">セッション準備とメモをまとめて管理します。</div>
           </div>
         </div>
 
-        <div class="task-calendar-strip" id="taskCalendarStrip"></div>
+        <nav class="hub-tabs reminder-subtabs" id="reminderSubTabs">
+          <button type="button" class="hub-tab active" id="reminderTaskTabBtn">TASK</button>
+          <button type="button" class="hub-tab" id="reminderMemoTabBtn">MEMO</button>
+        </nav>
 
-        <div class="task-workspace">
-          <aside class="task-filter-panel">
-            <h3>絞り込み</h3>
+        <section class="reminder-panel active" id="reminderTaskPanel">
+          <div class="task-toolbar-v712">
             <label>KP / PL
               <select class="control" id="taskRoleFilter">
                 <option value="">すべて</option>
@@ -7873,51 +8321,67 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
                 <option value="KPPL">KPPLのみ</option>
               </select>
             </label>
-            <label>表示する月
-              <select class="control" id="taskMonthFilter"><option value="">すべて</option></select>
+            <label class="task-search-v712">検索
+              <input class="control" id="taskSearchInput" placeholder="シナリオ名・メモを検索…">
             </label>
-            <label>シナリオ検索
-              <input class="control" id="taskSearchInput" placeholder="シナリオ名で検索…">
-            </label>
-            <label>ステータス
-              <select class="control" id="taskStatusFilter">
-                <option value="">すべて</option>
-                <option value="pending">未あり</option>
-                <option value="done">完了</option>
-              </select>
-            </label>
-            <div class="task-filter-legend">
-              <strong>ステータス</strong>
-              <span><i class="task-legend-dot pending"></i>未（これから）</span>
-              <span><i class="task-legend-dot done"></i>済（完了）</span>
-              <span><i class="task-legend-dot none"></i>-（なし）</span>
-            </div>
-            <button type="button" class="btn task-sync-btn" id="taskImportSessionBtn">SESSIONから追加（新規のみ）</button>
-          </aside>
+            <button type="button" class="btn primary task-sync-btn" id="taskImportSessionBtn">SESSIONから更新</button>
+            <span class="task-sync-note">新規だけ追加。既存の列・未/済/-・メモは変更しません。</span>
+          </div>
 
-          <section class="task-today-panel">
-            <div class="task-section-head">
-              <div>
-                <h3>☀ 今日のタスク</h3>
-                <p>本日より後のセッションを表示。2か月以内のSESSIONは自動で追加します。</p>
-              </div>
-              <span class="task-total-count" id="taskTotalCount">0件</span>
-            </div>
-            <div class="task-today-list" id="taskTodayList"></div>
-          </section>
+          <div class="task-calendar-strip" id="taskCalendarStrip"></div>
 
-          <aside class="task-future-panel">
-            <div class="task-section-head future">
-              <div>
-                <h3>今後のセッション</h3>
-                <p>まだ今日のタスクに入っていない予定</p>
-              </div>
-              <span class="task-future-count" id="taskFutureCount">0件</span>
+          <div class="task-board task-board-v712" id="taskBoard"></div>
+        </section>
+
+        <section class="reminder-panel hidden" id="reminderMemoPanel">
+          <div class="memo-toolbar">
+            <label class="memo-search-field">検索
+              <input class="control" id="memoSearchInput" placeholder="シナリオ名・メンバー・メモを検索…">
+            </label>
+            <label>MEMBER
+              <select class="control" id="memoMemberFilter"><option value="">すべて</option></select>
+            </label>
+            <button type="button" class="btn primary" id="memoAddBtn">＋ 追加</button>
+          </div>
+
+          <div class="memo-editor hidden" id="memoEditor">
+            <div class="memo-editor-head">
+              <strong id="memoEditorTitle">MEMOを追加</strong>
+              <button type="button" class="btn small" id="memoEditorCloseBtn">×</button>
             </div>
-            <div class="task-future-list" id="taskFutureList"></div>
-            <button type="button" class="btn primary task-future-add-btn" id="taskFutureAddBtn" disabled>選択した項目を今日のタスクにする</button>
-          </aside>
-        </div>
+            <div class="memo-editor-grid">
+              <label>STATUS
+                <select class="control" id="memoEditLane">
+                  <option value="action">📣 ACTION</option>
+                  <option value="wait">⏳ WAIT</option>
+                  <option value="later">🗓️ LATER</option>
+                  <option value="coord">🤝 COORD</option>
+                  <option value="recruit">📢 RECRUIT</option>
+                </select>
+              </label>
+              <label>DATE
+                <input class="control" id="memoEditDate" type="text" placeholder="未定 / 202611 / 2026-11-12">
+              </label>
+              <label class="memo-edit-title-field">SCENARIO
+                <input class="control" id="memoEditTitle" placeholder="シナリオ名">
+              </label>
+              <div class="memo-member-editor">
+                <span>MEMBER</span>
+                <div class="memo-member-options" id="memoMemberOptions"></div>
+              </div>
+              <label class="memo-edit-remarks-field">REMARKS
+                <textarea class="control" id="memoEditRemarks" rows="3" placeholder="立卓前の覚書"></textarea>
+              </label>
+            </div>
+            <div class="memo-editor-actions">
+              <button type="button" class="btn danger hidden" id="memoDeleteBtn">削除</button>
+              <button type="button" class="btn" id="memoEditorCancelBtn">キャンセル</button>
+              <button type="button" class="btn primary" id="memoSaveBtn">保存</button>
+            </div>
+          </div>
+
+          <div class="memo-board" id="memoBoard"></div>
+        </section>
       </div>
 
       <div id="linkHub" class="hub-content link-content hidden">
@@ -8164,7 +8628,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.11.1</p>
+    <p class="public-viewer-version">Viewer v7.12.1</p>
   </div>
 </div>
 
@@ -8245,7 +8709,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.11.1';
+const PUBLIC_VIEWER_VERSION='7.12.1';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -8256,10 +8720,12 @@ function loadAppData(){
      plExtraSessions:Array.isArray(raw.plExtraSessions)?raw.plExtraSessions:[],
      reportHiddenKeys:Array.isArray(raw.reportHiddenKeys)?raw.reportHiddenKeys:[],
      links:Array.isArray(raw.links)?raw.links:[],
-     taskRecords:Array.isArray(raw.taskRecords)?raw.taskRecords:[]
+     taskRecords:Array.isArray(raw.taskRecords)?raw.taskRecords:[],
+     reminderMemo:String(raw.reminderMemo||''),
+     memoRecords:Array.isArray(raw.memoRecords)?raw.memoRecords:[]
    };
  }catch(_){
-   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[]};
+   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],reminderMemo:'',memoRecords:[]};
  }
 }
 function saveAppData(){
@@ -8275,6 +8741,7 @@ let appData=loadAppData();
 if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
 if(!Array.isArray(appData.links))appData.links=[];
 if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
+if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
 const STAT_KEYS=['STR','CON','POW','DEX','APP','SIZ','INT','EDU'];
 const STATUS=['新規','継続','継続不可','ロスト'];
 
@@ -8922,7 +9389,9 @@ function normalizePublicPayload(payload){
      plExtraSessions:Array.isArray(payload.appData?.plExtraSessions)?payload.appData.plExtraSessions:[],
      reportHiddenKeys:Array.isArray(payload.appData?.reportHiddenKeys)?payload.appData.reportHiddenKeys:[],
      links:Array.isArray(payload.appData?.links)?payload.appData.links:[],
-     taskRecords:Array.isArray(payload.appData?.taskRecords)?payload.appData.taskRecords:[]
+     taskRecords:Array.isArray(payload.appData?.taskRecords)?payload.appData.taskRecords:[],
+     reminderMemo:String(payload.appData?.reminderMemo||''),
+     memoRecords:Array.isArray(payload.appData?.memoRecords)?payload.appData.memoRecords:[]
    },
    reportImages:Array.isArray(payload.reportImages)?payload.reportImages:[]
  };
@@ -8995,6 +9464,7 @@ async function startMobileEditor(ownerSecret,viewerSecret){
  if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
  if(!Array.isArray(appData.links))appData.links=[];
  if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
+ if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
 
  publicRemoteMode='mobile-editor';
  document.body.classList.add('public-mobile-editor');
@@ -11883,8 +12353,9 @@ async function renderIntegrityCheck(){
    };
  });
 }
-const taskFutureSelected=new Set();
+let activeReminderTab='task';
 let taskMemoSaveTimer=null;
+let reminderMemoSaveTimer=null;
 
 function taskTodayIso(){
  const d=new Date();
@@ -11897,6 +12368,12 @@ function taskDateObj(value){
  const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));
  return Number.isNaN(d.getTime())?null:d;
 }
+function taskAddDaysIso(dateIso,days){
+ const d=taskDateObj(dateIso)||new Date();
+ d.setDate(d.getDate()+days);
+ const p=n=>String(n).padStart(2,'0');
+ return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
 function taskAddMonthsIso(dateIso,months){
  const d=taskDateObj(dateIso)||new Date();
  d.setMonth(d.getMonth()+months);
@@ -11904,7 +12381,6 @@ function taskAddMonthsIso(dateIso,months){
  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
 }
 function taskRoleClass(role){return role==='KP'?'kp':role==='KPPL'?'kppl':'pl'}
-function taskMonthKey(date){const m=/^(\d{4})-(\d{2})/.exec(String(date||''));return m?`${m[1]}-${m[2]}`:''}
 function taskDateLabel(date){
  const d=taskDateObj(date);if(!d)return '日付未設定';
  return `${d.getMonth()+1}/${d.getDate()} (${['日','月','火','水','木','金','土'][d.getDay()]})`;
@@ -11915,23 +12391,35 @@ function taskNormalizeStatus(value){
 }
 function taskStatusKind(value){return value==='済'?'done':value==='-'?'none':'pending'}
 function taskNextStatus(value){return value==='未'?'済':value==='済'?'-':'未'}
-function taskAllDone(rec){return ['cs','standing','diff','room'].every(k=>['済','-'].includes(taskNormalizeStatus(rec[k])))}
 function taskRecordKey(rec){return `${rec.role}|${rec.date}|${normalizeSessionDuplicateText(rec.title)}`}
+function taskNormalizeLane(value){
+ return ['today','next','backlog','someday','done'].includes(value)?value:'today';
+}
 function taskNormalizeRecord(rec={}){
  const role=['KP','PL','KPPL'].includes(rec.role)?rec.role:'PL';
  return {
    id:rec.id||uid(),role,date:String(rec.date||''),title:String(rec.title||''),
    cs:taskNormalizeStatus(rec.cs),standing:taskNormalizeStatus(rec.standing),
    diff:taskNormalizeStatus(rec.diff),room:taskNormalizeStatus(rec.room),
-   memo:String(rec.memo||''),source:String(rec.source||'manual'),
+   memo:String(rec.memo||''),lane:taskNormalizeLane(rec.lane),
+   source:String(rec.source||'manual'),
    createdAt:rec.createdAt||new Date().toISOString(),updatedAt:rec.updatedAt||new Date().toISOString()
  };
+}
+function taskLaneForNewSession(date){
+ const today=taskTodayIso();
+ const twoWeeks=taskAddDaysIso(today,14);
+ const twoMonths=taskAddMonthsIso(today,2);
+ if(date<=twoWeeks)return 'next';
+ if(date<=twoMonths)return 'backlog';
+ return 'someday';
 }
 function taskNewRecord(session){
  const role=session.role||'PL';
  return taskNormalizeRecord({
-   role,date:session.date,title:session.title,
-   cs:'未',standing:'未',diff:'未',room:role==='PL'?'-':'未',source:'session'
+   role,date:session.date,title:session.title,lane:taskLaneForNewSession(session.date),
+   cs:'未',standing:'未',diff:'未',room:role==='PL'?'-':'未',
+   source:'session'
  });
 }
 async function collectUpcomingTaskSessions(){
@@ -11941,158 +12429,422 @@ async function collectUpcomingTaskSessions(){
  for(const r of pl){
    const date=normalizeScenarioDate(r.date||'');
    const title=String(r.title||'').trim();
-   if(!date||date<=today||!title)continue;
+   if(!date||date<today||!title)continue;
    const rec={role:'PL',date,title};
    const key=taskRecordKey(rec);if(seen.has(key))continue;seen.add(key);list.push(rec);
  }
  for(const r of appData.kpSessions||[]){
    const date=normalizeScenarioDate(r.date||'');
    const title=String(r.title||'').trim();
-   if(!date||date<=today||!title)continue;
+   if(!date||date<today||!title)continue;
    const rec={role:'KP',date,title};
    const key=taskRecordKey(rec);if(seen.has(key))continue;seen.add(key);list.push(rec);
  }
  return list.sort((a,b)=>a.date.localeCompare(b.date)||compareText(a.title,b.title));
 }
-async function syncTaskSessionsWithinTwoMonths(showMessage=false){
+function prunePastTaskRecords(){
+ const today=taskTodayIso();
+ const before=(appData.taskRecords||[]).length;
+ appData.taskRecords=(appData.taskRecords||[]).filter(r=>!r.date||String(r.date)>=today);
+ return before-appData.taskRecords.length;
+}
+async function syncTaskSessionsFromSession(showMessage=true){
  if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return 0;
- const today=taskTodayIso(),limit=taskAddMonthsIso(today,2);
  const sessions=await collectUpcomingTaskSessions();
  const existing=new Set((appData.taskRecords||[]).map(taskRecordKey));
  let added=0;
  for(const s of sessions){
-   if(s.date>limit)continue;
    const key=taskRecordKey(s);
    if(existing.has(key))continue;
-   appData.taskRecords.push(taskNewRecord(s));existing.add(key);added++;
+   appData.taskRecords.push(taskNewRecord(s));
+   existing.add(key);
+   added++;
  }
  if(added)saveAppData();
- if(showMessage)alert(added?`新しいSESSIONを${added}件追加しました。`:'2か月以内に追加できる新しいSESSIONはありません。');
+ if(showMessage){
+   alert(added?`SESSIONから新しい予定を${added}件追加しました。\n既存のTASKは変更していません。`:'追加できる新しいSESSIONはありません。');
+ }
  return added;
 }
-function taskFilteredRows(){
- const today=taskTodayIso();
+function taskLaneMeta(){
+ return [
+   ['today','🔥','TODAY'],
+   ['next','⏳','NEXT'],
+   ['backlog','📦','BACKLOG'],
+   ['someday','💤','SOMEDAY'],
+   ['done','✅','DONE']
+ ];
+}
+function taskFilteredRecords(){
  const role=$('taskRoleFilter')?.value||'';
  const q=String($('taskSearchInput')?.value||'').trim().toLowerCase();
- const month=$('taskMonthFilter')?.value||'';
- const status=$('taskStatusFilter')?.value||'';
  return (appData.taskRecords||[]).map(taskNormalizeRecord)
-   .filter(r=>r.date>today)
    .filter(r=>!role||r.role===role)
-   .filter(r=>!month||taskMonthKey(r.date)===month)
    .filter(r=>!q||`${r.title} ${r.role} ${r.memo}`.toLowerCase().includes(q))
-   .filter(r=>status==='pending'?!taskAllDone(r):status==='done'?taskAllDone(r):true)
-   .sort((a,b)=>a.date.localeCompare(b.date)||compareText(a.title,b.title));
+   .sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||compareText(a.title,b.title));
 }
 function taskStatusButtonHtml(rec,field,label,editable){
  const value=taskNormalizeStatus(rec[field]);
- return `<div class="task-cell-status"><span>${esc(label)}</span><button type="button" class="task-status-toggle ${taskStatusKind(value)}" data-task-id="${esc(rec.id)}" data-task-field="${field}" ${editable?'':'disabled'}>${esc(value)}</button></div>`;
+ return `<div class="task-mini-status"><span>${esc(label)}</span><button type="button" class="task-status-toggle ${taskStatusKind(value)}" data-task-id="${esc(rec.id)}" data-task-field="${field}" ${editable?'':'disabled'}>${esc(value)}</button></div>`;
 }
-function taskTodayRowHtml(rec,editable){
- return `<article class="task-today-row" data-task-id="${esc(rec.id)}">
-   <div class="task-session-main"><b class="task-date-big">${esc(taskDateLabel(rec.date))}</b><span class="task-role ${taskRoleClass(rec.role)}">${esc(rec.role)}</span><strong>${esc(rec.title||'無題')}</strong></div>
-   <div class="task-status-grid">
+function taskCardHtml(rec,editable){
+ return `<article class="task-kanban-card" data-task-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
+   <div class="task-card-top">
+     <span class="task-card-date">${esc(taskDateLabel(rec.date))}</span>
+     <span class="task-role ${taskRoleClass(rec.role)}">${esc(rec.role)}</span>
+     ${editable?`<select class="task-lane-select" data-task-lane-select="${esc(rec.id)}" title="列を移動">
+       ${taskLaneMeta().map(([key,,label])=>`<option value="${key}" ${rec.lane===key?'selected':''}>${label}</option>`).join('')}
+     </select>`:''}
+   </div>
+   <div class="task-card-title">${esc(rec.title||'無題')}</div>
+   <textarea class="task-card-memo-input" data-task-memo="${esc(rec.id)}" rows="2" placeholder="メモ" ${editable?'':'readonly'}>${esc(rec.memo||'')}</textarea>
+   <div class="task-card-status-grid">
      ${taskStatusButtonHtml(rec,'cs','CS',editable)}
      ${taskStatusButtonHtml(rec,'standing','立ち絵',editable)}
      ${taskStatusButtonHtml(rec,'diff','差分',editable)}
      ${taskStatusButtonHtml(rec,'room','部屋',editable)}
    </div>
-   <label class="task-inline-memo"><span>メモ</span><textarea data-task-memo="${esc(rec.id)}" rows="1" placeholder="ここに直接入力" ${editable?'':'readonly'}>${esc(rec.memo||'')}</textarea></label>
  </article>`;
 }
-function refreshTaskMonthOptions(rows=[]){
- const sel=$('taskMonthFilter');if(!sel)return;
- const keep=sel.value||'';
- const months=[...new Set(rows.map(r=>taskMonthKey(r.date)).filter(Boolean))].sort();
- sel.innerHTML='<option value="">すべて</option>'+months.map(m=>{const [y,mo]=m.split('-');return `<option value="${m}">${y}年${Number(mo)}月</option>`}).join('');
- sel.value=months.includes(keep)?keep:'';
-}
-function renderTaskCalendar(sessions,taskRows){
+function renderTaskCalendar(records){
  const wrap=$('taskCalendarStrip');if(!wrap)return;
- const taskMap=new Map(taskRows.map(r=>[taskRecordKey(r),r]));
+ const rows=[...records].filter(r=>r.date).sort((a,b)=>a.date.localeCompare(b.date));
  const unique=[];const seen=new Set();
- for(const s of sessions){
-   if(seen.has(s.date))continue;seen.add(s.date);unique.push(s.date);
-   if(unique.length>=18)break;
+ for(const r of rows){
+   if(seen.has(r.date))continue;
+   seen.add(r.date);unique.push(r.date);
+   if(unique.length>=24)break;
  }
  const today=taskTodayIso();
- wrap.innerHTML=`<div class="task-cal-title"><strong>${esc(today.slice(0,4))}年</strong><span>予定日</span></div><div class="task-cal-pills">${unique.map(date=>{
-   const d=taskDateObj(date);const day=d?['日','月','火','水','木','金','土'][d.getDay()]:'';
-   const sessionsOn=sessions.filter(s=>s.date===date);
-   const records=sessionsOn.map(s=>taskMap.get(taskRecordKey(s))).filter(Boolean);
-   const dot=records.length?(records.every(taskAllDone)?'done':'pending'):'none';
-   return `<div class="task-cal-pill${date===today?' today':''}"><b>${esc(taskDateLabel(date).split(' ')[0])}</b><span>${day}</span><i class="${dot}"></i></div>`;
- }).join('')}</div>`;
+ const laneByDate=new Map();
+ for(const r of rows){
+   if(!laneByDate.has(r.date))laneByDate.set(r.date,r.lane);
+   else if(r.lane==='today')laneByDate.set(r.date,'today');
+ }
+ wrap.innerHTML=`<div class="task-cal-title"><strong>${esc(today.slice(0,4))}年</strong><span>予定日</span></div>
+   <div class="task-cal-pills">${unique.map(date=>{
+     const d=taskDateObj(date);const day=d?['日','月','火','水','木','金','土'][d.getDay()]:'';
+     const lane=laneByDate.get(date)||'someday';
+     return `<div class="task-cal-pill ${date===today?'today ':''}lane-${lane}">
+       <b>${esc(taskDateLabel(date).split(' ')[0])}</b><span>${day}</span><i></i>
+     </div>`;
+   }).join('')}</div>`;
 }
-function bindTaskTodayInteractions(editable){
- const list=$('taskTodayList');if(!list)return;
- list.querySelectorAll('.task-status-toggle').forEach(btn=>{
+function bindTaskCardInteractions(editable){
+ const board=$('taskBoard');if(!board)return;
+
+ board.querySelectorAll('.task-status-toggle').forEach(btn=>{
    btn.onclick=()=>{
      if(!editable)return;
      const rec=(appData.taskRecords||[]).find(r=>r.id===btn.dataset.taskId);if(!rec)return;
-     const field=btn.dataset.taskField;rec[field]=taskNextStatus(taskNormalizeStatus(rec[field]));rec.updatedAt=new Date().toISOString();saveAppData();renderTaskHub(false);
+     const field=btn.dataset.taskField;
+     rec[field]=taskNextStatus(taskNormalizeStatus(rec[field]));
+     rec.updatedAt=new Date().toISOString();
+     saveAppData();
+     renderTaskHub();
    };
  });
- list.querySelectorAll('[data-task-memo]').forEach(area=>{
+
+ board.querySelectorAll('[data-task-memo]').forEach(area=>{
    area.oninput=()=>{
      if(!editable)return;
      const rec=(appData.taskRecords||[]).find(r=>r.id===area.dataset.taskMemo);if(!rec)return;
-     rec.memo=area.value;rec.updatedAt=new Date().toISOString();
-     clearTimeout(taskMemoSaveTimer);taskMemoSaveTimer=setTimeout(()=>saveAppData(),450);
+     rec.memo=area.value;
+     rec.updatedAt=new Date().toISOString();
+     clearTimeout(taskMemoSaveTimer);
+     taskMemoSaveTimer=setTimeout(()=>saveAppData(),400);
+   };
+ });
+
+ board.querySelectorAll('[data-task-lane-select]').forEach(sel=>{
+   sel.onchange=()=>{
+     if(!editable)return;
+     const rec=(appData.taskRecords||[]).find(r=>r.id===sel.dataset.taskLaneSelect);if(!rec)return;
+     rec.lane=taskNormalizeLane(sel.value);
+     rec.updatedAt=new Date().toISOString();
+     saveAppData();
+     renderTaskHub();
+   };
+ });
+
+ board.querySelectorAll('.task-kanban-card').forEach(card=>{
+   card.ondragstart=e=>{
+     if(!editable){e.preventDefault();return}
+     e.dataTransfer.setData('text/task-id',card.dataset.taskId||'');
+     e.dataTransfer.effectAllowed='move';
+     card.classList.add('dragging');
+   };
+   card.ondragend=()=>card.classList.remove('dragging');
+ });
+
+ board.querySelectorAll('.task-lane-body').forEach(body=>{
+   body.ondragover=e=>{
+     if(!editable)return;
+     e.preventDefault();
+     e.dataTransfer.dropEffect='move';
+     body.classList.add('drag-over');
+   };
+   body.ondragleave=()=>body.classList.remove('drag-over');
+   body.ondrop=e=>{
+     if(!editable)return;
+     e.preventDefault();
+     body.classList.remove('drag-over');
+     const id=e.dataTransfer.getData('text/task-id');
+     const rec=(appData.taskRecords||[]).find(r=>r.id===id);
+     if(!rec)return;
+     rec.lane=taskNormalizeLane(body.dataset.taskLane);
+     rec.updatedAt=new Date().toISOString();
+     saveAppData();
+     renderTaskHub();
    };
  });
 }
-function renderFutureTaskList(sessions,existingKeys,editable){
- const list=$('taskFutureList');if(!list)return;
- const role=$('taskRoleFilter')?.value||'';
- const q=String($('taskSearchInput')?.value||'').trim().toLowerCase();
- const future=sessions.filter(s=>!existingKeys.has(taskRecordKey(s))).filter(s=>!role||s.role===role).filter(s=>!q||s.title.toLowerCase().includes(q));
- const validKeys=new Set(future.map(taskRecordKey));
- for(const key of [...taskFutureSelected])if(!validKeys.has(key))taskFutureSelected.delete(key);
- $('taskFutureCount').textContent=`${future.length}件`;
- if(!future.length){list.innerHTML='<div class="task-future-empty">追加待ちのセッションはありません。</div>';}
- else list.innerHTML=future.map(s=>{
-   const key=taskRecordKey(s);const checked=taskFutureSelected.has(key);
-   const defaults={cs:'未',standing:'未',diff:'未',room:s.role==='PL'?'-':'未'};
-   return `<label class="task-future-row"><input type="checkbox" data-task-future-key="${esc(key)}" ${checked?'checked':''} ${editable?'':'disabled'}><span class="task-future-date">${esc(taskDateLabel(s.date))}</span><span class="task-role ${taskRoleClass(s.role)}">${esc(s.role)}</span><strong>${esc(s.title)}</strong><span class="task-future-dots"><i class="pending"></i><i class="pending"></i><i class="pending"></i><i class="${defaults.room==='-'?'none':'pending'}"></i></span></label>`;
- }).join('');
- list.querySelectorAll('[data-task-future-key]').forEach(box=>box.onchange=()=>{
-   if(box.checked)taskFutureSelected.add(box.dataset.taskFutureKey);else taskFutureSelected.delete(box.dataset.taskFutureKey);
-   $('taskFutureAddBtn').disabled=!taskFutureSelected.size;
+let editingMemoId='';
+let memoSelectedMembers=new Set();
+
+function memoLaneMeta(){
+ return [
+   ['action','📣','ACTION'],
+   ['wait','⏳','WAIT'],
+   ['later','🗓️','LATER'],
+   ['coord','🤝','COORD'],
+   ['recruit','📢','RECRUIT']
+ ];
+}
+function memoNormalizeLane(value){
+ return ['action','wait','later','coord','recruit'].includes(value)?value:'later';
+}
+function memoNormalizeRecord(rec={}){
+ return {
+   id:rec.id||uid(),
+   lane:memoNormalizeLane(rec.lane),
+   title:String(rec.title||''),
+   date:String(rec.date||''),
+   members:Array.isArray(rec.members)?[...new Set(rec.members.map(v=>String(v||'').trim()).filter(Boolean))]:[],
+   remarks:String(rec.remarks||''),
+   createdAt:rec.createdAt||new Date().toISOString(),
+   updatedAt:rec.updatedAt||new Date().toISOString()
+ };
+}
+function memoPlCandidates(){
+ return [...new Set((appData.yosoRecords||[]).map(r=>String(r.pl||'').trim()).filter(Boolean))]
+   .sort((a,b)=>compareText(a,b));
+}
+function memoMemberTagHtml(name){
+ const i=Math.abs([...String(name)].reduce((a,c)=>a+c.codePointAt(0),0))%6;
+ return `<span class="memo-member-tag tone-${i}">${esc(name)}</span>`;
+}
+function renderMemoMemberOptions(){
+ const box=$('memoMemberOptions');if(!box)return;
+ const candidates=memoPlCandidates();
+ box.innerHTML=candidates.length?candidates.map(name=>`<label class="memo-member-option">
+   <input type="checkbox" value="${esc(name)}" ${memoSelectedMembers.has(name)?'checked':''}>
+   <span>${esc(name)}</span>
+ </label>`).join(''):'<div class="memo-no-members">YOSONOKOのPLがありません。</div>';
+ box.querySelectorAll('input').forEach(input=>{
+   input.onchange=()=>{
+     if(input.checked)memoSelectedMembers.add(input.value);
+     else memoSelectedMembers.delete(input.value);
+   };
  });
- $('taskFutureAddBtn').disabled=!taskFutureSelected.size||!editable;
- return future;
 }
-async function renderTaskHub(autoSync=true){
- if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
+function openMemoEditor(rec=null){
  const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
- if(autoSync&&editable)await syncTaskSessionsWithinTwoMonths(false);
- const sessions=await collectUpcomingTaskSessions();
- refreshTaskMonthOptions((appData.taskRecords||[]).map(taskNormalizeRecord));
- const rows=taskFilteredRows();
- $('taskTotalCount').textContent=`${rows.length}件`;
- $('taskTodayList').innerHTML=rows.length?rows.map(r=>taskTodayRowHtml(r,editable)).join(''):'<div class="database-empty">条件に合う今日のタスクはありません。</div>';
- bindTaskTodayInteractions(editable);
- const existingKeys=new Set((appData.taskRecords||[]).map(taskRecordKey));
- renderFutureTaskList(sessions,existingKeys,editable);
- renderTaskCalendar(sessions,(appData.taskRecords||[]).map(taskNormalizeRecord));
- $('taskImportSessionBtn')?.classList.toggle('hidden',!editable);
+ if(!editable)return;
+ editingMemoId=rec?.id||'';
+ const r=memoNormalizeRecord(rec||{lane:'later',title:'',date:'',members:[],remarks:''});
+ memoSelectedMembers=new Set(r.members);
+ $('memoEditorTitle').textContent=editingMemoId?'MEMOを編集':'MEMOを追加';
+ $('memoEditLane').value=r.lane;
+ $('memoEditDate').value=r.date;
+ $('memoEditTitle').value=r.title;
+ $('memoEditRemarks').value=r.remarks;
+ $('memoDeleteBtn').classList.toggle('hidden',!editingMemoId);
+ renderMemoMemberOptions();
+ $('memoEditor').classList.remove('hidden');
+ $('memoEditTitle').focus();
 }
-async function importUpcomingSessionsToTasks(){
- await syncTaskSessionsWithinTwoMonths(true);
- await renderTaskHub(false);
+function closeMemoEditor(){
+ editingMemoId='';
+ memoSelectedMembers.clear();
+ $('memoEditor').classList.add('hidden');
 }
-async function addSelectedFutureTasks(){
- if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
- const sessions=await collectUpcomingTaskSessions();
- const map=new Map(sessions.map(s=>[taskRecordKey(s),s]));
- const existing=new Set((appData.taskRecords||[]).map(taskRecordKey));
- let added=0;
- for(const key of [...taskFutureSelected]){
-   const s=map.get(key);if(!s||existing.has(key))continue;
-   appData.taskRecords.push(taskNewRecord(s));existing.add(key);added++;
+function saveMemoEditor(){
+ const title=String($('memoEditTitle').value||'').trim();
+ if(!title){alert('シナリオ名を入力してください。');return}
+ const values={
+   lane:memoNormalizeLane($('memoEditLane').value),
+   date:String($('memoEditDate').value||'').trim(),
+   title,
+   members:[...memoSelectedMembers],
+   remarks:String($('memoEditRemarks').value||'').trim()
+ };
+ if(editingMemoId){
+   const rec=(appData.memoRecords||[]).find(r=>r.id===editingMemoId);
+   if(rec)Object.assign(rec,values,{updatedAt:new Date().toISOString()});
+ }else{
+   appData.memoRecords.push(memoNormalizeRecord(values));
  }
- taskFutureSelected.clear();if(added)saveAppData();await renderTaskHub(false);
+ saveAppData();
+ closeMemoEditor();
+ renderMemoKanban();
+}
+function deleteMemoEditor(){
+ if(!editingMemoId)return;
+ const rec=(appData.memoRecords||[]).find(r=>r.id===editingMemoId);
+ if(!rec)return;
+ if(!confirm(`「${rec.title||'このMEMO'}」を削除しますか？`))return;
+ appData.memoRecords=appData.memoRecords.filter(r=>r.id!==editingMemoId);
+ saveAppData();
+ closeMemoEditor();
+ renderMemoKanban();
+}
+function memoFilteredRecords(){
+ const q=String($('memoSearchInput')?.value||'').trim().toLowerCase();
+ const member=$('memoMemberFilter')?.value||'';
+ return (appData.memoRecords||[]).map(memoNormalizeRecord)
+   .filter(r=>!member||r.members.includes(member))
+   .filter(r=>!q||`${r.title} ${r.date} ${r.members.join(' ')} ${r.remarks}`.toLowerCase().includes(q))
+   .sort((a,b)=>compareText(a.date||'99999999',b.date||'99999999')||compareText(a.title,b.title));
+}
+function memoCardHtml(rec,editable){
+ return `<article class="memo-card" data-memo-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
+   <div class="memo-card-top">
+     ${rec.date?`<span class="memo-card-date">${esc(rec.date)}</span>`:'<span class="memo-card-date muted">未定</span>'}
+     ${editable?`<select class="memo-lane-select" data-memo-lane="${esc(rec.id)}">
+       ${memoLaneMeta().map(([key,,label])=>`<option value="${key}" ${rec.lane===key?'selected':''}>${label}</option>`).join('')}
+     </select>`:''}
+   </div>
+   <button type="button" class="memo-card-title" data-memo-edit="${esc(rec.id)}">${esc(rec.title||'無題')}</button>
+   <div class="memo-card-members">${rec.members.length?rec.members.map(memoMemberTagHtml).join(''):'<span class="memo-member-empty">MEMBER未設定</span>'}</div>
+   ${rec.remarks?`<div class="memo-card-remarks">${esc(rec.remarks)}</div>`:'<div class="memo-card-remarks muted">覚書なし</div>'}
+ </article>`;
+}
+function refreshMemoMemberFilter(){
+ const sel=$('memoMemberFilter');if(!sel)return;
+ const keep=sel.value||'';
+ const members=memoPlCandidates();
+ sel.innerHTML='<option value="">すべて</option>'+members.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('');
+ sel.value=members.includes(keep)?keep:'';
+}
+function bindMemoInteractions(editable){
+ const board=$('memoBoard');if(!board)return;
+
+ board.querySelectorAll('[data-memo-edit]').forEach(btn=>{
+   btn.onclick=()=>{
+     const rec=(appData.memoRecords||[]).find(r=>r.id===btn.dataset.memoEdit);
+     if(rec)openMemoEditor(rec);
+   };
+ });
+ board.querySelectorAll('[data-memo-lane]').forEach(sel=>{
+   sel.onchange=()=>{
+     if(!editable)return;
+     const rec=(appData.memoRecords||[]).find(r=>r.id===sel.dataset.memoLane);
+     if(!rec)return;
+     rec.lane=memoNormalizeLane(sel.value);
+     rec.updatedAt=new Date().toISOString();
+     saveAppData();
+     renderMemoKanban();
+   };
+ });
+ board.querySelectorAll('.memo-card').forEach(card=>{
+   card.ondragstart=e=>{
+     if(!editable){e.preventDefault();return}
+     e.dataTransfer.setData('text/memo-id',card.dataset.memoId||'');
+     e.dataTransfer.effectAllowed='move';
+     card.classList.add('dragging');
+   };
+   card.ondragend=()=>card.classList.remove('dragging');
+ });
+ board.querySelectorAll('.memo-lane-body').forEach(body=>{
+   body.ondragover=e=>{
+     if(!editable)return;
+     e.preventDefault();
+     body.classList.add('drag-over');
+   };
+   body.ondragleave=()=>body.classList.remove('drag-over');
+   body.ondrop=e=>{
+     if(!editable)return;
+     e.preventDefault();
+     body.classList.remove('drag-over');
+     const id=e.dataTransfer.getData('text/memo-id');
+     const rec=(appData.memoRecords||[]).find(r=>r.id===id);
+     if(!rec)return;
+     rec.lane=memoNormalizeLane(body.dataset.memoLane);
+     rec.updatedAt=new Date().toISOString();
+     saveAppData();
+     renderMemoKanban();
+   };
+ });
+}
+function renderMemoKanban(){
+ if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
+ refreshMemoMemberFilter();
+ const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
+ const rows=memoFilteredRecords();
+ const groups=new Map(memoLaneMeta().map(([key])=>[key,[]]));
+ rows.forEach(r=>groups.get(memoNormalizeLane(r.lane)).push(r));
+ $('memoBoard').innerHTML=memoLaneMeta().map(([key,icon,label])=>{
+   const list=groups.get(key)||[];
+   return `<section class="memo-lane memo-lane-${key}">
+     <div class="memo-lane-head"><span>${icon}</span><strong>${label}</strong><b>${list.length}</b></div>
+     <div class="memo-lane-body" data-memo-lane="${key}">
+       ${list.length?list.map(r=>memoCardHtml(r,editable)).join(''):'<div class="memo-lane-empty">なし</div>'}
+     </div>
+   </section>`;
+ }).join('');
+ bindMemoInteractions(editable);
+ $('memoAddBtn')?.classList.toggle('hidden',!editable);
+}
+function renderReminderMemo(){
+ renderMemoKanban();
+}
+
+function setReminderTab(tab){
+ activeReminderTab=tab==='memo'?'memo':'task';
+ $('reminderTaskTabBtn')?.classList.toggle('active',activeReminderTab==='task');
+ $('reminderMemoTabBtn')?.classList.toggle('active',activeReminderTab==='memo');
+ $('reminderTaskPanel')?.classList.toggle('hidden',activeReminderTab!=='task');
+ $('reminderMemoPanel')?.classList.toggle('hidden',activeReminderTab!=='memo');
+ if(activeReminderTab==='task')renderTaskHub();
+ else renderReminderMemo();
+}
+async function renderTaskHub(){
+ if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
+ const removed=prunePastTaskRecords();
+ if(removed)saveAppData();
+
+ // v7.11.1 had no lane field. Treat those existing hand-managed records as TODAY.
+ let migrated=false;
+ for(const rec of appData.taskRecords){
+   if(!['today','next','backlog','someday','done'].includes(rec.lane)){
+     rec.lane='today';
+     migrated=true;
+   }
+ }
+ if(migrated)saveAppData();
+
+ const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
+ const rows=taskFilteredRecords();
+ renderTaskCalendar(rows);
+
+ const groups=new Map(taskLaneMeta().map(([key])=>[key,[]]));
+ rows.forEach(r=>groups.get(taskNormalizeLane(r.lane)).push(r));
+
+ $('taskBoard').innerHTML=taskLaneMeta().map(([key,icon,label])=>{
+   const list=groups.get(key)||[];
+   return `<section class="task-lane task-lane-${key}">
+     <div class="task-lane-head">
+       <span class="task-lane-icon">${icon}</span><strong>${label}</strong><b>${list.length}</b>
+     </div>
+     <div class="task-lane-body" data-task-lane="${key}">
+       ${list.length?list.map(r=>taskCardHtml(r,editable)).join(''):'<div class="task-lane-empty">なし</div>'}
+     </div>
+   </section>`;
+ }).join('');
+
+ bindTaskCardInteractions(editable);
+ $('taskImportSessionBtn')?.classList.toggle('hidden',!editable);
 }
 
 async function renderOtherHub(){
@@ -12362,6 +13114,38 @@ async function importYosoCsvFile(file){
  }finally{
    if($('yosoCsvImportFile'))$('yosoCsvImportFile').value='';
  }
+}
+
+function bulkRenameYosoPl(){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const pls=[...new Set((appData.yosoRecords||[]).map(r=>String(r.pl||'').trim()).filter(Boolean))]
+   .sort((a,b)=>compareText(a,b));
+ if(!pls.length){alert('変更できるPLがありません。');return}
+ const before=prompt(`変更前のPL名を入力してください。\n\n現在のPL：\n${pls.join(' / ')}`,'');
+ if(before===null)return;
+ const from=String(before||'').trim();
+ if(!from){alert('変更前のPL名を入力してください。');return}
+ const matched=(appData.yosoRecords||[]).filter(r=>String(r.pl||'').trim()===from);
+ if(!matched.length){alert(`「${from}」に一致するPLはありません。`);return}
+ const after=prompt(`「${from}」を何に変更しますか？\n${matched.length}件が対象です。`,from);
+ if(after===null)return;
+ const to=String(after||'').trim();
+ if(!to){alert('変更後のPL名を入力してください。');return}
+ if(from===to)return;
+ if(!confirm(`YOSONOKOのPL「${from}」を「${to}」へ${matched.length}件まとめて変更しますか？`))return;
+ for(const rec of matched){
+   rec.pl=to;
+   rec.updatedAt=new Date().toISOString();
+ }
+ // MEMO member tags also follow the PL rename.
+ for(const rec of appData.memoRecords||[]){
+   if(!Array.isArray(rec.members))continue;
+   rec.members=[...new Set(rec.members.map(m=>m===from?to:m))];
+ }
+ saveAppData();
+ renderYoso();
+ if(activeReminderTab==='memo')renderMemoKanban();
+ alert(`${matched.length}件のPLを変更しました。`);
 }
 
 function renderYoso(){
@@ -13205,7 +13989,7 @@ async function showHubView(kind){
  }else if(kind==='task'){
    setTopNav('task');
    $('taskHub').classList.remove('hidden');
-   await renderTaskHub();
+   setReminderTab(activeReminderTab);
  }else if(kind==='link'){
    setTopNav('link');
    $('linkHub').classList.remove('hidden');
@@ -14143,7 +14927,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.11.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -14161,7 +14945,9 @@ function importBackup(file){
          plExtraSessions:Array.isArray(j.appData.plExtraSessions)?j.appData.plExtraSessions:[],
          reportHiddenKeys:Array.isArray(j.appData.reportHiddenKeys)?j.appData.reportHiddenKeys:[],
          links:Array.isArray(j.appData.links)?j.appData.links:[],
-         taskRecords:Array.isArray(j.appData.taskRecords)?j.appData.taskRecords:[]
+         taskRecords:Array.isArray(j.appData.taskRecords)?j.appData.taskRecords:[],
+         reminderMemo:String(j.appData.reminderMemo||''),
+         memoRecords:Array.isArray(j.appData.memoRecords)?j.appData.memoRecords:[]
        };
        saveAppData();
      }
@@ -15240,12 +16026,18 @@ $('addKPSessionBtn').onclick=()=>{
 $('yosoPlFilter').onchange=renderYoso;
 $('yosoSearchInput').oninput=renderYoso;
 
-$('taskRoleFilter').onchange=()=>renderTaskHub(false);
-$('taskSearchInput').oninput=()=>renderTaskHub(false);
-$('taskMonthFilter').onchange=()=>renderTaskHub(false);
-$('taskStatusFilter').onchange=()=>renderTaskHub(false);
-$('taskImportSessionBtn').onclick=importUpcomingSessionsToTasks;
-$('taskFutureAddBtn').onclick=addSelectedFutureTasks;
+$('taskRoleFilter').onchange=renderTaskHub;
+$('taskSearchInput').oninput=renderTaskHub;
+$('taskImportSessionBtn').onclick=async()=>{await syncTaskSessionsFromSession(true);await renderTaskHub();};
+$('reminderTaskTabBtn').onclick=()=>setReminderTab('task');
+$('reminderMemoTabBtn').onclick=()=>setReminderTab('memo');
+$('memoSearchInput').oninput=renderMemoKanban;
+$('memoMemberFilter').onchange=renderMemoKanban;
+$('memoAddBtn').onclick=()=>openMemoEditor();
+$('memoEditorCloseBtn').onclick=closeMemoEditor;
+$('memoEditorCancelBtn').onclick=closeMemoEditor;
+$('memoSaveBtn').onclick=saveMemoEditor;
+$('memoDeleteBtn').onclick=deleteMemoEditor;
 
 $('otherTallyTabBtn').onclick=async()=>{
  activeOtherTab='tally';
@@ -15296,6 +16088,7 @@ $('yosoFilterResetBtn').onclick=()=>{
  renderYoso();
 };
 $('yosoDeduplicateBtn').onclick=deleteDuplicateYosoRecords;
+$('yosoBulkPlRenameBtn').onclick=bulkRenameYosoPl;
 $('yosoDeleteAllBtn').onclick=deleteAllYosoRecords;
 $('yosoCsvImportBtn').onclick=()=>$('yosoCsvImportFile').click();
 $('yosoCsvImportFile').onchange=e=>{
@@ -15508,6 +16301,7 @@ async function initCharacterDatabase(){
        if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
        if(!Array.isArray(appData.links))appData.links=[];
        if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
+       if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
        publicRemoteMode='report';
        document.body.classList.add('public-online-report');
        await showHubView('report');
@@ -15524,6 +16318,7 @@ async function initCharacterDatabase(){
        if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
        if(!Array.isArray(appData.links))appData.links=[];
        if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
+       if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
        publicRemoteMode='database';
        document.body.classList.add('public-online-database');
        await showDatabaseView();
