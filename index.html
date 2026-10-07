@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.12</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.13</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8384,6 +8384,20 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
   text-underline-offset:2px;
 }
 
+
+/* v7.12.13 -------------------------------------------------------- */
+/* REMIND > MEMO: allow new KP/PL names directly from the autocomplete box. */
+.memo-member-suggestion-new{
+  margin-bottom:3px;
+  border-bottom:1px solid #e2e8ec!important;
+  background:#f5fafc!important;
+  color:#2f6f91!important;
+  font-weight:800!important;
+}
+.memo-member-suggestion-new:hover{
+  background:#eaf5fa!important;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -9233,7 +9247,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.12</p>
+    <p class="public-viewer-version">Viewer v7.12.13</p>
   </div>
 </div>
 
@@ -9340,7 +9354,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.12';
+const PUBLIC_VIEWER_VERSION='7.12.13';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -13325,7 +13339,16 @@ function memoNormalizeRecord(rec={}){
  };
 }
 function memoPlCandidates(){
- return [...new Set((appData.yosoRecords||[]).map(r=>String(r.pl||'').trim()).filter(Boolean))]
+ const names=[];
+ for(const r of appData.yosoRecords||[]){
+   const pl=String(r.pl||'').trim();
+   if(pl)names.push(pl);
+ }
+ for(const r of appData.memoRecords||[]){
+   const normalized=memoNormalizeRecord(r);
+   names.push(...normalized.kpMembers,...normalized.plMembers);
+ }
+ return [...new Set(names.map(v=>String(v||'').trim()).filter(Boolean))]
    .sort((a,b)=>compareText(a,b));
 }
 function memoMemberEmoji(name){
@@ -13391,28 +13414,45 @@ function renderMemoSelectedMembers(role){
    };
  });
 }
+function addMemoTypedMember(role,value){
+ const clean=String(value||'').normalize('NFKC').trim();
+ if(!clean)return false;
+ memoMemberSet(role).add(clean);
+ const {input}=memoMemberElements(role);
+ if(input)input.value='';
+ renderMemoSelectedMembers(role);
+ renderMemoMemberSuggestions(role);
+ input?.focus();
+ return true;
+}
 function renderMemoMemberSuggestions(role){
  const {input,box}=memoMemberElements(role);
  if(!box||!input)return;
- const q=String(input.value||'').normalize('NFKC').trim().toLowerCase();
+ const raw=String(input.value||'').normalize('NFKC').trim();
+ const q=raw.toLowerCase();
  if(!q){
    box.innerHTML='';
    box.classList.add('hidden');
    return;
  }
  const selected=memoMemberSet(role);
- // KP / PL both use the YOSO PL-name master as the people list.
- const candidates=memoPlCandidates()
+ const master=memoPlCandidates();
+ const candidates=master
    .filter(name=>!selected.has(name))
    .filter(name=>String(name).normalize('NFKC').toLowerCase().includes(q))
    .slice(0,8);
- if(!candidates.length){
+ const exact=master.some(name=>String(name).normalize('NFKC').toLowerCase()===q);
+ const addNew=!exact&&!selected.has(raw);
+ const newHtml=addNew
+   ? `<button type="button" class="memo-member-suggestion memo-member-suggestion-new" data-member-role="${role}" data-member-add-new="${esc(raw)}">＋「${esc(raw)}」を新規追加</button>`
+   : '';
+ const existingHtml=candidates.map(name=>`<button type="button" class="memo-member-suggestion" data-member-role="${role}" data-member-add="${esc(name)}">${esc(name)}</button>`).join('');
+ box.innerHTML=newHtml+existingHtml;
+ if(!box.innerHTML){
    box.innerHTML='<div class="memo-member-suggestion-empty">候補なし</div>';
-   box.classList.remove('hidden');
-   return;
  }
- box.innerHTML=candidates.map(name=>`<button type="button" class="memo-member-suggestion" data-member-role="${role}" data-member-add="${esc(name)}">${esc(name)}</button>`).join('');
  box.classList.remove('hidden');
+
  box.querySelectorAll('[data-member-add]').forEach(btn=>{
    btn.onmousedown=e=>e.preventDefault();
    btn.onclick=()=>{
@@ -13421,6 +13461,12 @@ function renderMemoMemberSuggestions(role){
      renderMemoSelectedMembers(role);
      renderMemoMemberSuggestions(role);
      input.focus();
+   };
+ });
+ box.querySelectorAll('[data-member-add-new]').forEach(btn=>{
+   btn.onmousedown=e=>e.preventDefault();
+   btn.onclick=()=>{
+     addMemoTypedMember(btn.dataset.memberRole||role,btn.dataset.memberAddNew||'');
    };
  });
 }
@@ -13432,10 +13478,13 @@ function bindMemoMemberAutocomplete(role){
  input.onfocus=()=>renderMemoMemberSuggestions(role);
  input.onkeydown=e=>{
    if(e.key==='Enter'){
-     const first=box.querySelector('[data-member-add]');
+     const first=box.querySelector('[data-member-add-new],[data-member-add]');
      if(first){
        e.preventDefault();
        first.click();
+     }else if(String(input.value||'').trim()){
+       e.preventDefault();
+       addMemoTypedMember(role,input.value);
      }
    }
    if(e.key==='Escape')box.classList.add('hidden');
@@ -15828,7 +15877,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.12',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.13',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
