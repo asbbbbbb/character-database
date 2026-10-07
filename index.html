@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.13</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.14</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8398,6 +8398,18 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
   background:#eaf5fa!important;
 }
 
+
+/* v7.12.14 -------------------------------------------------------- */
+/* REMIND: cards can be reordered inside each kanban column and moved across columns. */
+.task-kanban-card.dragging,
+.memo-card.dragging{
+  opacity:.42!important;
+}
+.task-lane-body.drag-over,
+.memo-lane-body.drag-over{
+  background:#eef7fb!important;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -9247,7 +9259,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.13</p>
+    <p class="public-viewer-version">Viewer v7.12.14</p>
   </div>
 </div>
 
@@ -9354,7 +9366,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.13';
+const PUBLIC_VIEWER_VERSION='7.12.14';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -13051,6 +13063,7 @@ function taskNormalizeRecord(rec={}){
    diff:taskNormalizeStatus(rec.diff),room:taskNormalizeStatus(rec.room),
    memo:String(rec.memo||''),lane:taskNormalizeLane(rec.lane),
    color:rec.color==='green'?'green':'red',
+   order:Number.isFinite(Number(rec.order))?Number(rec.order):999999,
    source:String(rec.source||'manual'),
    createdAt:rec.createdAt||new Date().toISOString(),updatedAt:rec.updatedAt||new Date().toISOString()
  };
@@ -13063,10 +13076,19 @@ function taskLaneForNewSession(date){
  if(date>twoWeeks&&date<=twoMonths)return 'backlog';
  return 'someday';
 }
+function nextTaskLaneOrder(lane){
+ const orders=(appData.taskRecords||[])
+   .filter(r=>taskNormalizeLane(r.lane)===lane)
+   .map(r=>Number(r.order))
+   .filter(Number.isFinite);
+ return orders.length?Math.max(...orders)+1:0;
+}
 function taskNewRecord(session){
  const role=session.role||'PL';
+ const lane=taskLaneForNewSession(session.date);
  return taskNormalizeRecord({
-   role,date:session.date,title:session.title,lane:taskLaneForNewSession(session.date),
+   role,date:session.date,title:session.title,lane,
+   order:nextTaskLaneOrder(lane),
    cs:'未',standing:'未',diff:'未',room:role==='PL'?'-':'未',
    source:'session'
  });
@@ -13124,6 +13146,7 @@ function rebucketTaskByDate(showMessage=true){
    const target=taskLaneForNewSession(String(rec.date||''));
    if(rec.lane!==target){
      rec.lane=target;
+     rec.order=nextTaskLaneOrder(target);
      rec.updatedAt=new Date().toISOString();
      moved++;
    }
@@ -13149,7 +13172,7 @@ function taskFilteredRecords(){
  return (appData.taskRecords||[]).map(taskNormalizeRecord)
    .filter(r=>!role||r.role===role)
    .filter(r=>!q||`${r.title} ${r.role} ${r.memo}`.toLowerCase().includes(q))
-   .sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||compareText(a.title,b.title));
+   .sort((a,b)=>(a.order-b.order)||String(a.date||'').localeCompare(String(b.date||''))||compareText(a.title,b.title));
 }
 function taskStatusButtonHtml(rec,field,label,editable){
  const value=taskNormalizeStatus(rec[field]);
@@ -13217,84 +13240,39 @@ function deleteSelectedTasks(){
  renderTaskHub();
 }
 
-function bindTaskCardInteractions(editable){
- const board=$('taskBoard');if(!board)return;
-
- board.querySelectorAll('[data-task-select]').forEach(box=>{
-   box.onchange=()=>{
-     if(box.checked)taskSelectedIds.add(box.dataset.taskSelect);
-     else taskSelectedIds.delete(box.dataset.taskSelect);
-     box.closest('.task-kanban-card')?.classList.toggle('selected',box.checked);
-     updateTaskSelectionUi();
-   };
-   box.onclick=e=>e.stopPropagation();
- });
-
- board.querySelectorAll('[data-task-color-toggle]').forEach(btn=>{
-   btn.onclick=e=>{
-     e.stopPropagation();
-     if(!editable)return;
-     const rec=(appData.taskRecords||[]).find(r=>r.id===btn.dataset.taskColorToggle);
-     if(!rec)return;
-     rec.color=rec.color==='green'?'red':'green';
-     rec.updatedAt=new Date().toISOString();
-     saveAppData();
-     renderTaskHub();
-   };
- });
- updateTaskSelectionUi();
-
- board.querySelectorAll('.task-status-toggle').forEach(btn=>{
-   btn.onclick=()=>{
-     if(!editable)return;
-     const rec=(appData.taskRecords||[]).find(r=>r.id===btn.dataset.taskId);if(!rec)return;
-     const field=btn.dataset.taskField;
-     rec[field]=taskNextStatus(taskNormalizeStatus(rec[field]));
-     rec.updatedAt=new Date().toISOString();
-     saveAppData();
-     renderTaskHub();
-   };
- });
-
- board.querySelectorAll('[data-task-memo]').forEach(area=>{
-   area.oninput=()=>{
-     if(!editable)return;
-     const rec=(appData.taskRecords||[]).find(r=>r.id===area.dataset.taskMemo);if(!rec)return;
-     rec.memo=area.value;
-     rec.updatedAt=new Date().toISOString();
-     clearTimeout(taskMemoSaveTimer);
-     taskMemoSaveTimer=setTimeout(()=>saveAppData(),400);
-   };
- });
-
- board.querySelectorAll('.task-kanban-card').forEach(card=>{
-   card.ondragstart=e=>{
-     if(!editable){e.preventDefault();return}
-     e.dataTransfer.setData('text/task-id',card.dataset.taskId||'');
-     e.dataTransfer.effectAllowed='move';
-     card.classList.add('dragging');
-   };
-   card.ondragend=()=>card.classList.remove('dragging');
- });
-
+function moveDraggedCardWithinBody(e,body,cardSelector,boardSelector){
+ const board=body.closest(boardSelector);
+ const dragging=board?.querySelector(`${cardSelector}.dragging`);
+ if(!dragging)return;
+ const target=e.target.closest(cardSelector);
+ if(target&&target!==dragging&&target.parentElement===body){
+   const rect=target.getBoundingClientRect();
+   body.insertBefore(dragging,e.clientY<rect.top+rect.height/2?target:target.nextSibling);
+ }else if(!target||target.parentElement!==body){
+   body.appendChild(dragging);
+ }
+}
+function persistTaskBoardOrder(board){
+ if(!board)return;
+ const byId=new Map((appData.taskRecords||[]).map(r=>[r.id,r]));
  board.querySelectorAll('.task-lane-body').forEach(body=>{
    body.ondragover=e=>{
      if(!editable)return;
      e.preventDefault();
      e.dataTransfer.dropEffect='move';
      body.classList.add('drag-over');
+     moveDraggedCardWithinBody(e,body,'.task-kanban-card','.task-board');
    };
-   body.ondragleave=()=>body.classList.remove('drag-over');
+   body.ondragleave=e=>{
+     if(!body.contains(e.relatedTarget))body.classList.remove('drag-over');
+   };
    body.ondrop=e=>{
      if(!editable)return;
      e.preventDefault();
      body.classList.remove('drag-over');
      const id=e.dataTransfer.getData('text/task-id');
-     const rec=(appData.taskRecords||[]).find(r=>r.id===id);
-     if(!rec)return;
-     rec.lane=taskNormalizeLane(body.dataset.taskLane);
-     rec.updatedAt=new Date().toISOString();
-     saveAppData();
+     if(!(appData.taskRecords||[]).some(r=>r.id===id))return;
+     persistTaskBoardOrder(board);
      renderTaskHub();
    };
  });
@@ -13334,6 +13312,7 @@ function memoNormalizeRecord(rec={}){
    plMembers,
    members,
    remarks:String(rec.remarks||''),
+   order:Number.isFinite(Number(rec.order))?Number(rec.order):999999,
    createdAt:rec.createdAt||new Date().toISOString(),
    updatedAt:rec.updatedAt||new Date().toISOString()
  };
@@ -13534,6 +13513,13 @@ function closeMemoEditor(){
  memoSelectedPlMembers.clear();
  dockMemoEditor();
 }
+function nextMemoLaneOrder(lane){
+ const orders=(appData.memoRecords||[])
+   .filter(r=>memoNormalizeLane(r.lane)===lane)
+   .map(r=>Number(r.order))
+   .filter(Number.isFinite);
+ return orders.length?Math.max(...orders)+1:0;
+}
 function saveMemoEditor(){
  const title=String($('memoEditTitle').value||'').trim();
  if(!title){alert('シナリオ名を入力してください。');return}
@@ -13550,9 +13536,17 @@ function saveMemoEditor(){
  };
  if(editingMemoId){
    const rec=(appData.memoRecords||[]).find(r=>r.id===editingMemoId);
-   if(rec)Object.assign(rec,values,{updatedAt:new Date().toISOString()});
+   if(rec){
+     const oldLane=memoNormalizeLane(rec.lane);
+     const targetLane=memoNormalizeLane(values.lane);
+     const order=oldLane===targetLane
+       ? (Number.isFinite(Number(rec.order))?Number(rec.order):nextMemoLaneOrder(targetLane))
+       : nextMemoLaneOrder(targetLane);
+     Object.assign(rec,values,{order,updatedAt:new Date().toISOString()});
+   }
  }else{
-   appData.memoRecords.push(memoNormalizeRecord(values));
+   const lane=memoNormalizeLane(values.lane);
+   appData.memoRecords.push(memoNormalizeRecord({...values,order:nextMemoLaneOrder(lane)}));
  }
  saveAppData();
  closeMemoEditor();
@@ -13572,7 +13566,7 @@ function memoFilteredRecords(){
  const member=$('memoMemberFilter')?.value||'';
  return (appData.memoRecords||[]).map(memoNormalizeRecord)
    .filter(r=>!member||r.kpMembers.includes(member)||r.plMembers.includes(member))
-   .sort((a,b)=>compareText(a.date||'99999999',b.date||'99999999')||compareText(a.title,b.title));
+   .sort((a,b)=>(a.order-b.order)||compareText(a.date||'99999999',b.date||'99999999')||compareText(a.title,b.title));
 }
 function memoCardHtml(rec,editable){
  return `<article class="memo-card${memoSelectedIds.has(rec.id)?' selected':''}" data-memo-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
@@ -13628,6 +13622,21 @@ function deleteAllMemos(){
  closeMemoEditor();
  renderMemoKanban();
 }
+function persistMemoBoardOrder(board){
+ if(!board)return;
+ const byId=new Map((appData.memoRecords||[]).map(r=>[r.id,r]));
+ board.querySelectorAll('.memo-lane-body').forEach(body=>{
+   const lane=memoNormalizeLane(body.dataset.memoLane);
+   [...body.querySelectorAll('.memo-card')].forEach((card,index)=>{
+     const rec=byId.get(card.dataset.memoId);
+     if(!rec)return;
+     rec.lane=lane;
+     rec.order=index;
+     rec.updatedAt=new Date().toISOString();
+   });
+ });
+ saveAppData();
+}
 function bindMemoInteractions(editable){
  const board=$('memoBoard');if(!board)return;
 
@@ -13671,19 +13680,20 @@ function bindMemoInteractions(editable){
    body.ondragover=e=>{
      if(!editable)return;
      e.preventDefault();
+     e.dataTransfer.dropEffect='move';
      body.classList.add('drag-over');
+     moveDraggedCardWithinBody(e,body,'.memo-card','.memo-board');
    };
-   body.ondragleave=()=>body.classList.remove('drag-over');
+   body.ondragleave=e=>{
+     if(!body.contains(e.relatedTarget))body.classList.remove('drag-over');
+   };
    body.ondrop=e=>{
      if(!editable)return;
      e.preventDefault();
      body.classList.remove('drag-over');
      const id=e.dataTransfer.getData('text/memo-id');
-     const rec=(appData.memoRecords||[]).find(r=>r.id===id);
-     if(!rec)return;
-     rec.lane=memoNormalizeLane(body.dataset.memoLane);
-     rec.updatedAt=new Date().toISOString();
-     saveAppData();
+     if(!(appData.memoRecords||[]).some(r=>r.id===id))return;
+     persistMemoBoardOrder(board);
      renderMemoKanban();
    };
  });
@@ -15877,7 +15887,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.13',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.14',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
