@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.6</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.8</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8036,6 +8036,187 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
 }
 .task-kanban-card .task-role{display:none!important}
 
+
+/* v7.12.7 --------------------------------------------------------- */
+/* REMIND > TASK: improve overall card readability, especially memo text. */
+.task-card-date{
+  font-size:11px!important;
+}
+.task-card-title{
+  font-size:13px!important;
+  line-height:1.4!important;
+}
+.task-card-memo-input{
+  min-height:50px!important;
+  padding:8px 9px!important;
+  font-size:11px!important;
+  line-height:1.5!important;
+}
+.task-card-memo-input::placeholder{
+  font-size:11px!important;
+}
+.task-mini-status>span{
+  font-size:9px!important;
+}
+.task-status-toggle{
+  min-height:29px!important;
+  font-size:10px!important;
+  font-weight:800!important;
+}
+.task-lane-head strong{
+  font-size:13px!important;
+}
+.task-lane-head>b{
+  font-size:10px!important;
+}
+.task-selected-count,
+.task-sync-note{
+  font-size:9px!important;
+}
+@media(max-width:700px){
+  .task-card-date{font-size:12px!important}
+  .task-card-title{font-size:14px!important}
+  .task-card-memo-input{
+    min-height:54px!important;
+    font-size:12px!important;
+  }
+  .task-mini-status>span{font-size:10px!important}
+  .task-status-toggle{font-size:11px!important}
+}
+
+
+/* v7.12.8 --------------------------------------------------------- */
+/* REMIND > MEMO: autocomplete member picker, drag-only lanes, bulk delete. */
+.memo-toolbar-compact{
+  grid-template-columns:190px auto auto auto!important;
+  align-items:end;
+}
+.memo-selected-count{
+  align-self:center;
+  color:#6f7d87;
+  font-size:9px;
+  font-weight:800;
+  white-space:nowrap;
+}
+#memoDeleteSelectedBtn:disabled{
+  opacity:.4;
+  cursor:default;
+}
+.memo-member-selected{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  min-height:24px;
+  margin-bottom:4px;
+}
+.memo-member-selected-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  max-width:100%;
+  padding:4px 7px;
+  border:1px solid #cfdce4;
+  border-radius:999px;
+  background:#eef6fa;
+  color:#46606f;
+  font-size:9px;
+  font-weight:800;
+  cursor:pointer;
+}
+.memo-member-selected-empty{
+  color:#9aa5ad;
+  font-size:9px;
+}
+.memo-member-editor{
+  position:relative;
+}
+.memo-member-suggestions{
+  position:absolute;
+  left:0;
+  right:0;
+  top:100%;
+  z-index:30;
+  max-height:180px;
+  overflow:auto;
+  margin-top:3px;
+  padding:4px;
+  border:1px solid #cbd8e0;
+  border-radius:7px;
+  background:#fff;
+  box-shadow:0 7px 20px rgba(31,51,64,.15);
+}
+.memo-member-suggestion{
+  display:block;
+  width:100%;
+  padding:7px 8px;
+  border:0;
+  border-radius:5px;
+  background:transparent;
+  color:#334752;
+  text-align:left;
+  font-size:10px;
+  cursor:pointer;
+}
+.memo-member-suggestion:hover{
+  background:#edf5f9;
+}
+.memo-member-suggestion-empty{
+  padding:7px 8px;
+  color:#9aa5ad;
+  font-size:9px;
+}
+.memo-member-options{
+  display:none!important;
+}
+.memo-lane-select{
+  display:none!important;
+}
+.memo-drag-hint{
+  margin-left:auto;
+  color:#96a2aa;
+  font-size:15px;
+  line-height:1;
+  cursor:grab;
+  user-select:none;
+}
+.memo-select-box{
+  position:relative;
+  flex:0 0 16px;
+  width:16px;
+  height:16px;
+  cursor:pointer;
+}
+.memo-select-box input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.memo-select-box span{
+  display:block;
+  width:14px;
+  height:14px;
+  border:1px solid #b8c4cc;
+  border-radius:4px;
+  background:#fff;
+}
+.memo-select-box input:checked + span{
+  border-color:#4b86aa;
+  background:#4b86aa;
+  box-shadow:inset 0 0 0 3px #fff;
+}
+.memo-card.selected{
+  outline:2px solid #79a9c5;
+  outline-offset:-2px;
+}
+@media(max-width:700px){
+  .memo-toolbar-compact{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .memo-selected-count{
+    grid-column:1 / -1;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -8579,6 +8760,9 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
             <label>MEMBER
               <select class="control" id="memoMemberFilter"><option value="">すべて</option></select>
             </label>
+            <span class="memo-selected-count" id="memoSelectedCount">0件選択</span>
+            <button type="button" class="btn danger" id="memoDeleteSelectedBtn" disabled>選択削除</button>
+            <button type="button" class="btn danger" id="memoDeleteAllBtn">一括削除</button>
           </div>
 
           <div id="memoEditorDock">
@@ -8605,7 +8789,9 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
               </label>
               <div class="memo-member-editor">
                 <span>MEMBER</span>
-                <div class="memo-member-options" id="memoMemberOptions"></div>
+                <div class="memo-member-selected" id="memoMemberSelected"></div>
+                <input class="control memo-member-input" id="memoMemberInput" placeholder="PL名を少し入力…">
+                <div class="memo-member-suggestions hidden" id="memoMemberSuggestions"></div>
               </div>
               <label class="memo-edit-remarks-field">REMARKS
                 <textarea class="control" id="memoEditRemarks" rows="3" placeholder="立卓前の覚書"></textarea>
@@ -8867,7 +9053,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.6</p>
+    <p class="public-viewer-version">Viewer v7.12.8</p>
   </div>
 </div>
 
@@ -8974,7 +9160,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.6';
+const PUBLIC_VIEWER_VERSION='7.12.8';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -12921,6 +13107,7 @@ function bindTaskCardInteractions(editable){
 }
 let editingMemoId='';
 let memoSelectedMembers=new Set();
+const memoSelectedIds=new Set();
 
 function memoLaneMeta(){
  return [
@@ -12954,19 +13141,70 @@ function memoMemberTagHtml(name){
  const i=Math.abs([...String(name)].reduce((a,c)=>a+c.codePointAt(0),0))%6;
  return `<span class="memo-member-tag tone-${i}">${esc(name)}</span>`;
 }
-function renderMemoMemberOptions(){
- const box=$('memoMemberOptions');if(!box)return;
- const candidates=memoPlCandidates();
- box.innerHTML=candidates.length?candidates.map(name=>`<label class="memo-member-option">
-   <input type="checkbox" value="${esc(name)}" ${memoSelectedMembers.has(name)?'checked':''}>
-   <span>${esc(name)}</span>
- </label>`).join(''):'<div class="memo-no-members">YOSONOKOのPLがありません。</div>';
- box.querySelectorAll('input').forEach(input=>{
-   input.onchange=()=>{
-     if(input.checked)memoSelectedMembers.add(input.value);
-     else memoSelectedMembers.delete(input.value);
+function renderMemoSelectedMembers(){
+ const wrap=$('memoMemberSelected');if(!wrap)return;
+ const members=[...memoSelectedMembers];
+ wrap.innerHTML=members.length?members.map(name=>`<button type="button" class="memo-member-selected-tag" data-member-remove="${esc(name)}">${esc(name)} <span>×</span></button>`).join(''):'<span class="memo-member-selected-empty">選択なし</span>';
+ wrap.querySelectorAll('[data-member-remove]').forEach(btn=>{
+   btn.onclick=()=>{
+     memoSelectedMembers.delete(btn.dataset.memberRemove||'');
+     renderMemoSelectedMembers();
+     renderMemoMemberSuggestions();
    };
  });
+}
+function renderMemoMemberSuggestions(){
+ const box=$('memoMemberSuggestions');
+ const input=$('memoMemberInput');
+ if(!box||!input)return;
+ const q=String(input.value||'').normalize('NFKC').trim().toLowerCase();
+ if(!q){
+   box.innerHTML='';
+   box.classList.add('hidden');
+   return;
+ }
+ const candidates=memoPlCandidates()
+   .filter(name=>!memoSelectedMembers.has(name))
+   .filter(name=>String(name).normalize('NFKC').toLowerCase().includes(q))
+   .slice(0,8);
+ if(!candidates.length){
+   box.innerHTML='<div class="memo-member-suggestion-empty">候補なし</div>';
+   box.classList.remove('hidden');
+   return;
+ }
+ box.innerHTML=candidates.map(name=>`<button type="button" class="memo-member-suggestion" data-member-add="${esc(name)}">${esc(name)}</button>`).join('');
+ box.classList.remove('hidden');
+ box.querySelectorAll('[data-member-add]').forEach(btn=>{
+   btn.onmousedown=e=>e.preventDefault();
+   btn.onclick=()=>{
+     memoSelectedMembers.add(btn.dataset.memberAdd||'');
+     input.value='';
+     renderMemoSelectedMembers();
+     renderMemoMemberSuggestions();
+     input.focus();
+   };
+ });
+}
+function renderMemoMemberOptions(){
+ const input=$('memoMemberInput');
+ if(input){
+   input.value='';
+   input.oninput=renderMemoMemberSuggestions;
+   input.onfocus=renderMemoMemberSuggestions;
+   input.onkeydown=e=>{
+     if(e.key==='Enter'){
+       const first=$('memoMemberSuggestions')?.querySelector('[data-member-add]');
+       if(first){
+         e.preventDefault();
+         first.click();
+       }
+     }
+     if(e.key==='Escape')$('memoMemberSuggestions')?.classList.add('hidden');
+   };
+   input.onblur=()=>setTimeout(()=>$('memoMemberSuggestions')?.classList.add('hidden'),120);
+ }
+ renderMemoSelectedMembers();
+ renderMemoMemberSuggestions();
 }
 function dockMemoEditor(){
  const editor=$('memoEditor');
@@ -13040,12 +13278,11 @@ function memoFilteredRecords(){
    .sort((a,b)=>compareText(a.date||'99999999',b.date||'99999999')||compareText(a.title,b.title));
 }
 function memoCardHtml(rec,editable){
- return `<article class="memo-card" data-memo-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
+ return `<article class="memo-card${memoSelectedIds.has(rec.id)?' selected':''}" data-memo-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
    <div class="memo-card-top">
+     ${editable?`<label class="memo-select-box" title="選択"><input type="checkbox" data-memo-select="${esc(rec.id)}" ${memoSelectedIds.has(rec.id)?'checked':''}><span></span></label>`:''}
      ${rec.date?`<span class="memo-card-date">${esc(rec.date)}</span>`:'<span class="memo-card-date muted">未定</span>'}
-     ${editable?`<select class="memo-lane-select" data-memo-lane="${esc(rec.id)}">
-       ${memoLaneMeta().map(([key,,label])=>`<option value="${key}" ${rec.lane===key?'selected':''}>${label}</option>`).join('')}
-     </select>`:''}
+     ${editable?'<span class="memo-drag-hint" title="ドラッグして移動">⠿</span>':''}
    </div>
    <button type="button" class="memo-card-title" data-memo-edit="${esc(rec.id)}">${esc(rec.title||'無題')}</button>
    <div class="memo-card-members">${rec.members.length?rec.members.map(memoMemberTagHtml).join(''):'<span class="memo-member-empty">MEMBER未設定</span>'}</div>
@@ -13059,6 +13296,36 @@ function refreshMemoMemberFilter(){
  sel.innerHTML='<option value="">すべて</option>'+members.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('');
  sel.value=members.includes(keep)?keep:'';
 }
+function updateMemoSelectionUi(){
+ const valid=new Set((appData.memoRecords||[]).map(r=>r.id));
+ for(const id of [...memoSelectedIds])if(!valid.has(id))memoSelectedIds.delete(id);
+ const count=memoSelectedIds.size;
+ if($('memoSelectedCount'))$('memoSelectedCount').textContent=`${count}件選択`;
+ if($('memoDeleteSelectedBtn'))$('memoDeleteSelectedBtn').disabled=!count;
+}
+function deleteSelectedMemos(){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const ids=[...memoSelectedIds];
+ if(!ids.length)return;
+ if(!confirm(`選択した${ids.length}件のMEMOを削除しますか？`))return;
+ const set=new Set(ids);
+ appData.memoRecords=(appData.memoRecords||[]).filter(r=>!set.has(r.id));
+ memoSelectedIds.clear();
+ saveAppData();
+ closeMemoEditor();
+ renderMemoKanban();
+}
+function deleteAllMemos(){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const count=(appData.memoRecords||[]).length;
+ if(!count){alert('削除するMEMOがありません。');return}
+ if(!confirm(`REMIND > MEMO の${count}件をすべて削除しますか？`))return;
+ appData.memoRecords=[];
+ memoSelectedIds.clear();
+ saveAppData();
+ closeMemoEditor();
+ renderMemoKanban();
+}
 function bindMemoInteractions(editable){
  const board=$('memoBoard');if(!board)return;
 
@@ -13069,21 +13336,19 @@ function bindMemoInteractions(editable){
    };
  });
 
+ board.querySelectorAll('[data-memo-select]').forEach(box=>{
+   box.onchange=()=>{
+     if(box.checked)memoSelectedIds.add(box.dataset.memoSelect);
+     else memoSelectedIds.delete(box.dataset.memoSelect);
+     box.closest('.memo-card')?.classList.toggle('selected',box.checked);
+     updateMemoSelectionUi();
+   };
+   box.onclick=e=>e.stopPropagation();
+ });
  board.querySelectorAll('[data-memo-edit]').forEach(btn=>{
    btn.onclick=()=>{
      const rec=(appData.memoRecords||[]).find(r=>r.id===btn.dataset.memoEdit);
      if(rec)openMemoEditor(rec);
-   };
- });
- board.querySelectorAll('[data-memo-lane]').forEach(sel=>{
-   sel.onchange=()=>{
-     if(!editable)return;
-     const rec=(appData.memoRecords||[]).find(r=>r.id===sel.dataset.memoLane);
-     if(!rec)return;
-     rec.lane=memoNormalizeLane(sel.value);
-     rec.updatedAt=new Date().toISOString();
-     saveAppData();
-     renderMemoKanban();
    };
  });
  board.querySelectorAll('.memo-card').forEach(card=>{
@@ -13137,7 +13402,9 @@ function renderMemoKanban(){
    </section>`;
  }).join('');
  bindMemoInteractions(editable);
- $('memoAddBtn')?.classList.toggle('hidden',!editable);
+ updateMemoSelectionUi();
+ $('memoDeleteSelectedBtn')?.classList.toggle('hidden',!editable);
+ $('memoDeleteAllBtn')?.classList.toggle('hidden',!editable);
 }
 function renderReminderMemo(){
  renderMemoKanban();
@@ -15302,7 +15569,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.8',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -16410,6 +16677,8 @@ $('taskDeleteSelectedBtn').onclick=deleteSelectedTasks;
 $('reminderTaskTabBtn').onclick=()=>setReminderTab('task');
 $('reminderMemoTabBtn').onclick=()=>setReminderTab('memo');
 $('memoMemberFilter').onchange=renderMemoKanban;
+$('memoDeleteSelectedBtn').onclick=deleteSelectedMemos;
+$('memoDeleteAllBtn').onclick=deleteAllMemos;
 $('memoEditorCloseBtn').onclick=closeMemoEditor;
 $('memoEditLane').onchange=()=>placeMemoEditorInLane(memoNormalizeLane($('memoEditLane').value));
 $('memoEditorCancelBtn').onclick=closeMemoEditor;
