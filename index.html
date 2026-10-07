@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.3</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.4</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -7918,7 +7918,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
 /* v7.12.3 --------------------------------------------------------- */
 /* TASK selection delete */
 .task-toolbar-v712{
-  grid-template-columns:150px minmax(220px,420px) auto auto auto minmax(220px,1fr)!important;
+  grid-template-columns:150px minmax(220px,420px) auto auto auto auto minmax(220px,1fr)!important;
 }
 .task-selected-count{
   align-self:center;
@@ -7998,6 +7998,14 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
 }
 .memo-lane-body .memo-editor-actions{
   flex-wrap:wrap;
+}
+
+
+/* v7.12.4 --------------------------------------------------------- */
+.task-refresh-btn{
+  white-space:nowrap!important;
+  border-color:#b9c7d0!important;
+  background:#fff!important;
 }
 
 </style>
@@ -8526,10 +8534,11 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
             <label class="task-search-v712">検索
               <input class="control" id="taskSearchInput" placeholder="シナリオ名・メモを検索…">
             </label>
-            <button type="button" class="btn primary task-sync-btn" id="taskImportSessionBtn">SESSIONから更新</button>
+            <button type="button" class="btn primary task-sync-btn" id="taskImportSessionBtn">SESSIONから追加</button>
+            <button type="button" class="btn task-refresh-btn" id="taskRebucketBtn">TASKを更新</button>
             <button type="button" class="btn danger task-selection-delete" id="taskDeleteSelectedBtn" disabled>選択削除</button>
             <span class="task-selected-count" id="taskSelectedCount">0件選択</span>
-            <span class="task-sync-note">新規だけ追加。既存の列・未/済/-・メモは変更しません。</span>
+            <span class="task-sync-note">SESSIONから追加＝未登録のみ。TASKを更新＝NEXT/BACKLOG/SOMEDAYだけ日付で再配置。TODAY/DONEは触りません。</span>
           </div>
 
           <div class="task-calendar-strip" id="taskCalendarStrip"></div>
@@ -8830,7 +8839,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.3</p>
+    <p class="public-viewer-version">Viewer v7.12.4</p>
   </div>
 </div>
 
@@ -8937,7 +8946,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.3';
+const PUBLIC_VIEWER_VERSION='7.12.4';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -12641,8 +12650,8 @@ function taskLaneForNewSession(date){
  const today=taskTodayIso();
  const twoWeeks=taskAddDaysIso(today,14);
  const twoMonths=taskAddMonthsIso(today,2);
- if(date<=twoWeeks)return 'next';
- if(date<=twoMonths)return 'backlog';
+ if(date>=today&&date<=twoWeeks)return 'next';
+ if(date>twoWeeks&&date<=twoMonths)return 'backlog';
  return 'someday';
 }
 function taskNewRecord(session){
@@ -12696,6 +12705,25 @@ async function syncTaskSessionsFromSession(showMessage=true){
    alert(added?`SESSIONから新しい予定を${added}件追加しました。\n既存のTASKは変更していません。`:'追加できる新しいSESSIONはありません。');
  }
  return added;
+}
+function rebucketTaskByDate(showMessage=true){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return {moved:0,removed:0};
+ const removed=prunePastTaskRecords();
+ let moved=0;
+ for(const rec of appData.taskRecords||[]){
+   if(!['next','backlog','someday'].includes(rec.lane))continue;
+   const target=taskLaneForNewSession(String(rec.date||''));
+   if(rec.lane!==target){
+     rec.lane=target;
+     rec.updatedAt=new Date().toISOString();
+     moved++;
+   }
+ }
+ if(removed||moved)saveAppData();
+ if(showMessage){
+   alert(`TASKを更新しました。\\n列移動 ${moved}件 / 過去日付の削除 ${removed}件\\nTODAY・DONE・未/済/-・メモは変更していません。`);
+ }
+ return {moved,removed};
 }
 function taskLaneMeta(){
  return [
@@ -13129,6 +13157,7 @@ async function renderTaskHub(){
  bindTaskCardInteractions(editable);
  updateTaskSelectionUi();
  $('taskImportSessionBtn')?.classList.toggle('hidden',!editable);
+ $('taskRebucketBtn')?.classList.toggle('hidden',!editable);
  $('taskDeleteSelectedBtn')?.classList.toggle('hidden',!editable);
 }
 
@@ -15230,7 +15259,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.4',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -16333,6 +16362,7 @@ $('yosoSearchInput').oninput=renderYoso;
 $('taskRoleFilter').onchange=renderTaskHub;
 $('taskSearchInput').oninput=renderTaskHub;
 $('taskImportSessionBtn').onclick=async()=>{await syncTaskSessionsFromSession(true);await renderTaskHub();};
+$('taskRebucketBtn').onclick=async()=>{rebucketTaskByDate(true);await renderTaskHub();};
 $('taskDeleteSelectedBtn').onclick=deleteSelectedTasks;
 $('reminderTaskTabBtn').onclick=()=>setReminderTab('task');
 $('reminderMemoTabBtn').onclick=()=>setReminderTab('memo');
