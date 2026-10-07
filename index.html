@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.1</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.2</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -7798,6 +7798,122 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
   .memo-lane{scroll-snap-align:start}
 }
 
+
+/* v7.12.2 --------------------------------------------------------- */
+/* Names */
+.reminder-head h2{letter-spacing:.04em}
+
+/* TASK: drag-only card movement */
+.task-drag-hint{
+  margin-left:auto;
+  color:#96a2aa;
+  font-size:15px;
+  line-height:1;
+  cursor:grab;
+  user-select:none;
+}
+.task-kanban-card:active .task-drag-hint{cursor:grabbing}
+.task-lane-select{display:none!important}
+
+/* MEMO: compact filter + add inside each kanban lane */
+.memo-toolbar-compact{
+  grid-template-columns:190px!important;
+  justify-content:end;
+}
+.memo-lane-head{
+  grid-template-columns:auto 1fr auto auto!important;
+}
+.memo-lane-add{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;
+  height:24px;
+  padding:0;
+  border:1px solid rgba(77,101,116,.18);
+  border-radius:6px;
+  background:rgba(255,255,255,.8);
+  color:#405462;
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+}
+.memo-lane-add:hover{background:#fff}
+@media(max-width:700px){
+  .memo-toolbar-compact{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* YOSO PL rename modal */
+.yoso-pl-rename-modal{
+  position:fixed;
+  inset:0;
+  z-index:4300;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(18,31,40,.58);
+}
+.yoso-pl-rename-modal.hidden{display:none!important}
+.yoso-pl-rename-dialog{
+  width:min(560px,94vw);
+  padding:16px;
+  border:1px solid #cbd7df;
+  border-radius:13px;
+  background:#fff;
+  box-shadow:0 24px 70px rgba(17,35,49,.28);
+}
+.yoso-pl-rename-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.yoso-pl-rename-head h3{margin:0 0 4px;font-size:18px}
+.yoso-pl-rename-head .note{color:#75828c;font-size:9px;line-height:1.45}
+.yoso-pl-rename-grid{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:9px;
+  align-items:end;
+}
+.yoso-pl-rename-grid label{
+  display:grid;
+  gap:4px;
+  color:#64737e;
+  font-size:9px;
+  font-weight:800;
+}
+.yoso-pl-rename-arrow{
+  padding-bottom:9px;
+  color:#80909a;
+  font-size:18px;
+  font-weight:900;
+}
+.yoso-pl-rename-preview{
+  margin-top:12px;
+  padding:10px;
+  border:1px solid #dce4e9;
+  border-radius:8px;
+  background:#f7fafb;
+  color:#52626d;
+  font-size:10px;
+  line-height:1.45;
+}
+.yoso-pl-rename-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:12px;
+}
+@media(max-width:620px){
+  .yoso-pl-rename-grid{grid-template-columns:1fr}
+  .yoso-pl-rename-arrow{display:none}
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -7808,8 +7924,8 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <button type="button" class="app-nav-btn" id="choiceViewBtn">CHOICE</button>
     <button type="button" class="app-nav-btn" id="sessionViewBtn">SESSION</button>
     <button type="button" class="app-nav-btn" id="reportViewBtn">REPORT</button>
-    <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSONOKO</button>
-    <button type="button" class="app-nav-btn" id="taskViewBtn">REMINDER</button>
+    <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSO</button>
+    <button type="button" class="app-nav-btn" id="taskViewBtn">REMIND</button>
     <button type="button" class="app-nav-btn" id="linkViewBtn">OTHER</button>
   </nav>
   <div class="mobile-editor-sync-status" id="mobileEditorSyncStatus">クラウド接続</div>
@@ -8272,7 +8388,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
         <div class="hub-view-head">
           <div>
             <div class="hub-kicker">CHARACTER DATABASE</div>
-            <h2>YOSONOKO</h2>
+            <h2>YOSO</h2>
           </div>
         </div>
         <div class="yoso-filter-bar">
@@ -8301,8 +8417,8 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
         <div class="reminder-head">
           <div>
             <div class="hub-kicker">CHARACTER DATABASE</div>
-            <h2>REMINDER</h2>
-            <div class="task-head-note">セッション準備とメモをまとめて管理します。</div>
+            <h2>REMIND</h2>
+            <div class="task-head-note">セッション準備と立卓前メモをまとめて管理します。</div>
           </div>
         </div>
 
@@ -8334,14 +8450,10 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
         </section>
 
         <section class="reminder-panel hidden" id="reminderMemoPanel">
-          <div class="memo-toolbar">
-            <label class="memo-search-field">検索
-              <input class="control" id="memoSearchInput" placeholder="シナリオ名・メンバー・メモを検索…">
-            </label>
+          <div class="memo-toolbar memo-toolbar-compact">
             <label>MEMBER
               <select class="control" id="memoMemberFilter"><option value="">すべて</option></select>
             </label>
-            <button type="button" class="btn primary" id="memoAddBtn">＋ 追加</button>
           </div>
 
           <div class="memo-editor hidden" id="memoEditor">
@@ -8628,10 +8740,36 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.1</p>
+    <p class="public-viewer-version">Viewer v7.12.2</p>
   </div>
 </div>
 
+
+<div class="yoso-pl-rename-modal hidden" id="yosoPlRenameModal" role="dialog" aria-modal="true" aria-labelledby="yosoPlRenameTitle">
+  <div class="yoso-pl-rename-dialog">
+    <div class="yoso-pl-rename-head">
+      <div>
+        <h3 id="yosoPlRenameTitle">YOSO｜PL一括変更</h3>
+        <div class="note">同じPL表記をまとめて変更します。MEMOのMEMBERタグも一緒に更新されます。</div>
+      </div>
+      <button type="button" class="btn small" id="yosoPlRenameCloseBtn">×</button>
+    </div>
+    <div class="yoso-pl-rename-grid">
+      <label>変更前
+        <select class="control" id="yosoPlRenameFrom"></select>
+      </label>
+      <div class="yoso-pl-rename-arrow">→</div>
+      <label>変更後
+        <input class="control" id="yosoPlRenameTo" placeholder="例：🍓いちご">
+      </label>
+    </div>
+    <div class="yoso-pl-rename-preview" id="yosoPlRenamePreview"></div>
+    <div class="yoso-pl-rename-actions">
+      <button type="button" class="btn" id="yosoPlRenameCancelBtn">キャンセル</button>
+      <button type="button" class="btn primary" id="yosoPlRenameApplyBtn">まとめて変更</button>
+    </div>
+  </div>
+</div>
 
 <div class="online-sync-modal hidden" id="onlineSyncModal" role="dialog" aria-modal="true" aria-labelledby="onlineSyncModalTitle">
   <div class="online-sync-dialog">
@@ -8709,7 +8847,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.1';
+const PUBLIC_VIEWER_VERSION='7.12.2';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -8722,10 +8860,11 @@ function loadAppData(){
      links:Array.isArray(raw.links)?raw.links:[],
      taskRecords:Array.isArray(raw.taskRecords)?raw.taskRecords:[],
      reminderMemo:String(raw.reminderMemo||''),
-     memoRecords:Array.isArray(raw.memoRecords)?raw.memoRecords:[]
+     memoRecords:Array.isArray(raw.memoRecords)?raw.memoRecords:[],
+     taskRulesVersion:Number(raw.taskRulesVersion||0)
    };
  }catch(_){
-   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],reminderMemo:'',memoRecords:[]};
+   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],reminderMemo:'',memoRecords:[],taskRulesVersion:0};
  }
 }
 function saveAppData(){
@@ -9391,7 +9530,8 @@ function normalizePublicPayload(payload){
      links:Array.isArray(payload.appData?.links)?payload.appData.links:[],
      taskRecords:Array.isArray(payload.appData?.taskRecords)?payload.appData.taskRecords:[],
      reminderMemo:String(payload.appData?.reminderMemo||''),
-     memoRecords:Array.isArray(payload.appData?.memoRecords)?payload.appData.memoRecords:[]
+     memoRecords:Array.isArray(payload.appData?.memoRecords)?payload.appData.memoRecords:[],
+     taskRulesVersion:Number(payload.appData?.taskRulesVersion||0)
    },
    reportImages:Array.isArray(payload.reportImages)?payload.reportImages:[]
  };
@@ -12492,9 +12632,7 @@ function taskCardHtml(rec,editable){
    <div class="task-card-top">
      <span class="task-card-date">${esc(taskDateLabel(rec.date))}</span>
      <span class="task-role ${taskRoleClass(rec.role)}">${esc(rec.role)}</span>
-     ${editable?`<select class="task-lane-select" data-task-lane-select="${esc(rec.id)}" title="列を移動">
-       ${taskLaneMeta().map(([key,,label])=>`<option value="${key}" ${rec.lane===key?'selected':''}>${label}</option>`).join('')}
-     </select>`:''}
+     ${editable?'<span class="task-drag-hint" title="ドラッグして移動">⠿</span>':''}
    </div>
    <div class="task-card-title">${esc(rec.title||'無題')}</div>
    <textarea class="task-card-memo-input" data-task-memo="${esc(rec.id)}" rows="2" placeholder="メモ" ${editable?'':'readonly'}>${esc(rec.memo||'')}</textarea>
@@ -12553,17 +12691,6 @@ function bindTaskCardInteractions(editable){
      rec.updatedAt=new Date().toISOString();
      clearTimeout(taskMemoSaveTimer);
      taskMemoSaveTimer=setTimeout(()=>saveAppData(),400);
-   };
- });
-
- board.querySelectorAll('[data-task-lane-select]').forEach(sel=>{
-   sel.onchange=()=>{
-     if(!editable)return;
-     const rec=(appData.taskRecords||[]).find(r=>r.id===sel.dataset.taskLaneSelect);if(!rec)return;
-     rec.lane=taskNormalizeLane(sel.value);
-     rec.updatedAt=new Date().toISOString();
-     saveAppData();
-     renderTaskHub();
    };
  });
 
@@ -12648,11 +12775,11 @@ function renderMemoMemberOptions(){
    };
  });
 }
-function openMemoEditor(rec=null){
+function openMemoEditor(rec=null,presetLane='later'){
  const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
  if(!editable)return;
  editingMemoId=rec?.id||'';
- const r=memoNormalizeRecord(rec||{lane:'later',title:'',date:'',members:[],remarks:''});
+ const r=memoNormalizeRecord(rec||{lane:memoNormalizeLane(presetLane),title:'',date:'',members:[],remarks:''});
  memoSelectedMembers=new Set(r.members);
  $('memoEditorTitle').textContent=editingMemoId?'MEMOを編集':'MEMOを追加';
  $('memoEditLane').value=r.lane;
@@ -12700,11 +12827,9 @@ function deleteMemoEditor(){
  renderMemoKanban();
 }
 function memoFilteredRecords(){
- const q=String($('memoSearchInput')?.value||'').trim().toLowerCase();
  const member=$('memoMemberFilter')?.value||'';
  return (appData.memoRecords||[]).map(memoNormalizeRecord)
    .filter(r=>!member||r.members.includes(member))
-   .filter(r=>!q||`${r.title} ${r.date} ${r.members.join(' ')} ${r.remarks}`.toLowerCase().includes(q))
    .sort((a,b)=>compareText(a.date||'99999999',b.date||'99999999')||compareText(a.title,b.title));
 }
 function memoCardHtml(rec,editable){
@@ -12729,6 +12854,13 @@ function refreshMemoMemberFilter(){
 }
 function bindMemoInteractions(editable){
  const board=$('memoBoard');if(!board)return;
+
+ board.querySelectorAll('[data-memo-add-lane]').forEach(btn=>{
+   btn.onclick=()=>{
+     if(!editable)return;
+     openMemoEditor(null,btn.dataset.memoAddLane||'later');
+   };
+ });
 
  board.querySelectorAll('[data-memo-edit]').forEach(btn=>{
    btn.onclick=()=>{
@@ -12787,7 +12919,10 @@ function renderMemoKanban(){
  $('memoBoard').innerHTML=memoLaneMeta().map(([key,icon,label])=>{
    const list=groups.get(key)||[];
    return `<section class="memo-lane memo-lane-${key}">
-     <div class="memo-lane-head"><span>${icon}</span><strong>${label}</strong><b>${list.length}</b></div>
+     <div class="memo-lane-head">
+       <span>${icon}</span><strong>${label}</strong><b>${list.length}</b>
+       ${editable?`<button type="button" class="memo-lane-add" data-memo-add-lane="${key}" title="${label}に追加">＋</button>`:''}
+     </div>
      <div class="memo-lane-body" data-memo-lane="${key}">
        ${list.length?list.map(r=>memoCardHtml(r,editable)).join(''):'<div class="memo-lane-empty">なし</div>'}
      </div>
@@ -12812,15 +12947,24 @@ function setReminderTab(tab){
 async function renderTaskHub(){
  if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
  const removed=prunePastTaskRecords();
- if(removed)saveAppData();
+ let migrated=!!removed;
 
- // v7.11.1 had no lane field. Treat those existing hand-managed records as TODAY.
- let migrated=false;
- for(const rec of appData.taskRecords){
-   if(!['today','next','backlog','someday','done'].includes(rec.lane)){
-     rec.lane='today';
-     migrated=true;
+ // v7.12.1 accidentally inherited every old SESSION task as TODAY.
+ // Repair only once, and only when the SESSION-sourced future tasks are still all in TODAY.
+ if(Number(appData.taskRulesVersion||0)<2){
+   const futureSessionRows=appData.taskRecords.filter(r=>String(r.source||'')==='session'&&String(r.date||'')>=taskTodayIso());
+   const looksLikeOldAllToday=futureSessionRows.length>0&&futureSessionRows.every(r=>!r.lane||r.lane==='today');
+   for(const rec of appData.taskRecords){
+     if(!['today','next','backlog','someday','done'].includes(rec.lane)){
+       rec.lane=String(rec.source||'')==='session'?taskLaneForNewSession(rec.date):'today';
+       migrated=true;
+     }else if(looksLikeOldAllToday&&String(rec.source||'')==='session'&&rec.lane==='today'){
+       rec.lane=taskLaneForNewSession(rec.date);
+       migrated=true;
+     }
    }
+   appData.taskRulesVersion=2;
+   migrated=true;
  }
  if(migrated)saveAppData();
 
@@ -13116,36 +13260,54 @@ async function importYosoCsvFile(file){
  }
 }
 
-function bulkRenameYosoPl(){
+function yosoPlRenameRows(from){
+ return (appData.yosoRecords||[]).filter(r=>String(r.pl||'').trim()===String(from||'').trim());
+}
+function updateYosoPlRenamePreview(){
+ const from=String($('yosoPlRenameFrom')?.value||'').trim();
+ const to=String($('yosoPlRenameTo')?.value||'').trim();
+ const count=yosoPlRenameRows(from).length;
+ const el=$('yosoPlRenamePreview');
+ if(el)el.innerHTML=from
+   ? `<strong>${esc(from)}</strong> に一致する <b>${count}件</b> を ${to?`<strong>${esc(to)}</strong>`:'新しいPL名'} へ変更します。`
+   : '変更するPLを選択してください。';
+}
+function openYosoPlRenameModal(){
  if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
  const pls=[...new Set((appData.yosoRecords||[]).map(r=>String(r.pl||'').trim()).filter(Boolean))]
    .sort((a,b)=>compareText(a,b));
  if(!pls.length){alert('変更できるPLがありません。');return}
- const before=prompt(`変更前のPL名を入力してください。\n\n現在のPL：\n${pls.join(' / ')}`,'');
- if(before===null)return;
- const from=String(before||'').trim();
- if(!from){alert('変更前のPL名を入力してください。');return}
- const matched=(appData.yosoRecords||[]).filter(r=>String(r.pl||'').trim()===from);
- if(!matched.length){alert(`「${from}」に一致するPLはありません。`);return}
- const after=prompt(`「${from}」を何に変更しますか？\n${matched.length}件が対象です。`,from);
- if(after===null)return;
- const to=String(after||'').trim();
- if(!to){alert('変更後のPL名を入力してください。');return}
- if(from===to)return;
- if(!confirm(`YOSONOKOのPL「${from}」を「${to}」へ${matched.length}件まとめて変更しますか？`))return;
+ $('yosoPlRenameFrom').innerHTML=pls.map(pl=>`<option value="${esc(pl)}">${esc(pl)}</option>`).join('');
+ $('yosoPlRenameTo').value='';
+ $('yosoPlRenameModal').classList.remove('hidden');
+ updateYosoPlRenamePreview();
+ $('yosoPlRenameTo').focus();
+}
+function closeYosoPlRenameModal(){
+ $('yosoPlRenameModal')?.classList.add('hidden');
+}
+function applyYosoPlRename(){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const from=String($('yosoPlRenameFrom')?.value||'').trim();
+ const to=String($('yosoPlRenameTo')?.value||'').trim();
+ if(!from){alert('変更前のPLを選択してください。');return}
+ if(!to){alert('変更後のPL名を入力してください。');$('yosoPlRenameTo')?.focus();return}
+ if(from===to){closeYosoPlRenameModal();return}
+ const matched=yosoPlRenameRows(from);
+ if(!matched.length){alert('対象のPLがありません。');return}
  for(const rec of matched){
    rec.pl=to;
    rec.updatedAt=new Date().toISOString();
  }
- // MEMO member tags also follow the PL rename.
  for(const rec of appData.memoRecords||[]){
    if(!Array.isArray(rec.members))continue;
    rec.members=[...new Set(rec.members.map(m=>m===from?to:m))];
  }
  saveAppData();
+ closeYosoPlRenameModal();
  renderYoso();
  if(activeReminderTab==='memo')renderMemoKanban();
- alert(`${matched.length}件のPLを変更しました。`);
+ alert(`${matched.length}件のPLを「${to}」へ変更しました。`);
 }
 
 function renderYoso(){
@@ -14927,7 +15089,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -14947,7 +15109,8 @@ function importBackup(file){
          links:Array.isArray(j.appData.links)?j.appData.links:[],
          taskRecords:Array.isArray(j.appData.taskRecords)?j.appData.taskRecords:[],
          reminderMemo:String(j.appData.reminderMemo||''),
-         memoRecords:Array.isArray(j.appData.memoRecords)?j.appData.memoRecords:[]
+         memoRecords:Array.isArray(j.appData.memoRecords)?j.appData.memoRecords:[],
+         taskRulesVersion:Number(j.appData.taskRulesVersion||0)
        };
        saveAppData();
      }
@@ -16031,9 +16194,7 @@ $('taskSearchInput').oninput=renderTaskHub;
 $('taskImportSessionBtn').onclick=async()=>{await syncTaskSessionsFromSession(true);await renderTaskHub();};
 $('reminderTaskTabBtn').onclick=()=>setReminderTab('task');
 $('reminderMemoTabBtn').onclick=()=>setReminderTab('memo');
-$('memoSearchInput').oninput=renderMemoKanban;
 $('memoMemberFilter').onchange=renderMemoKanban;
-$('memoAddBtn').onclick=()=>openMemoEditor();
 $('memoEditorCloseBtn').onclick=closeMemoEditor;
 $('memoEditorCancelBtn').onclick=closeMemoEditor;
 $('memoSaveBtn').onclick=saveMemoEditor;
@@ -16088,8 +16249,14 @@ $('yosoFilterResetBtn').onclick=()=>{
  renderYoso();
 };
 $('yosoDeduplicateBtn').onclick=deleteDuplicateYosoRecords;
-$('yosoBulkPlRenameBtn').onclick=bulkRenameYosoPl;
+$('yosoBulkPlRenameBtn').onclick=openYosoPlRenameModal;
 $('yosoDeleteAllBtn').onclick=deleteAllYosoRecords;
+$('yosoPlRenameCloseBtn').onclick=closeYosoPlRenameModal;
+$('yosoPlRenameCancelBtn').onclick=closeYosoPlRenameModal;
+$('yosoPlRenameApplyBtn').onclick=applyYosoPlRename;
+$('yosoPlRenameFrom').onchange=updateYosoPlRenamePreview;
+$('yosoPlRenameTo').oninput=updateYosoPlRenamePreview;
+$('yosoPlRenameModal').onclick=e=>{if(e.target===$('yosoPlRenameModal'))closeYosoPlRenameModal()};
 $('yosoCsvImportBtn').onclick=()=>$('yosoCsvImportFile').click();
 $('yosoCsvImportFile').onchange=e=>{
  const file=e.target.files?.[0];
