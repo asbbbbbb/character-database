@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.4</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.6</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -7452,14 +7452,11 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
 .task-kanban-card{
   padding:9px!important;
   border:1px solid #dce3e8!important;
-  border-left:4px solid #9aa8b1!important;
+  border-left:1px solid #dce3e8!important;
   border-radius:9px!important;
   background:#fff!important;
   box-shadow:0 1px 3px rgba(34,51,64,.05)!important;
 }
-.task-kanban-card:has(.task-role.pl){border-left-color:#e85c68!important}
-.task-kanban-card:has(.task-role.kp){border-left-color:#27a675!important}
-.task-kanban-card:has(.task-role.kppl){border-left-color:#3d79b6!important}
 .task-kanban-card.dragging{opacity:.45}
 .task-card-top{
   display:flex!important;
@@ -8007,6 +8004,37 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
   border-color:#b9c7d0!important;
   background:#fff!important;
 }
+
+
+/* v7.12.5 --------------------------------------------------------- */
+/* REMIND > TASK cards: hide KP/PL badges and use neutral card styling. */
+.task-kanban-card .task-role{display:none!important}
+
+
+/* v7.12.6 --------------------------------------------------------- */
+/* REMIND > TASK: one circle toggles green/red; card highlight follows it. */
+.task-color-toggle{
+  margin-left:auto;
+  width:14px;
+  height:14px;
+  padding:0;
+  border:2px solid #fff;
+  border-radius:50%;
+  box-shadow:0 0 0 1px #bfcbd2;
+  cursor:pointer;
+  flex:0 0 14px;
+}
+.task-color-toggle.red{background:#e85c68}
+.task-color-toggle.green{background:#27a675}
+.task-kanban-card.task-color-red{
+  border-left:4px solid #e85c68!important;
+  box-shadow:0 1px 3px rgba(232,92,104,.10)!important;
+}
+.task-kanban-card.task-color-green{
+  border-left:4px solid #27a675!important;
+  box-shadow:0 1px 3px rgba(39,166,117,.10)!important;
+}
+.task-kanban-card .task-role{display:none!important}
 
 </style>
 </head>
@@ -8839,7 +8867,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.4</p>
+    <p class="public-viewer-version">Viewer v7.12.6</p>
   </div>
 </div>
 
@@ -8946,7 +8974,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.4';
+const PUBLIC_VIEWER_VERSION='7.12.6';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -12642,6 +12670,7 @@ function taskNormalizeRecord(rec={}){
    cs:taskNormalizeStatus(rec.cs),standing:taskNormalizeStatus(rec.standing),
    diff:taskNormalizeStatus(rec.diff),room:taskNormalizeStatus(rec.room),
    memo:String(rec.memo||''),lane:taskNormalizeLane(rec.lane),
+   color:rec.color==='green'?'green':'red',
    source:String(rec.source||'manual'),
    createdAt:rec.createdAt||new Date().toISOString(),updatedAt:rec.updatedAt||new Date().toISOString()
  };
@@ -12747,11 +12776,12 @@ function taskStatusButtonHtml(rec,field,label,editable){
  return `<div class="task-mini-status"><span>${esc(label)}</span><button type="button" class="task-status-toggle ${taskStatusKind(value)}" data-task-id="${esc(rec.id)}" data-task-field="${field}" ${editable?'':'disabled'}>${esc(value)}</button></div>`;
 }
 function taskCardHtml(rec,editable){
- return `<article class="task-kanban-card${taskSelectedIds.has(rec.id)?' selected':''}" data-task-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
+ const color=rec.color==='green'?'green':'red';
+ return `<article class="task-kanban-card task-color-${color}${taskSelectedIds.has(rec.id)?' selected':''}" data-task-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
    <div class="task-card-top">
      ${editable?`<label class="task-select-box" title="選択"><input type="checkbox" data-task-select="${esc(rec.id)}" ${taskSelectedIds.has(rec.id)?'checked':''}><span></span></label>`:''}
      <span class="task-card-date">${esc(taskDateLabel(rec.date))}</span>
-     <span class="task-role ${taskRoleClass(rec.role)}">${esc(rec.role)}</span>
+     ${editable?`<button type="button" class="task-color-toggle ${color}" data-task-color-toggle="${esc(rec.id)}" title="${color==='green'?'赤に切り替え':'緑に切り替え'}" aria-label="カード色を切り替え"></button>`:''}
      ${editable?'<span class="task-drag-hint" title="ドラッグして移動">⠿</span>':''}
    </div>
    <div class="task-card-title">${esc(rec.title||'無題')}</div>
@@ -12818,6 +12848,19 @@ function bindTaskCardInteractions(editable){
      updateTaskSelectionUi();
    };
    box.onclick=e=>e.stopPropagation();
+ });
+
+ board.querySelectorAll('[data-task-color-toggle]').forEach(btn=>{
+   btn.onclick=e=>{
+     e.stopPropagation();
+     if(!editable)return;
+     const rec=(appData.taskRecords||[]).find(r=>r.id===btn.dataset.taskColorToggle);
+     if(!rec)return;
+     rec.color=rec.color==='green'?'red':'green';
+     rec.updatedAt=new Date().toISOString();
+     saveAppData();
+     renderTaskHub();
+   };
  });
  updateTaskSelectionUi();
 
@@ -15259,7 +15302,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.4',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.6',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
