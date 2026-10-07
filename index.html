@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.11</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.11.1</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -7291,6 +7291,68 @@ body.public-viewer-only .task-card-menu{
   }
 }
 
+
+/* v7.11.1 --------------------------------------------------------- */
+/* Mobile Editor: new character actions are always visible at top of PC LIST. */
+.mobile-editor-create-panel{display:none}
+body.public-mobile-editor .mobile-editor-create-panel{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:7px!important;
+  width:100%!important;
+  margin:0 0 10px!important;
+  padding:9px!important;
+  border:1px solid #d5dee5!important;
+  border-radius:10px!important;
+  background:#fff!important;
+}
+body.public-mobile-editor .mobile-editor-create-title{
+  grid-column:1 / -1;
+  color:#53636f;
+  font-size:10px;
+  font-weight:900;
+}
+body.public-mobile-editor .mobile-editor-create-panel .btn{
+  display:block!important;
+  min-height:39px!important;
+  font-size:11px!important;
+}
+
+/* TASK optimized dashboard */
+.task-content{width:96%!important;max-width:1580px!important;min-width:920px!important}
+.task-head.compact{margin-bottom:8px}
+.task-calendar-strip{
+  display:flex!important;align-items:stretch!important;min-height:72px!important;
+  margin-bottom:12px!important;border:1px solid #d7dfe5!important;border-radius:10px!important;background:#fff!important;overflow-x:auto!important
+}
+.task-cal-title{flex:0 0 92px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #e2e7eb;background:#fff;position:sticky;left:0;z-index:2}
+.task-cal-title strong{font-size:12px}.task-cal-title span{font-size:9px;color:#7d8992}
+.task-cal-pills{display:flex;align-items:stretch;min-width:max-content}
+.task-cal-pill{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:58px;border-right:1px solid #edf0f2;color:#43525d;font-size:8px}
+.task-cal-pill b{font-size:11px}.task-cal-pill span{color:#8b959c}.task-cal-pill i{width:7px;height:7px;border-radius:50%;margin-top:2px}.task-cal-pill i.pending{background:#f59b23}.task-cal-pill i.done{background:#1ca36f}.task-cal-pill i.none{background:#9aa6ae}
+.task-cal-pill.today{background:#e8f2ff}.task-cal-pill.today b{color:#176bc0}
+.task-workspace{display:grid;grid-template-columns:190px minmax(520px,1fr) minmax(290px,350px);gap:12px;align-items:start}
+.task-filter-panel,.task-today-panel,.task-future-panel{border:1px solid #d9e0e5;border-radius:11px;background:#fff;overflow:hidden}
+.task-filter-panel{padding:12px;display:grid;gap:10px}
+.task-filter-panel h3{margin:0 0 2px;font-size:14px}
+.task-filter-panel label{display:grid;gap:4px;color:#52616d;font-size:9px;font-weight:800}
+.task-filter-legend{display:grid;gap:6px;padding-top:8px;border-top:1px solid #e8ecef;color:#667681;font-size:9px}.task-filter-legend strong{color:#364550}.task-filter-legend span{display:flex;align-items:center;gap:6px}
+.task-legend-dot{width:11px;height:11px;border-radius:50%}.task-legend-dot.pending{background:#f59b23}.task-legend-dot.done{background:#1ca36f}.task-legend-dot.none{background:#9aa6ae}
+.task-sync-btn{margin-top:3px;white-space:normal!important;line-height:1.25!important}
+.task-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:11px 13px;border-bottom:1px solid #e1e6ea;background:#fafdff}.task-section-head h3{margin:0;font-size:18px}.task-section-head p{margin:3px 0 0;color:#7b8790;font-size:8px}.task-section-head.future h3{font-size:16px}
+.task-today-list{display:grid;padding:8px;gap:7px;max-height:68vh;overflow:auto}
+.task-today-row{display:grid;grid-template-columns:minmax(190px,1.25fr) minmax(270px,1fr);gap:7px 12px;padding:9px 10px;border:1px solid #dce3e8;border-radius:9px;background:#fff}
+.task-session-main{display:grid;grid-template-columns:78px 42px minmax(0,1fr);align-items:center;gap:7px}.task-date-big{font-size:10px;color:#465762}.task-session-main strong{font-size:11px;overflow-wrap:anywhere}
+.task-status-grid{display:grid;grid-template-columns:repeat(4,minmax(54px,1fr));gap:5px}.task-cell-status{display:grid;gap:3px;text-align:center}.task-cell-status>span{font-size:7px;color:#697984;font-weight:800}
+.task-status-toggle{min-height:28px;border:1px solid transparent;border-radius:6px;font-size:9px;font-weight:900;cursor:pointer}.task-status-toggle.pending{background:#fff0dd;border-color:#ffd3a2;color:#b96716}.task-status-toggle.done{background:#def6e8;border-color:#bce9cf;color:#16754e}.task-status-toggle.none{background:#eef2f4;border-color:#dce3e7;color:#7c8991}.task-status-toggle:disabled{cursor:default}
+.task-inline-memo{grid-column:1 / -1;display:grid;grid-template-columns:36px minmax(0,1fr);align-items:center;gap:6px;color:#687680;font-size:8px;font-weight:800}.task-inline-memo textarea{width:100%;min-height:31px;max-height:80px;resize:vertical;border:1px solid #d8e0e6;border-radius:6px;padding:6px 8px;font-size:9px;font-family:inherit}
+.task-future-count{font-size:10px;color:#75818a;font-weight:800}.task-future-list{display:grid;max-height:63vh;overflow:auto}.task-future-row{display:grid;grid-template-columns:18px 64px 38px minmax(0,1fr) 54px;align-items:center;gap:6px;padding:8px 9px;border-bottom:1px solid #e9edf0;cursor:pointer}.task-future-row:hover{background:#f8fbfd}.task-future-row>input{width:14px;height:14px}.task-future-date{font-size:8px;color:#566672}.task-future-row strong{font-size:9px;line-height:1.25;overflow-wrap:anywhere}.task-future-dots{display:flex;gap:4px;justify-content:flex-end}.task-future-dots i{width:7px;height:7px;border-radius:50%}.task-future-dots i.pending{background:#f59b23}.task-future-dots i.none{background:#a5afb6}
+.task-future-empty{padding:28px 10px;color:#98a2a9;text-align:center;font-size:9px}.task-future-add-btn{width:calc(100% - 16px);margin:8px;white-space:normal!important}.task-future-add-btn:disabled{opacity:.45;cursor:default}
+@media(max-width:1100px){.task-content{width:100%!important;min-width:0!important}.task-workspace{grid-template-columns:170px minmax(500px,1fr) 300px;overflow-x:auto}}
+@media(max-width:760px){
+  .task-content{min-width:0!important}.task-calendar-strip{min-height:62px!important}.task-workspace{display:block;overflow:visible}.task-filter-panel{grid-template-columns:1fr 1fr;margin-bottom:9px}.task-filter-panel h3,.task-filter-legend,.task-sync-btn{grid-column:1 / -1}.task-today-panel{margin-bottom:9px}.task-today-row{grid-template-columns:1fr}.task-inline-memo{grid-column:1}.task-future-panel{margin-bottom:18px}.task-today-list,.task-future-list{max-height:none}.task-section-head h3{font-size:16px}.task-calendar-strip{overflow-x:auto!important}
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -7594,11 +7656,12 @@ body.public-viewer-only .task-card-menu{
         </div>
         <button type="button" class="btn" id="backFromDatabaseBtn">← 入力画面へ</button>
       </div>
+      <div class="mobile-editor-create-panel mobile-editor-only">
+        <div class="mobile-editor-create-title">新規探索者</div>
+        <button type="button" class="btn primary" id="mobileNew6Btn">＋ 新規作成（6版）</button>
+        <button type="button" class="btn primary" id="mobileNew7Btn">＋ 新規作成（7版）</button>
+      </div>
       <div class="database-toolbar">
-        <div class="mobile-editor-new-actions mobile-editor-only">
-          <button type="button" class="btn small" id="mobileNew6Btn">＋6版</button>
-          <button type="button" class="btn small" id="mobileNew7Btn">＋7版</button>
-        </div>
         <label class="database-edition-field">版
           <select class="control" id="databaseEditionFilter">
             <option value="6">6版</option><option value="7">7版</option>
@@ -7789,85 +7852,72 @@ body.public-viewer-only .task-card-menu{
       </div>
 
       <div id="taskHub" class="hub-content task-content hidden">
-        <div class="task-head">
+        <div class="task-head compact">
           <div>
             <div class="hub-kicker">CHARACTER DATABASE</div>
             <h2>TASK</h2>
-            <div class="task-head-note">今日以降のセッションに向けた準備タスクを管理します。</div>
+            <div class="task-head-note">セッション準備を「今日のタスク」と「今後のセッション」で整理します。</div>
           </div>
-          <div class="task-head-actions">
-            <button type="button" class="btn" id="taskImportSessionBtn">SESSIONから追加</button>
-            <button type="button" class="btn primary" id="taskAddBtn">＋ 追加</button>
-          </div>
-        </div>
-
-        <div class="task-toolbar">
-          <label>KP / PL
-            <select class="control" id="taskRoleFilter">
-              <option value="">すべて</option>
-              <option value="KP">KP</option>
-              <option value="PL">PL</option>
-              <option value="KPPL">KPPL</option>
-            </select>
-          </label>
-          <label class="task-search-field">検索
-            <input class="control" id="taskSearchInput" placeholder="タイトルで検索…">
-          </label>
-          <label>表示月
-            <select class="control" id="taskMonthFilter"><option value="">すべての月</option></select>
-          </label>
-          <span class="task-total-count" id="taskTotalCount">0件</span>
         </div>
 
         <div class="task-calendar-strip" id="taskCalendarStrip"></div>
 
-        <div class="task-editor hidden" id="taskEditor">
-          <div class="task-editor-head">
-            <strong id="taskEditorTitle">TASKを追加</strong>
-            <button type="button" class="btn small" id="taskEditorCloseBtn">×</button>
-          </div>
-          <div class="task-editor-grid">
+        <div class="task-workspace">
+          <aside class="task-filter-panel">
+            <h3>絞り込み</h3>
             <label>KP / PL
-              <select class="control" id="taskEditRole">
-                <option value="PL">PL</option>
-                <option value="KP">KP</option>
-                <option value="KPPL">KPPL</option>
+              <select class="control" id="taskRoleFilter">
+                <option value="">すべて</option>
+                <option value="KP">KPのみ</option>
+                <option value="PL">PLのみ</option>
+                <option value="KPPL">KPPLのみ</option>
               </select>
             </label>
-            <label>日付
-              <input class="control" id="taskEditDate" type="date" min="1000-01-01" max="9999-12-31">
+            <label>表示する月
+              <select class="control" id="taskMonthFilter"><option value="">すべて</option></select>
             </label>
-            <label class="task-edit-title-field">シナリオ名
-              <input class="control" id="taskEditTitle" placeholder="シナリオ名">
+            <label>シナリオ検索
+              <input class="control" id="taskSearchInput" placeholder="シナリオ名で検索…">
             </label>
-            <label>CS
-              <input class="control" id="taskEditCs" placeholder="済 / 未 / 期限 / -">
+            <label>ステータス
+              <select class="control" id="taskStatusFilter">
+                <option value="">すべて</option>
+                <option value="pending">未あり</option>
+                <option value="done">完了</option>
+              </select>
             </label>
-            <label>立ち絵
-              <input class="control" id="taskEditStanding" placeholder="済 / 未 / 期限 / -">
-            </label>
-            <label>差分
-              <input class="control" id="taskEditDiff" placeholder="済 / 未 / 期限 / -">
-            </label>
-            <label>部屋
-              <input class="control" id="taskEditRoom" placeholder="済 / 未 / 期限 / -">
-            </label>
-            <label class="task-confirm-field">
-              <input type="checkbox" id="taskEditConfirm">
-              <span>確認待ちにする</span>
-            </label>
-            <label class="task-edit-memo-field">メモ
-              <textarea class="control" id="taskEditMemo" rows="2" placeholder="補足・連絡事項"></textarea>
-            </label>
-          </div>
-          <div class="task-editor-actions">
-            <button type="button" class="btn danger hidden" id="taskDeleteBtn">削除</button>
-            <button type="button" class="btn" id="taskEditorCancelBtn">キャンセル</button>
-            <button type="button" class="btn primary" id="taskSaveBtn">保存</button>
-          </div>
-        </div>
+            <div class="task-filter-legend">
+              <strong>ステータス</strong>
+              <span><i class="task-legend-dot pending"></i>未（これから）</span>
+              <span><i class="task-legend-dot done"></i>済（完了）</span>
+              <span><i class="task-legend-dot none"></i>-（なし）</span>
+            </div>
+            <button type="button" class="btn task-sync-btn" id="taskImportSessionBtn">SESSIONから追加（新規のみ）</button>
+          </aside>
 
-        <div class="task-board" id="taskBoard"></div>
+          <section class="task-today-panel">
+            <div class="task-section-head">
+              <div>
+                <h3>☀ 今日のタスク</h3>
+                <p>本日より後のセッションを表示。2か月以内のSESSIONは自動で追加します。</p>
+              </div>
+              <span class="task-total-count" id="taskTotalCount">0件</span>
+            </div>
+            <div class="task-today-list" id="taskTodayList"></div>
+          </section>
+
+          <aside class="task-future-panel">
+            <div class="task-section-head future">
+              <div>
+                <h3>今後のセッション</h3>
+                <p>まだ今日のタスクに入っていない予定</p>
+              </div>
+              <span class="task-future-count" id="taskFutureCount">0件</span>
+            </div>
+            <div class="task-future-list" id="taskFutureList"></div>
+            <button type="button" class="btn primary task-future-add-btn" id="taskFutureAddBtn" disabled>選択した項目を今日のタスクにする</button>
+          </aside>
+        </div>
       </div>
 
       <div id="linkHub" class="hub-content link-content hidden">
@@ -8114,7 +8164,7 @@ body.public-viewer-only .task-card-menu{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.11</p>
+    <p class="public-viewer-version">Viewer v7.11.1</p>
   </div>
 </div>
 
@@ -8195,7 +8245,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.11';
+const PUBLIC_VIEWER_VERSION='7.11.1';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -11833,7 +11883,8 @@ async function renderIntegrityCheck(){
    };
  });
 }
-let editingTaskId='';
+const taskFutureSelected=new Set();
+let taskMemoSaveTimer=null;
 
 function taskTodayIso(){
  const d=new Date();
@@ -11846,280 +11897,202 @@ function taskDateObj(value){
  const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));
  return Number.isNaN(d.getTime())?null:d;
 }
-function taskRoleClass(role){
- return role==='KP'?'kp':role==='KPPL'?'kppl':'pl';
+function taskAddMonthsIso(dateIso,months){
+ const d=taskDateObj(dateIso)||new Date();
+ d.setMonth(d.getMonth()+months);
+ const p=n=>String(n).padStart(2,'0');
+ return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
 }
-function taskStatusInfo(value){
- const raw=String(value??'').trim();
- if(!raw||raw==='未')return {kind:'pending',label:'未'};
- if(raw==='済')return {kind:'done',label:'済'};
- if(raw==='-'||raw==='—')return {kind:'none',label:'-'};
- return {kind:'deadline',label:raw};
-}
-function taskAllDone(rec){
- return ['cs','standing','diff','room'].every(k=>{
-   const kind=taskStatusInfo(rec[k]).kind;
-   return kind==='done'||kind==='none';
- });
-}
-function taskWeekBounds(baseDate=new Date()){
- const d=new Date(baseDate.getFullYear(),baseDate.getMonth(),baseDate.getDate());
- const day=d.getDay();
- const mondayOffset=day===0?-6:1-day;
- const start=new Date(d);start.setDate(d.getDate()+mondayOffset);
- const end=new Date(start);end.setDate(start.getDate()+6);
- const nextStart=new Date(start);nextStart.setDate(start.getDate()+7);
- const nextEnd=new Date(start);nextEnd.setDate(start.getDate()+13);
- return {start,end,nextStart,nextEnd};
-}
-function taskLane(rec){
- if(taskAllDone(rec))return 'done';
- if(rec.confirmPending)return 'confirm';
- const d=taskDateObj(rec.date);
- if(!d)return 'prep';
- const {start,end,nextStart,nextEnd}=taskWeekBounds(new Date());
- const t=d.getTime();
- if(t>=start.getTime()&&t<=end.getTime())return 'thisweek';
- if(t>=nextStart.getTime()&&t<=nextEnd.getTime())return 'nextweek';
- return 'prep';
-}
-function taskLaneMeta(){
- return [
-   ['thisweek','今週','⏰'],
-   ['nextweek','来週','◷'],
-   ['prep','準備中','⚙'],
-   ['confirm','確認待ち','⌛'],
-   ['done','完了','●']
- ];
-}
-function taskMonthKey(date){
- const m=/^(\d{4})-(\d{2})/.exec(String(date||''));
- return m?`${m[1]}-${m[2]}`:'';
-}
+function taskRoleClass(role){return role==='KP'?'kp':role==='KPPL'?'kppl':'pl'}
+function taskMonthKey(date){const m=/^(\d{4})-(\d{2})/.exec(String(date||''));return m?`${m[1]}-${m[2]}`:''}
 function taskDateLabel(date){
- const d=taskDateObj(date);
- if(!d)return '日付未設定';
+ const d=taskDateObj(date);if(!d)return '日付未設定';
  return `${d.getMonth()+1}/${d.getDate()} (${['日','月','火','水','木','金','土'][d.getDay()]})`;
 }
+function taskNormalizeStatus(value){
+ const v=String(value??'').trim();
+ return ['未','済','-'].includes(v)?v:'未';
+}
+function taskStatusKind(value){return value==='済'?'done':value==='-'?'none':'pending'}
+function taskNextStatus(value){return value==='未'?'済':value==='済'?'-':'未'}
+function taskAllDone(rec){return ['cs','standing','diff','room'].every(k=>['済','-'].includes(taskNormalizeStatus(rec[k])))}
+function taskRecordKey(rec){return `${rec.role}|${rec.date}|${normalizeSessionDuplicateText(rec.title)}`}
 function taskNormalizeRecord(rec={}){
+ const role=['KP','PL','KPPL'].includes(rec.role)?rec.role:'PL';
  return {
-   id:rec.id||uid(),
-   role:['KP','PL','KPPL'].includes(rec.role)?rec.role:'PL',
-   date:String(rec.date||''),
-   title:String(rec.title||''),
-   cs:String(rec.cs??'未'),
-   standing:String(rec.standing??'未'),
-   diff:String(rec.diff??'未'),
-   room:String(rec.room??'未'),
-   confirmPending:!!rec.confirmPending,
-   memo:String(rec.memo||''),
-   source:String(rec.source||'manual'),
-   createdAt:rec.createdAt||new Date().toISOString(),
-   updatedAt:rec.updatedAt||new Date().toISOString()
+   id:rec.id||uid(),role,date:String(rec.date||''),title:String(rec.title||''),
+   cs:taskNormalizeStatus(rec.cs),standing:taskNormalizeStatus(rec.standing),
+   diff:taskNormalizeStatus(rec.diff),room:taskNormalizeStatus(rec.room),
+   memo:String(rec.memo||''),source:String(rec.source||'manual'),
+   createdAt:rec.createdAt||new Date().toISOString(),updatedAt:rec.updatedAt||new Date().toISOString()
  };
+}
+function taskNewRecord(session){
+ const role=session.role||'PL';
+ return taskNormalizeRecord({
+   role,date:session.date,title:session.title,
+   cs:'未',standing:'未',diff:'未',room:role==='PL'?'-':'未',source:'session'
+ });
+}
+async function collectUpcomingTaskSessions(){
+ const today=taskTodayIso();
+ const list=[],seen=new Set();
+ const pl=await collectPLSessions();
+ for(const r of pl){
+   const date=normalizeScenarioDate(r.date||'');
+   const title=String(r.title||'').trim();
+   if(!date||date<=today||!title)continue;
+   const rec={role:'PL',date,title};
+   const key=taskRecordKey(rec);if(seen.has(key))continue;seen.add(key);list.push(rec);
+ }
+ for(const r of appData.kpSessions||[]){
+   const date=normalizeScenarioDate(r.date||'');
+   const title=String(r.title||'').trim();
+   if(!date||date<=today||!title)continue;
+   const rec={role:'KP',date,title};
+   const key=taskRecordKey(rec);if(seen.has(key))continue;seen.add(key);list.push(rec);
+ }
+ return list.sort((a,b)=>a.date.localeCompare(b.date)||compareText(a.title,b.title));
+}
+async function syncTaskSessionsWithinTwoMonths(showMessage=false){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return 0;
+ const today=taskTodayIso(),limit=taskAddMonthsIso(today,2);
+ const sessions=await collectUpcomingTaskSessions();
+ const existing=new Set((appData.taskRecords||[]).map(taskRecordKey));
+ let added=0;
+ for(const s of sessions){
+   if(s.date>limit)continue;
+   const key=taskRecordKey(s);
+   if(existing.has(key))continue;
+   appData.taskRecords.push(taskNewRecord(s));existing.add(key);added++;
+ }
+ if(added)saveAppData();
+ if(showMessage)alert(added?`新しいSESSIONを${added}件追加しました。`:'2か月以内に追加できる新しいSESSIONはありません。');
+ return added;
 }
 function taskFilteredRows(){
  const today=taskTodayIso();
  const role=$('taskRoleFilter')?.value||'';
  const q=String($('taskSearchInput')?.value||'').trim().toLowerCase();
  const month=$('taskMonthFilter')?.value||'';
- return (appData.taskRecords||[])
-   .map(taskNormalizeRecord)
-   .filter(r=>r.date>=today)
+ const status=$('taskStatusFilter')?.value||'';
+ return (appData.taskRecords||[]).map(taskNormalizeRecord)
+   .filter(r=>r.date>today)
    .filter(r=>!role||r.role===role)
    .filter(r=>!month||taskMonthKey(r.date)===month)
    .filter(r=>!q||`${r.title} ${r.role} ${r.memo}`.toLowerCase().includes(q))
-   .sort((a,b)=>String(a.date).localeCompare(String(b.date))||compareText(a.title,b.title));
+   .filter(r=>status==='pending'?!taskAllDone(r):status==='done'?taskAllDone(r):true)
+   .sort((a,b)=>a.date.localeCompare(b.date)||compareText(a.title,b.title));
 }
-function taskChipHtml(label,value){
- const info=taskStatusInfo(value);
- return `<div class="task-mini"><span>${esc(label)}</span><b class="task-status ${info.kind}">${esc(info.label)}</b></div>`;
+function taskStatusButtonHtml(rec,field,label,editable){
+ const value=taskNormalizeStatus(rec[field]);
+ return `<div class="task-cell-status"><span>${esc(label)}</span><button type="button" class="task-status-toggle ${taskStatusKind(value)}" data-task-id="${esc(rec.id)}" data-task-field="${field}" ${editable?'':'disabled'}>${esc(value)}</button></div>`;
 }
-function taskCardHtml(rec){
- const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
- return `<article class="task-card" data-task-id="${esc(rec.id)}">
-   <div class="task-card-top">
-     <span class="task-card-date">${esc(taskDateLabel(rec.date))}</span>
-     <span class="task-role ${taskRoleClass(rec.role)}">${esc(rec.role)}</span>
-     ${editable?`<button type="button" class="task-card-menu" title="編集">•••</button>`:''}
+function taskTodayRowHtml(rec,editable){
+ return `<article class="task-today-row" data-task-id="${esc(rec.id)}">
+   <div class="task-session-main"><b class="task-date-big">${esc(taskDateLabel(rec.date))}</b><span class="task-role ${taskRoleClass(rec.role)}">${esc(rec.role)}</span><strong>${esc(rec.title||'無題')}</strong></div>
+   <div class="task-status-grid">
+     ${taskStatusButtonHtml(rec,'cs','CS',editable)}
+     ${taskStatusButtonHtml(rec,'standing','立ち絵',editable)}
+     ${taskStatusButtonHtml(rec,'diff','差分',editable)}
+     ${taskStatusButtonHtml(rec,'room','部屋',editable)}
    </div>
-   <div class="task-card-title">${esc(rec.title||'無題')}</div>
-   <div class="task-mini-grid">
-     ${taskChipHtml('CS',rec.cs)}
-     ${taskChipHtml('立ち絵',rec.standing)}
-     ${taskChipHtml('差分',rec.diff)}
-     ${taskChipHtml('部屋',rec.room)}
-   </div>
-   ${rec.memo?`<div class="task-card-memo">${esc(rec.memo)}</div>`:''}
+   <label class="task-inline-memo"><span>メモ</span><textarea data-task-memo="${esc(rec.id)}" rows="1" placeholder="ここに直接入力" ${editable?'':'readonly'}>${esc(rec.memo||'')}</textarea></label>
  </article>`;
 }
-function renderTaskCalendar(rows){
- const wrap=$('taskCalendarStrip');
- if(!wrap)return;
- const monthFilter=$('taskMonthFilter')?.value||'';
- let base=new Date();
- if(monthFilter){
-   const m=/^(\d{4})-(\d{2})$/.exec(monthFilter);
-   if(m)base=new Date(Number(m[1]),Number(m[2])-1,1);
- }
- const y=base.getFullYear(),mo=base.getMonth();
- const days=new Date(y,mo+1,0).getDate();
- const today=taskTodayIso();
- const countByDate=new Map();
- rows.forEach(r=>countByDate.set(r.date,(countByDate.get(r.date)||0)+1));
- const dayNames=['日','月','火','水','木','金','土'];
- wrap.innerHTML=`<div class="task-cal-month"><strong>${y}年</strong><span>${mo+1}月</span></div>
-   <div class="task-cal-days">${Array.from({length:days},(_,i)=>{
-     const d=i+1;
-     const iso=`${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-     const dt=new Date(y,mo,d);
-     const has=countByDate.get(iso)||0;
-     return `<div class="task-cal-day${iso===today?' today':''}${has?' has-task':''}">
-       <b>${d}</b><span>${dayNames[dt.getDay()]}</span>${has?`<i>${has}</i>`:''}
-     </div>`;
-   }).join('')}</div>`;
-}
-function refreshTaskMonthOptions(){
- const sel=$('taskMonthFilter');
- if(!sel)return;
+function refreshTaskMonthOptions(rows=[]){
+ const sel=$('taskMonthFilter');if(!sel)return;
  const keep=sel.value||'';
- const months=[...new Set((appData.taskRecords||[]).map(r=>taskMonthKey(r.date)).filter(Boolean))]
-   .sort();
- sel.innerHTML='<option value="">すべての月</option>'+months.map(m=>{
-   const [y,mo]=m.split('-');
-   return `<option value="${m}">${y}年${Number(mo)}月</option>`;
- }).join('');
+ const months=[...new Set(rows.map(r=>taskMonthKey(r.date)).filter(Boolean))].sort();
+ sel.innerHTML='<option value="">すべて</option>'+months.map(m=>{const [y,mo]=m.split('-');return `<option value="${m}">${y}年${Number(mo)}月</option>`}).join('');
  sel.value=months.includes(keep)?keep:'';
 }
-async function renderTaskHub(){
- if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
- refreshTaskMonthOptions();
- const rows=taskFilteredRows();
- $('taskTotalCount').textContent=`${rows.length}件`;
- renderTaskCalendar(rows);
-
- const grouped=new Map(taskLaneMeta().map(([key])=>[key,[]]));
- rows.forEach(r=>grouped.get(taskLane(r)).push(r));
-
- $('taskBoard').innerHTML=taskLaneMeta().map(([key,label,icon])=>{
-   const list=grouped.get(key)||[];
-   return `<section class="task-lane task-lane-${key}">
-     <div class="task-lane-head"><span>${icon}</span><strong>${label}</strong><b>${list.length}</b></div>
-     <div class="task-lane-body">${list.length?list.map(taskCardHtml).join(''):'<div class="task-lane-empty">該当なし</div>'}</div>
-   </section>`;
- }).join('');
-
- $('taskBoard').querySelectorAll('.task-card-menu').forEach(btn=>{
+function renderTaskCalendar(sessions,taskRows){
+ const wrap=$('taskCalendarStrip');if(!wrap)return;
+ const taskMap=new Map(taskRows.map(r=>[taskRecordKey(r),r]));
+ const unique=[];const seen=new Set();
+ for(const s of sessions){
+   if(seen.has(s.date))continue;seen.add(s.date);unique.push(s.date);
+   if(unique.length>=18)break;
+ }
+ const today=taskTodayIso();
+ wrap.innerHTML=`<div class="task-cal-title"><strong>${esc(today.slice(0,4))}年</strong><span>予定日</span></div><div class="task-cal-pills">${unique.map(date=>{
+   const d=taskDateObj(date);const day=d?['日','月','火','水','木','金','土'][d.getDay()]:'';
+   const sessionsOn=sessions.filter(s=>s.date===date);
+   const records=sessionsOn.map(s=>taskMap.get(taskRecordKey(s))).filter(Boolean);
+   const dot=records.length?(records.every(taskAllDone)?'done':'pending'):'none';
+   return `<div class="task-cal-pill${date===today?' today':''}"><b>${esc(taskDateLabel(date).split(' ')[0])}</b><span>${day}</span><i class="${dot}"></i></div>`;
+ }).join('')}</div>`;
+}
+function bindTaskTodayInteractions(editable){
+ const list=$('taskTodayList');if(!list)return;
+ list.querySelectorAll('.task-status-toggle').forEach(btn=>{
    btn.onclick=()=>{
-     const rec=(appData.taskRecords||[]).find(r=>r.id===btn.closest('.task-card')?.dataset.taskId);
-     if(rec)openTaskEditor(rec);
+     if(!editable)return;
+     const rec=(appData.taskRecords||[]).find(r=>r.id===btn.dataset.taskId);if(!rec)return;
+     const field=btn.dataset.taskField;rec[field]=taskNextStatus(taskNormalizeStatus(rec[field]));rec.updatedAt=new Date().toISOString();saveAppData();renderTaskHub(false);
    };
  });
-
+ list.querySelectorAll('[data-task-memo]').forEach(area=>{
+   area.oninput=()=>{
+     if(!editable)return;
+     const rec=(appData.taskRecords||[]).find(r=>r.id===area.dataset.taskMemo);if(!rec)return;
+     rec.memo=area.value;rec.updatedAt=new Date().toISOString();
+     clearTimeout(taskMemoSaveTimer);taskMemoSaveTimer=setTimeout(()=>saveAppData(),450);
+   };
+ });
+}
+function renderFutureTaskList(sessions,existingKeys,editable){
+ const list=$('taskFutureList');if(!list)return;
+ const role=$('taskRoleFilter')?.value||'';
+ const q=String($('taskSearchInput')?.value||'').trim().toLowerCase();
+ const future=sessions.filter(s=>!existingKeys.has(taskRecordKey(s))).filter(s=>!role||s.role===role).filter(s=>!q||s.title.toLowerCase().includes(q));
+ const validKeys=new Set(future.map(taskRecordKey));
+ for(const key of [...taskFutureSelected])if(!validKeys.has(key))taskFutureSelected.delete(key);
+ $('taskFutureCount').textContent=`${future.length}件`;
+ if(!future.length){list.innerHTML='<div class="task-future-empty">追加待ちのセッションはありません。</div>';}
+ else list.innerHTML=future.map(s=>{
+   const key=taskRecordKey(s);const checked=taskFutureSelected.has(key);
+   const defaults={cs:'未',standing:'未',diff:'未',room:s.role==='PL'?'-':'未'};
+   return `<label class="task-future-row"><input type="checkbox" data-task-future-key="${esc(key)}" ${checked?'checked':''} ${editable?'':'disabled'}><span class="task-future-date">${esc(taskDateLabel(s.date))}</span><span class="task-role ${taskRoleClass(s.role)}">${esc(s.role)}</span><strong>${esc(s.title)}</strong><span class="task-future-dots"><i class="pending"></i><i class="pending"></i><i class="pending"></i><i class="${defaults.room==='-'?'none':'pending'}"></i></span></label>`;
+ }).join('');
+ list.querySelectorAll('[data-task-future-key]').forEach(box=>box.onchange=()=>{
+   if(box.checked)taskFutureSelected.add(box.dataset.taskFutureKey);else taskFutureSelected.delete(box.dataset.taskFutureKey);
+   $('taskFutureAddBtn').disabled=!taskFutureSelected.size;
+ });
+ $('taskFutureAddBtn').disabled=!taskFutureSelected.size||!editable;
+ return future;
+}
+async function renderTaskHub(autoSync=true){
+ if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
  const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
- $('taskAddBtn')?.classList.toggle('hidden',!editable);
+ if(autoSync&&editable)await syncTaskSessionsWithinTwoMonths(false);
+ const sessions=await collectUpcomingTaskSessions();
+ refreshTaskMonthOptions((appData.taskRecords||[]).map(taskNormalizeRecord));
+ const rows=taskFilteredRows();
+ $('taskTotalCount').textContent=`${rows.length}件`;
+ $('taskTodayList').innerHTML=rows.length?rows.map(r=>taskTodayRowHtml(r,editable)).join(''):'<div class="database-empty">条件に合う今日のタスクはありません。</div>';
+ bindTaskTodayInteractions(editable);
+ const existingKeys=new Set((appData.taskRecords||[]).map(taskRecordKey));
+ renderFutureTaskList(sessions,existingKeys,editable);
+ renderTaskCalendar(sessions,(appData.taskRecords||[]).map(taskNormalizeRecord));
  $('taskImportSessionBtn')?.classList.toggle('hidden',!editable);
 }
-function openTaskEditor(rec=null){
- const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
- if(!editable)return;
- editingTaskId=rec?.id||'';
- const r=taskNormalizeRecord(rec||{
-   role:'PL',date:taskTodayIso(),title:'',cs:'未',standing:'未',diff:'未',room:'未'
- });
- $('taskEditorTitle').textContent=editingTaskId?'TASKを編集':'TASKを追加';
- $('taskEditRole').value=r.role;
- $('taskEditDate').value=r.date;
- $('taskEditTitle').value=r.title;
- $('taskEditCs').value=r.cs;
- $('taskEditStanding').value=r.standing;
- $('taskEditDiff').value=r.diff;
- $('taskEditRoom').value=r.room;
- $('taskEditConfirm').checked=!!r.confirmPending;
- $('taskEditMemo').value=r.memo||'';
- $('taskDeleteBtn').classList.toggle('hidden',!editingTaskId);
- $('taskEditor').classList.remove('hidden');
- $('taskEditTitle').focus();
- $('taskEditor').scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-function closeTaskEditor(){
- editingTaskId='';
- $('taskEditor').classList.add('hidden');
-}
-function saveTaskEditor(){
- const date=String($('taskEditDate').value||'').trim();
- const title=String($('taskEditTitle').value||'').trim();
- if(!date){alert('日付を入力してください。');return}
- if(!title){alert('シナリオ名を入力してください。');return}
- const values={
-   role:$('taskEditRole').value||'PL',
-   date,title,
-   cs:String($('taskEditCs').value||'').trim()||'未',
-   standing:String($('taskEditStanding').value||'').trim()||'未',
-   diff:String($('taskEditDiff').value||'').trim()||'未',
-   room:String($('taskEditRoom').value||'').trim()||'未',
-   confirmPending:!!$('taskEditConfirm').checked,
-   memo:String($('taskEditMemo').value||'').trim()
- };
- if(editingTaskId){
-   const rec=(appData.taskRecords||[]).find(r=>r.id===editingTaskId);
-   if(rec)Object.assign(rec,values,{updatedAt:new Date().toISOString()});
- }else{
-   appData.taskRecords.push(taskNormalizeRecord({...values,source:'manual'}));
- }
- saveAppData();
- closeTaskEditor();
- renderTaskHub();
-}
-function deleteTaskEditor(){
- if(!editingTaskId)return;
- const rec=(appData.taskRecords||[]).find(r=>r.id===editingTaskId);
- if(!rec)return;
- if(!confirm(`「${rec.title||'このTASK'}」を削除しますか？`))return;
- appData.taskRecords=appData.taskRecords.filter(r=>r.id!==editingTaskId);
- saveAppData();
- closeTaskEditor();
- renderTaskHub();
-}
 async function importUpcomingSessionsToTasks(){
+ await syncTaskSessionsWithinTwoMonths(true);
+ await renderTaskHub(false);
+}
+async function addSelectedFutureTasks(){
  if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
- const today=taskTodayIso();
- const candidates=[];
- const seen=new Set();
-
- const pl=await collectPLSessions();
- for(const r of pl){
-   if(!r.date||r.date<today||!String(r.title||'').trim())continue;
-   const key=`PL|${r.date}|${normalizeSessionDuplicateText(r.title)}`;
-   if(seen.has(key))continue;
-   seen.add(key);
-   candidates.push({role:'PL',date:r.date,title:r.title});
- }
- for(const r of appData.kpSessions||[]){
-   const date=normalizeScenarioDate(r.date||'');
-   if(!date||date<today||!String(r.title||'').trim())continue;
-   const key=`KP|${date}|${normalizeSessionDuplicateText(r.title)}`;
-   if(seen.has(key))continue;
-   seen.add(key);
-   candidates.push({role:'KP',date,title:String(r.title||'').trim()});
- }
-
- const existing=new Set((appData.taskRecords||[]).map(r=>
-   `${r.role}|${r.date}|${normalizeSessionDuplicateText(r.title)}`
- ));
+ const sessions=await collectUpcomingTaskSessions();
+ const map=new Map(sessions.map(s=>[taskRecordKey(s),s]));
+ const existing=new Set((appData.taskRecords||[]).map(taskRecordKey));
  let added=0;
- for(const c of candidates){
-   const key=`${c.role}|${c.date}|${normalizeSessionDuplicateText(c.title)}`;
-   if(existing.has(key))continue;
-   appData.taskRecords.push(taskNormalizeRecord({
-     ...c,cs:'未',standing:'未',diff:'未',room:'未',source:'session'
-   }));
-   existing.add(key);
-   added++;
+ for(const key of [...taskFutureSelected]){
+   const s=map.get(key);if(!s||existing.has(key))continue;
+   appData.taskRecords.push(taskNewRecord(s));existing.add(key);added++;
  }
- saveAppData();
- await renderTaskHub();
- alert(added?`SESSIONから${added}件追加しました。`:'追加できる新しい予定はありません。');
+ taskFutureSelected.clear();if(added)saveAppData();await renderTaskHub(false);
 }
 
 async function renderOtherHub(){
@@ -14170,7 +14143,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.11',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.11.1',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -15267,15 +15240,12 @@ $('addKPSessionBtn').onclick=()=>{
 $('yosoPlFilter').onchange=renderYoso;
 $('yosoSearchInput').oninput=renderYoso;
 
-$('taskRoleFilter').onchange=renderTaskHub;
-$('taskSearchInput').oninput=renderTaskHub;
-$('taskMonthFilter').onchange=renderTaskHub;
-$('taskAddBtn').onclick=()=>openTaskEditor();
+$('taskRoleFilter').onchange=()=>renderTaskHub(false);
+$('taskSearchInput').oninput=()=>renderTaskHub(false);
+$('taskMonthFilter').onchange=()=>renderTaskHub(false);
+$('taskStatusFilter').onchange=()=>renderTaskHub(false);
 $('taskImportSessionBtn').onclick=importUpcomingSessionsToTasks;
-$('taskEditorCloseBtn').onclick=closeTaskEditor;
-$('taskEditorCancelBtn').onclick=closeTaskEditor;
-$('taskSaveBtn').onclick=saveTaskEditor;
-$('taskDeleteBtn').onclick=deleteTaskEditor;
+$('taskFutureAddBtn').onclick=addSelectedFutureTasks;
 
 $('otherTallyTabBtn').onclick=async()=>{
  activeOtherTab='tally';
