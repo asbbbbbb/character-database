@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.2</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.3</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -7914,6 +7914,92 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
   .yoso-pl-rename-arrow{display:none}
 }
 
+
+/* v7.12.3 --------------------------------------------------------- */
+/* TASK selection delete */
+.task-toolbar-v712{
+  grid-template-columns:150px minmax(220px,420px) auto auto auto minmax(220px,1fr)!important;
+}
+.task-selected-count{
+  align-self:center;
+  color:#6e7d87;
+  font-size:8px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.task-selection-delete:disabled{
+  opacity:.4;
+  cursor:default;
+}
+.task-select-box{
+  position:relative;
+  flex:0 0 16px;
+  width:16px;
+  height:16px;
+  cursor:pointer;
+}
+.task-select-box input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.task-select-box span{
+  display:block;
+  width:14px;
+  height:14px;
+  border:1px solid #b8c4cc;
+  border-radius:4px;
+  background:#fff;
+}
+.task-select-box input:checked + span{
+  border-color:#4b86aa;
+  background:#4b86aa;
+  box-shadow:inset 0 0 0 3px #fff;
+}
+.task-kanban-card.selected{
+  outline:2px solid #79a9c5;
+  outline-offset:-2px;
+}
+@media(max-width:1100px){
+  .task-toolbar-v712{
+    grid-template-columns:140px minmax(180px,1fr) auto auto!important;
+  }
+  .task-selected-count{justify-self:start}
+}
+
+/* MEMO editor stays inside the selected kanban column */
+#memoEditorDock{
+  display:none;
+}
+.memo-lane-body .memo-editor{
+  display:block;
+  margin:0 0 4px;
+  padding:8px;
+  border:1px solid #91b4c9;
+  border-radius:8px;
+  background:#fff;
+  box-shadow:0 4px 14px rgba(37,58,72,.10);
+}
+.memo-lane-body .memo-editor.hidden{
+  display:none!important;
+}
+.memo-lane-body .memo-editor-grid{
+  grid-template-columns:1fr!important;
+  gap:6px;
+}
+.memo-lane-body .memo-edit-title-field,
+.memo-lane-body .memo-member-editor,
+.memo-lane-body .memo-edit-remarks-field{
+  grid-column:auto!important;
+}
+.memo-lane-body .memo-member-options{
+  max-height:105px;
+  overflow:auto;
+}
+.memo-lane-body .memo-editor-actions{
+  flex-wrap:wrap;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -8441,6 +8527,8 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
               <input class="control" id="taskSearchInput" placeholder="シナリオ名・メモを検索…">
             </label>
             <button type="button" class="btn primary task-sync-btn" id="taskImportSessionBtn">SESSIONから更新</button>
+            <button type="button" class="btn danger task-selection-delete" id="taskDeleteSelectedBtn" disabled>選択削除</button>
+            <span class="task-selected-count" id="taskSelectedCount">0件選択</span>
             <span class="task-sync-note">新規だけ追加。既存の列・未/済/-・メモは変更しません。</span>
           </div>
 
@@ -8456,6 +8544,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
             </label>
           </div>
 
+          <div id="memoEditorDock">
           <div class="memo-editor hidden" id="memoEditor">
             <div class="memo-editor-head">
               <strong id="memoEditorTitle">MEMOを追加</strong>
@@ -8490,6 +8579,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
               <button type="button" class="btn" id="memoEditorCancelBtn">キャンセル</button>
               <button type="button" class="btn primary" id="memoSaveBtn">保存</button>
             </div>
+          </div>
           </div>
 
           <div class="memo-board" id="memoBoard"></div>
@@ -8740,7 +8830,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.2</p>
+    <p class="public-viewer-version">Viewer v7.12.3</p>
   </div>
 </div>
 
@@ -8847,7 +8937,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.2';
+const PUBLIC_VIEWER_VERSION='7.12.3';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -12494,6 +12584,7 @@ async function renderIntegrityCheck(){
  });
 }
 let activeReminderTab='task';
+const taskSelectedIds=new Set();
 let taskMemoSaveTimer=null;
 let reminderMemoSaveTimer=null;
 
@@ -12628,8 +12719,9 @@ function taskStatusButtonHtml(rec,field,label,editable){
  return `<div class="task-mini-status"><span>${esc(label)}</span><button type="button" class="task-status-toggle ${taskStatusKind(value)}" data-task-id="${esc(rec.id)}" data-task-field="${field}" ${editable?'':'disabled'}>${esc(value)}</button></div>`;
 }
 function taskCardHtml(rec,editable){
- return `<article class="task-kanban-card" data-task-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
+ return `<article class="task-kanban-card${taskSelectedIds.has(rec.id)?' selected':''}" data-task-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
    <div class="task-card-top">
+     ${editable?`<label class="task-select-box" title="選択"><input type="checkbox" data-task-select="${esc(rec.id)}" ${taskSelectedIds.has(rec.id)?'checked':''}><span></span></label>`:''}
      <span class="task-card-date">${esc(taskDateLabel(rec.date))}</span>
      <span class="task-role ${taskRoleClass(rec.role)}">${esc(rec.role)}</span>
      ${editable?'<span class="task-drag-hint" title="ドラッグして移動">⠿</span>':''}
@@ -12668,8 +12760,38 @@ function renderTaskCalendar(records){
      </div>`;
    }).join('')}</div>`;
 }
+function updateTaskSelectionUi(){
+ const valid=new Set((appData.taskRecords||[]).map(r=>r.id));
+ for(const id of [...taskSelectedIds])if(!valid.has(id))taskSelectedIds.delete(id);
+ const count=taskSelectedIds.size;
+ if($('taskSelectedCount'))$('taskSelectedCount').textContent=`${count}件選択`;
+ if($('taskDeleteSelectedBtn'))$('taskDeleteSelectedBtn').disabled=!count;
+}
+function deleteSelectedTasks(){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const ids=[...taskSelectedIds];
+ if(!ids.length)return;
+ if(!confirm(`選択した${ids.length}件のTASKを削除しますか？`))return;
+ const set=new Set(ids);
+ appData.taskRecords=(appData.taskRecords||[]).filter(r=>!set.has(r.id));
+ taskSelectedIds.clear();
+ saveAppData();
+ renderTaskHub();
+}
+
 function bindTaskCardInteractions(editable){
  const board=$('taskBoard');if(!board)return;
+
+ board.querySelectorAll('[data-task-select]').forEach(box=>{
+   box.onchange=()=>{
+     if(box.checked)taskSelectedIds.add(box.dataset.taskSelect);
+     else taskSelectedIds.delete(box.dataset.taskSelect);
+     box.closest('.task-kanban-card')?.classList.toggle('selected',box.checked);
+     updateTaskSelectionUi();
+   };
+   box.onclick=e=>e.stopPropagation();
+ });
+ updateTaskSelectionUi();
 
  board.querySelectorAll('.task-status-toggle').forEach(btn=>{
    btn.onclick=()=>{
@@ -12775,6 +12897,20 @@ function renderMemoMemberOptions(){
    };
  });
 }
+function dockMemoEditor(){
+ const editor=$('memoEditor');
+ const dock=$('memoEditorDock');
+ if(!editor||!dock)return;
+ editor.classList.add('hidden');
+ dock.appendChild(editor);
+}
+function placeMemoEditorInLane(lane){
+ const editor=$('memoEditor');
+ const body=$('memoBoard')?.querySelector(`.memo-lane-body[data-memo-lane="${lane}"]`);
+ if(!editor||!body)return;
+ editor.classList.remove('hidden');
+ body.prepend(editor);
+}
 function openMemoEditor(rec=null,presetLane='later'){
  const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
  if(!editable)return;
@@ -12788,13 +12924,13 @@ function openMemoEditor(rec=null,presetLane='later'){
  $('memoEditRemarks').value=r.remarks;
  $('memoDeleteBtn').classList.toggle('hidden',!editingMemoId);
  renderMemoMemberOptions();
- $('memoEditor').classList.remove('hidden');
+ placeMemoEditorInLane(r.lane);
  $('memoEditTitle').focus();
 }
 function closeMemoEditor(){
  editingMemoId='';
  memoSelectedMembers.clear();
- $('memoEditor').classList.add('hidden');
+ dockMemoEditor();
 }
 function saveMemoEditor(){
  const title=String($('memoEditTitle').value||'').trim();
@@ -12911,6 +13047,7 @@ function bindMemoInteractions(editable){
 }
 function renderMemoKanban(){
  if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
+ dockMemoEditor();
  refreshMemoMemberFilter();
  const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
  const rows=memoFilteredRecords();
@@ -12949,21 +13086,23 @@ async function renderTaskHub(){
  const removed=prunePastTaskRecords();
  let migrated=!!removed;
 
- // v7.12.1 accidentally inherited every old SESSION task as TODAY.
- // Repair only once, and only when the SESSION-sourced future tasks are still all in TODAY.
- if(Number(appData.taskRulesVersion||0)<2){
-   const futureSessionRows=appData.taskRecords.filter(r=>String(r.source||'')==='session'&&String(r.date||'')>=taskTodayIso());
-   const looksLikeOldAllToday=futureSessionRows.length>0&&futureSessionRows.every(r=>!r.lane||r.lane==='today');
+ // v7.12.1 once placed legacy SESSION tasks in TODAY.
+ // v7.12.3 repairs those exact SESSION matches once. After this, TODAY is manual-only.
+ if(Number(appData.taskRulesVersion||0)<3){
+   const sessions=await collectUpcomingTaskSessions();
+   const sessionKeys=new Set(sessions.map(taskRecordKey));
    for(const rec of appData.taskRecords){
      if(!['today','next','backlog','someday','done'].includes(rec.lane)){
-       rec.lane=String(rec.source||'')==='session'?taskLaneForNewSession(rec.date):'today';
+       rec.lane=sessionKeys.has(taskRecordKey(rec))?taskLaneForNewSession(rec.date):'today';
        migrated=true;
-     }else if(looksLikeOldAllToday&&String(rec.source||'')==='session'&&rec.lane==='today'){
+       continue;
+     }
+     if(rec.lane==='today'&&sessionKeys.has(taskRecordKey(rec))&&String(rec.source||'')==='session'){
        rec.lane=taskLaneForNewSession(rec.date);
        migrated=true;
      }
    }
-   appData.taskRulesVersion=2;
+   appData.taskRulesVersion=3;
    migrated=true;
  }
  if(migrated)saveAppData();
@@ -12988,7 +13127,9 @@ async function renderTaskHub(){
  }).join('');
 
  bindTaskCardInteractions(editable);
+ updateTaskSelectionUi();
  $('taskImportSessionBtn')?.classList.toggle('hidden',!editable);
+ $('taskDeleteSelectedBtn')?.classList.toggle('hidden',!editable);
 }
 
 async function renderOtherHub(){
@@ -15089,7 +15230,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.2',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.3',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -16192,10 +16333,12 @@ $('yosoSearchInput').oninput=renderYoso;
 $('taskRoleFilter').onchange=renderTaskHub;
 $('taskSearchInput').oninput=renderTaskHub;
 $('taskImportSessionBtn').onclick=async()=>{await syncTaskSessionsFromSession(true);await renderTaskHub();};
+$('taskDeleteSelectedBtn').onclick=deleteSelectedTasks;
 $('reminderTaskTabBtn').onclick=()=>setReminderTab('task');
 $('reminderMemoTabBtn').onclick=()=>setReminderTab('memo');
 $('memoMemberFilter').onchange=renderMemoKanban;
 $('memoEditorCloseBtn').onclick=closeMemoEditor;
+$('memoEditLane').onchange=()=>placeMemoEditorInLane(memoNormalizeLane($('memoEditLane').value));
 $('memoEditorCancelBtn').onclick=closeMemoEditor;
 $('memoSaveBtn').onclick=saveMemoEditor;
 $('memoDeleteBtn').onclick=deleteMemoEditor;
