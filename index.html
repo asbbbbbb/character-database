@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.9</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.12</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8269,6 +8269,121 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
   gap:4px;
 }
 
+
+/* v7.12.10 -------------------------------------------------------- */
+/* REMIND > MEMO: match TASK readability and enlarge editor/card text. */
+.memo-lane-head strong{
+  font-size:13px!important;
+}
+.memo-lane-head>b{
+  font-size:10px!important;
+}
+.memo-card-date{
+  font-size:11px!important;
+}
+.memo-card-title{
+  font-size:13px!important;
+  line-height:1.4!important;
+}
+.memo-member-tag{
+  padding:4px 7px!important;
+  font-size:10px!important;
+}
+.memo-member-empty{
+  font-size:10px!important;
+}
+.memo-card-remarks{
+  font-size:11px!important;
+  line-height:1.5!important;
+}
+.memo-card-remarks.muted{
+  font-size:10px!important;
+}
+.memo-member-row>b{
+  font-size:9px!important;
+  padding-top:4px!important;
+}
+.memo-member-selected-tag{
+  font-size:10px!important;
+}
+.memo-member-selected-empty{
+  font-size:10px!important;
+}
+.memo-member-input{
+  min-height:34px!important;
+  font-size:11px!important;
+}
+.memo-member-suggestion{
+  font-size:11px!important;
+}
+.memo-member-suggestion-empty{
+  font-size:10px!important;
+}
+.memo-editor-grid label,
+.memo-member-editor{
+  font-size:10px!important;
+}
+.memo-editor .control{
+  font-size:11px!important;
+}
+.memo-editor textarea.control{
+  line-height:1.5!important;
+}
+.memo-editor-head strong{
+  font-size:13px!important;
+}
+@media(max-width:700px){
+  .memo-lane-head strong{font-size:14px!important}
+  .memo-card-date{font-size:12px!important}
+  .memo-card-title{font-size:14px!important}
+  .memo-member-tag{font-size:11px!important}
+  .memo-card-remarks{font-size:12px!important}
+  .memo-member-row>b{font-size:10px!important}
+  .memo-member-input,
+  .memo-editor .control{font-size:12px!important}
+  .memo-member-suggestion{font-size:12px!important}
+}
+
+
+/* v7.12.11 -------------------------------------------------------- */
+/* REMIND > MEMO: chip colors follow the member's emoji with very pale backgrounds. */
+.memo-member-tag{
+  background:var(--member-chip-bg,#eef2f4)!important;
+  color:var(--member-chip-fg,#65727a)!important;
+}
+.memo-member-selected-tag{
+  background:var(--member-chip-bg,#eef2f4)!important;
+  color:var(--member-chip-fg,#65727a)!important;
+  border-color:color-mix(in srgb,var(--member-chip-fg,#65727a) 22%, transparent)!important;
+}
+
+
+/* v7.12.12 -------------------------------------------------------- */
+/* REMIND > MEMO: explicit edit control; editing must not be swallowed by drag. */
+.memo-card-edit-btn{
+  margin-left:auto;
+  width:25px;
+  height:25px;
+  padding:0;
+  border:1px solid #d3dce2;
+  border-radius:6px;
+  background:#fff;
+  color:#627581;
+  font-size:13px;
+  line-height:1;
+  cursor:pointer;
+}
+.memo-card-edit-btn:hover{
+  background:#eef5f8;
+}
+.memo-card-edit-btn + .memo-drag-hint{
+  margin-left:2px;
+}
+.memo-card-title:hover{
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -9118,7 +9233,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.9</p>
+    <p class="public-viewer-version">Viewer v7.12.12</p>
   </div>
 </div>
 
@@ -9225,7 +9340,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.9';
+const PUBLIC_VIEWER_VERSION='7.12.12';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -13213,9 +13328,44 @@ function memoPlCandidates(){
  return [...new Set((appData.yosoRecords||[]).map(r=>String(r.pl||'').trim()).filter(Boolean))]
    .sort((a,b)=>compareText(a,b));
 }
+function memoMemberEmoji(name){
+ const value=String(name||'').trim();
+ try{
+   const match=value.match(/\p{Extended_Pictographic}/u);
+   return match?.[0]||'';
+ }catch(_){
+   return [...value][0]||'';
+ }
+}
+function memoMemberChipColors(name){
+ const emoji=memoMemberEmoji(name);
+ const groups=[
+   {chars:'🍓🍒🍎🌹🌷🌸🎀🐙🐷💗❤️',bg:'#fdecef',fg:'#9e4f5f'},
+   {chars:'🍊🥕🦊🐈🔥🧡',bg:'#fff0e3',fg:'#9a633d'},
+   {chars:'🍋🍌🌻⭐🌟🐥🐤🐱💛',bg:'#fff7d9',fg:'#8b7330'},
+   {chars:'🍏🥝🥦🌿🍀🌱🐸🐢💚',bg:'#eaf7ee',fg:'#4d775d'},
+   {chars:'🫐🐟🐬🐳💧🌊🦋💙',bg:'#eaf4fc',fg:'#4f708b'},
+   {chars:'🍇🍆💜🔮🪻😈☂️',bg:'#f2ebfb',fg:'#725b91'},
+   {chars:'🥔🥖🥐🍞🥚🐻🐵🦉🤎',bg:'#f7f0e7',fg:'#7b6650'},
+   {chars:'🕊🐺🐭🐨☁️🩶',bg:'#eef2f4',fg:'#65727a'}
+ ];
+ const hit=groups.find(g=>emoji&&g.chars.includes(emoji));
+ if(hit)return hit;
+ const fallback=[
+   ['#fdecef','#9e4f5f'],['#fff0e3','#9a633d'],['#fff7d9','#8b7330'],
+   ['#eaf7ee','#4d775d'],['#eaf4fc','#4f708b'],['#f2ebfb','#725b91'],
+   ['#f7f0e7','#7b6650'],['#eef2f4','#65727a']
+ ];
+ const seed=emoji||String(name||'');
+ const index=Math.abs([...seed].reduce((a,c)=>a+c.codePointAt(0),0))%fallback.length;
+ return {bg:fallback[index][0],fg:fallback[index][1]};
+}
+function memoMemberChipStyle(name){
+ const c=memoMemberChipColors(name);
+ return `--member-chip-bg:${c.bg};--member-chip-fg:${c.fg};`;
+}
 function memoMemberTagHtml(name){
- const i=Math.abs([...String(name)].reduce((a,c)=>a+c.codePointAt(0),0))%6;
- return `<span class="memo-member-tag tone-${i}">${esc(name)}</span>`;
+ return `<span class="memo-member-tag" style="${memoMemberChipStyle(name)}">${esc(name)}</span>`;
 }
 function memoMemberSet(role){
  return role==='kp'?memoSelectedKpMembers:memoSelectedPlMembers;
@@ -13231,7 +13381,7 @@ function renderMemoSelectedMembers(role){
  const set=memoMemberSet(role);
  const members=[...set];
  selected.innerHTML=members.length
-   ? members.map(name=>`<button type="button" class="memo-member-selected-tag" data-member-role="${role}" data-member-remove="${esc(name)}">${esc(name)} <span>×</span></button>`).join('')
+   ? members.map(name=>`<button type="button" class="memo-member-selected-tag" style="${memoMemberChipStyle(name)}" data-member-role="${role}" data-member-remove="${esc(name)}">${esc(name)} <span>×</span></button>`).join('')
    : '<span class="memo-member-selected-empty">選択なし</span>';
  selected.querySelectorAll('[data-member-remove]').forEach(btn=>{
    btn.onclick=()=>{
@@ -13380,9 +13530,10 @@ function memoCardHtml(rec,editable){
    <div class="memo-card-top">
      ${editable?`<label class="memo-select-box" title="選択"><input type="checkbox" data-memo-select="${esc(rec.id)}" ${memoSelectedIds.has(rec.id)?'checked':''}><span></span></label>`:''}
      ${rec.date?`<span class="memo-card-date">${esc(rec.date)}</span>`:'<span class="memo-card-date muted">未定</span>'}
+     ${editable?`<button type="button" class="memo-card-edit-btn" data-memo-edit="${esc(rec.id)}" draggable="false" title="編集" aria-label="編集">✎</button>`:''}
      ${editable?'<span class="memo-drag-hint" title="ドラッグして移動">⠿</span>':''}
    </div>
-   <button type="button" class="memo-card-title" data-memo-edit="${esc(rec.id)}">${esc(rec.title||'無題')}</button>
+   <button type="button" class="memo-card-title" data-memo-edit="${esc(rec.id)}" draggable="false" title="クリックして編集">${esc(rec.title||'無題')}</button>
    <div class="memo-card-members">
      ${rec.kpMembers.length?`<div class="memo-member-row"><b>KP</b><span>${rec.kpMembers.map(memoMemberTagHtml).join('')}</span></div>`:''}
      ${rec.plMembers.length?`<div class="memo-member-row"><b>PL</b><span>${rec.plMembers.map(memoMemberTagHtml).join('')}</span></div>`:''}
@@ -13448,14 +13599,19 @@ function bindMemoInteractions(editable){
    box.onclick=e=>e.stopPropagation();
  });
  board.querySelectorAll('[data-memo-edit]').forEach(btn=>{
-   btn.onclick=()=>{
+   btn.draggable=false;
+   btn.onpointerdown=e=>e.stopPropagation();
+   btn.ondragstart=e=>e.preventDefault();
+   btn.onclick=e=>{
+     e.preventDefault();
+     e.stopPropagation();
      const rec=(appData.memoRecords||[]).find(r=>r.id===btn.dataset.memoEdit);
      if(rec)openMemoEditor(rec);
    };
  });
  board.querySelectorAll('.memo-card').forEach(card=>{
    card.ondragstart=e=>{
-     if(!editable){e.preventDefault();return}
+     if(!editable||e.target.closest('button,input,textarea,select,label')){e.preventDefault();return}
      e.dataTransfer.setData('text/memo-id',card.dataset.memoId||'');
      e.dataTransfer.effectAllowed='move';
      card.classList.add('dragging');
@@ -15672,7 +15828,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.9',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.12',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
