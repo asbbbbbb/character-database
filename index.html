@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.17</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.18</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -9463,7 +9463,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.17</p>
+    <p class="public-viewer-version">Viewer v7.12.18</p>
   </div>
 </div>
 
@@ -9570,7 +9570,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.17';
+const PUBLIC_VIEWER_VERSION='7.12.18';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -14745,6 +14745,16 @@ function todayMonthDay(){
    label:`${d.getMonth()+1}月${d.getDate()}日`
  };
 }
+function reportIsThroughCurrentMonth(date){
+ const value=normalizeScenarioDate(date||'');
+ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+ // Preserve existing undated/irregular records; only valid future-dated SESSION rows are hidden.
+ if(!m)return true;
+ const now=new Date();
+ const currentMonthKey=now.getFullYear()*12+now.getMonth();
+ const rowMonthKey=Number(m[1])*12+(Number(m[2])-1);
+ return rowMonthKey<=currentMonthKey;
+}
 async function collectReportRows(){
  const pl=await collectPLSessions();
  const kp=(appData.kpSessions||[]).map(r=>({
@@ -14762,6 +14772,7 @@ async function collectReportRows(){
  const hidden=new Set(appData.reportHiddenKeys||[]);
  return [...pl,...kp]
    .filter(r=>String(r.title||'').trim()&&!hidden.has(r.reportKey))
+   .filter(r=>reportIsThroughCurrentMonth(r.date))
    .sort((a,b)=>String(b.date||'0000-00-00').localeCompare(String(a.date||'0000-00-00'))||
                 String(b.no||'').localeCompare(String(a.no||''),undefined,{numeric:true}));
 }
@@ -16362,7 +16373,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.17',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.18',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
