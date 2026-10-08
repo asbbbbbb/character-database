@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.16</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.17</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8589,6 +8589,17 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
   }
 }
 
+
+/* v7.12.17 -------------------------------------------------------- */
+/* YOSO: kana column centered; name and URL remain left aligned. */
+.yoso-table th.col-kana,
+.yoso-table td.col-kana{
+  text-align:center!important;
+}
+.yoso-table td.col-kana input{
+  text-align:center!important;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -9452,7 +9463,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.16</p>
+    <p class="public-viewer-version">Viewer v7.12.17</p>
   </div>
 </div>
 
@@ -9559,7 +9570,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.16';
+const PUBLIC_VIEWER_VERSION='7.12.17';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -10970,25 +10981,34 @@ function syncDFeaturePointsTotal(){
  current.dFeaturePoints=current.dFeaturePoints1+current.dFeaturePoints2;
 }
 function rollDFeaturePointSlot(slot){
- if(!isDFeatureSlot(slot))return;
+ if(!current)return;
+ if(!isDFeatureSlot(slot)){
+   alert(`特徴表${slot}がD特徴（4-x）のときに1d6×10Pをロールできます。`);
+   return;
+ }
  current[`dFeaturePoints${slot}`]=(Math.floor(Math.random()*6)+1)*10;
  syncDFeaturePointsTotal();
  renderPoints();
+ const input=$(`dFeaturePoints${slot}Input`);
+ if(input)input.value=current[`dFeaturePoints${slot}`];
 }
 function rollDFeaturePoints(){
  if(isDFeatureSlot(1))rollDFeaturePointSlot(1);
  if(isDFeatureSlot(2))rollDFeaturePointSlot(2);
 }
 function rollFeatureSlot(slot){
- if(!current||current.edition!=='6')return;
- const d6=Math.floor(Math.random()*6)+1;
- const d10=Math.floor(Math.random()*10)+1;
- const prefix=`${d6}-${d10}：`;
- const value=FEATURES6.find(v=>v.startsWith(prefix))||'';
+ if(!current)return;
+ if(current.edition!=='6'){
+   alert('特徴表ロールは6版の探索者で使用できます。');
+   return;
+ }
+ const value=FEATURES6[Math.floor(Math.random()*FEATURES6.length)]||'';
  current[`feature${slot}`]=value;
  if(!/^4-/.test(String(value||'')))current[`dFeaturePoints${slot}`]=0;
  syncDFeaturePointsTotal();
  renderFeatureSelects();
+ const select=$(`feature${slot}Select`);
+ if(select)value && (select.value=value);
  renderAbilityTable();
  renderSkills();
  renderPoints();
@@ -11043,9 +11063,9 @@ function renderPoints(){
      input.title=enabled?'D特徴P（0～60P）':'D特徴を選択したときに使用します';
    }
    if(rollBtn){
-     rollBtn.disabled=!enabled;
+     rollBtn.disabled=false;
      rollBtn.textContent='🎲';
-     rollBtn.title=enabled?'1d6×10Pをロール':'D特徴を選択したときに使用します';
+     rollBtn.title=enabled?'1d6×10Pをロール':`特徴表${slot}がD特徴（4-x）のときに使用します`;
    }
  }
 }
@@ -13623,6 +13643,93 @@ function persistTaskBoardOrder(board){
  if(!board)return;
  const byId=new Map((appData.taskRecords||[]).map(r=>[r.id,r]));
  board.querySelectorAll('.task-lane-body').forEach(body=>{
+   const lane=taskNormalizeLane(body.dataset.taskLane);
+   [...body.querySelectorAll('.task-kanban-card')].forEach((card,index)=>{
+     const rec=byId.get(card.dataset.taskId);
+     if(!rec)return;
+     rec.lane=lane;
+     rec.order=index;
+     rec.updatedAt=new Date().toISOString();
+   });
+ });
+ saveAppData();
+}
+function bindTaskCardInteractions(editable){
+ const board=$('taskBoard');if(!board)return;
+
+ board.querySelectorAll('[data-task-select]').forEach(box=>{
+   box.onchange=()=>{
+     if(box.checked)taskSelectedIds.add(box.dataset.taskSelect);
+     else taskSelectedIds.delete(box.dataset.taskSelect);
+     box.closest('.task-kanban-card')?.classList.toggle('selected',box.checked);
+     updateTaskSelectionUi();
+   };
+   box.onclick=e=>e.stopPropagation();
+   box.onpointerdown=e=>e.stopPropagation();
+ });
+
+ board.querySelectorAll('[data-task-color-toggle]').forEach(btn=>{
+   btn.draggable=false;
+   btn.onpointerdown=e=>e.stopPropagation();
+   btn.ondragstart=e=>e.preventDefault();
+   btn.onclick=e=>{
+     e.preventDefault();
+     e.stopPropagation();
+     if(!editable)return;
+     const rec=(appData.taskRecords||[]).find(r=>r.id===btn.dataset.taskColorToggle);
+     if(!rec)return;
+     rec.color=rec.color==='green'?'red':'green';
+     rec.updatedAt=new Date().toISOString();
+     saveAppData();
+     renderTaskHub();
+   };
+ });
+
+ board.querySelectorAll('.task-status-toggle').forEach(btn=>{
+   btn.draggable=false;
+   btn.onpointerdown=e=>e.stopPropagation();
+   btn.ondragstart=e=>e.preventDefault();
+   btn.onclick=e=>{
+     e.preventDefault();
+     e.stopPropagation();
+     if(!editable)return;
+     const rec=(appData.taskRecords||[]).find(r=>r.id===btn.dataset.taskId);
+     if(!rec)return;
+     const field=btn.dataset.taskField;
+     if(!['cs','standing','diff','room'].includes(field))return;
+     rec[field]=taskNextStatus(taskNormalizeStatus(rec[field]));
+     rec.updatedAt=new Date().toISOString();
+     saveAppData();
+     renderTaskHub();
+   };
+ });
+
+ board.querySelectorAll('[data-task-memo]').forEach(area=>{
+   area.draggable=false;
+   area.onpointerdown=e=>e.stopPropagation();
+   area.ondragstart=e=>e.preventDefault();
+   area.oninput=()=>{
+     if(!editable)return;
+     const rec=(appData.taskRecords||[]).find(r=>r.id===area.dataset.taskMemo);
+     if(!rec)return;
+     rec.memo=area.value;
+     rec.updatedAt=new Date().toISOString();
+     clearTimeout(taskMemoSaveTimer);
+     taskMemoSaveTimer=setTimeout(()=>saveAppData(),400);
+   };
+ });
+
+ board.querySelectorAll('.task-kanban-card').forEach(card=>{
+   card.ondragstart=e=>{
+     if(!editable||e.target.closest('button,input,textarea,select,label')){e.preventDefault();return}
+     e.dataTransfer.setData('text/task-id',card.dataset.taskId||'');
+     e.dataTransfer.effectAllowed='move';
+     card.classList.add('dragging');
+   };
+   card.ondragend=()=>card.classList.remove('dragging');
+ });
+
+ board.querySelectorAll('.task-lane-body').forEach(body=>{
    body.ondragover=e=>{
      if(!editable)return;
      e.preventDefault();
@@ -13643,6 +13750,7 @@ function persistTaskBoardOrder(board){
      renderTaskHub();
    };
  });
+ updateTaskSelectionUi();
 }
 let editingMemoId='';
 let memoSelectedKpMembers=new Set();
@@ -16254,7 +16362,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.16',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.17',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
