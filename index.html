@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.14</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.16</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8410,6 +8410,185 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
   background:#eef7fb!important;
 }
 
+
+/* v7.12.15 -------------------------------------------------------- */
+/* OTHER > BIRTH: quick entry list for PCs without a valid birthday. */
+.birth-unset-section{
+  margin-top:14px;
+  padding:12px;
+  border:1px solid #d7e0e6;
+  border-radius:9px;
+  background:#f8fafb;
+}
+.birth-unset-head{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:4px;
+}
+.birth-unset-head strong{font-size:13px}
+.birth-unset-head span,
+.birth-unset-note{color:#73818b;font-size:10px}
+.birth-unset-note{margin-bottom:9px}
+.birth-unset-list{display:grid;gap:6px}
+.birth-unset-row{
+  display:grid;
+  grid-template-columns:minmax(160px,1fr) 88px 88px 70px;
+  gap:7px;
+  align-items:center;
+  padding:7px 8px;
+  border:1px solid #e0e6ea;
+  border-radius:7px;
+  background:#fff;
+}
+.birth-unset-name{
+  border:0;
+  background:transparent;
+  color:#2c4657;
+  text-align:left;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+}
+.birth-unset-row label{display:flex;align-items:center;gap:4px;color:#73818b;font-size:10px}
+.birth-unset-row input{
+  width:56px;
+  min-width:0;
+  padding:6px 7px;
+  border:1px solid #cfd9e0;
+  border-radius:6px;
+  background:#fff;
+  font:inherit;
+  font-size:11px;
+}
+.birth-unset-empty{display:flex;gap:10px;align-items:center;color:#73818b;font-size:10px}
+@media(max-width:700px){
+  .birth-unset-row{grid-template-columns:minmax(120px,1fr) 72px 72px;}
+  .birth-unset-row .birth-quick-save{grid-column:1 / -1;justify-self:end}
+  .birth-unset-name{font-size:12px}
+  .birth-unset-row input{font-size:12px;width:48px}
+}
+
+
+/* v7.12.16 -------------------------------------------------------- */
+/* Story > Basic info: base occupation master + dropdown */
+.base-occupation-field{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:7px;
+  align-items:end;
+  margin-bottom:8px;
+}
+.base-occupation-field label{
+  display:grid;
+  gap:4px;
+  font-size:10px;
+  font-weight:800;
+  color:#5f6f79;
+}
+.base-occupation-master{
+  margin-bottom:8px;
+  padding:8px;
+  border:1px solid #d9e2e7;
+  border-radius:8px;
+  background:#f8fafb;
+}
+.base-occupation-master-note{
+  margin-bottom:5px;
+  color:#78858e;
+  font-size:9px;
+}
+.base-occupation-master textarea{
+  width:100%;
+  min-height:120px;
+  resize:vertical;
+  font:inherit;
+  font-size:11px;
+}
+.base-occupation-master-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:5px;
+  margin-top:6px;
+}
+
+/* Taste */
+.taste-roll-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:6px;
+}
+.taste-roll-row strong{
+  font-size:11px;
+}
+
+/* Feature table */
+.feature-roll-stack{
+  display:grid;
+  gap:7px;
+}
+.feature-roll-row{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  gap:6px;
+  align-items:center;
+}
+.feature-roll-btn{
+  width:34px;
+  min-width:34px;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+.feature-select-field{
+  margin:0!important;
+}
+.d-feature-inline{
+  display:grid;
+  grid-template-columns:auto 54px auto 34px;
+  gap:4px;
+  align-items:center;
+  white-space:nowrap;
+}
+.d-feature-inline strong{
+  font-size:9px;
+}
+.d-feature-inline input{
+  width:54px;
+  min-width:54px;
+  text-align:right;
+}
+
+/* YOSO widths: PL a little wider, kana compact */
+.yoso-table .col-pl{
+  width:112px!important;
+  min-width:112px!important;
+  text-align:center;
+}
+.yoso-table .col-kana{
+  width:78px!important;
+  min-width:78px!important;
+  max-width:90px!important;
+  white-space:nowrap!important;
+}
+.yoso-table td.col-kana input{
+  width:72px!important;
+  min-width:64px!important;
+  max-width:78px!important;
+}
+
+@media(max-width:700px){
+  .base-occupation-field{grid-template-columns:1fr}
+  .feature-roll-row{
+    grid-template-columns:34px minmax(0,1fr);
+  }
+  .d-feature-inline{
+    grid-column:2;
+    justify-content:start;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -8531,6 +8710,10 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
             </div>
 
             <div class="chat-palette-box compact">
+              <div class="taste-roll-row">
+                <strong>味覚</strong>
+                <button type="button" class="btn small" id="tasteRollAllBtn">🎲 5種一括ロール</button>
+              </div>
               <div class="taste-grid" aria-label="味覚">
                 <label><span>酸</span><input name="tasteAcid" type="number" min="1" max="100" inputmode="numeric"></label>
                 <label><span>苦</span><input name="tasteBitter" type="number" min="1" max="100" inputmode="numeric"></label>
@@ -8608,16 +8791,26 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
 
           <div class="card feature-card">
             <h3>特徴表</h3>
-            <div class="feature-select-stack">
-              <label class="field"><select name="feature1" id="feature1Select"></select></label>
-              <label class="field"><select name="feature2" id="feature2Select"></select></label>
-            </div>
-            <div class="d-feature-points" id="dFeaturePointsRow">
-              <strong>D特徴P</strong>
-              <div class="d-feature-controls">
-                <input id="dFeaturePointsInput" type="number" min="0" step="10" value="0">
-                <span>P</span>
-                <button type="button" class="btn small" id="dFeatureRollBtn">D特徴なし</button>
+            <div class="feature-select-stack feature-roll-stack">
+              <div class="feature-roll-row">
+                <button type="button" class="btn small feature-roll-btn" id="feature1RollBtn" title="特徴表1をロール">🎲</button>
+                <label class="field feature-select-field"><select name="feature1" id="feature1Select"></select></label>
+                <div class="d-feature-inline">
+                  <strong>D特徴P</strong>
+                  <input id="dFeaturePoints1Input" type="number" min="0" max="60" step="10" value="0">
+                  <span>P</span>
+                  <button type="button" class="btn small" id="dFeaturePoints1RollBtn" title="1d6×10P">🎲</button>
+                </div>
+              </div>
+              <div class="feature-roll-row">
+                <button type="button" class="btn small feature-roll-btn" id="feature2RollBtn" title="特徴表2をロール">🎲</button>
+                <label class="field feature-select-field"><select name="feature2" id="feature2Select"></select></label>
+                <div class="d-feature-inline">
+                  <strong>D特徴P</strong>
+                  <input id="dFeaturePoints2Input" type="number" min="0" max="60" step="10" value="0">
+                  <span>P</span>
+                  <button type="button" class="btn small" id="dFeaturePoints2RollBtn" title="1d6×10P">🎲</button>
+                </div>
               </div>
             </div>
           </div>
@@ -9259,7 +9452,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.14</p>
+    <p class="public-viewer-version">Viewer v7.12.16</p>
   </div>
 </div>
 
@@ -9366,7 +9559,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.14';
+const PUBLIC_VIEWER_VERSION='7.12.16';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9380,10 +9573,11 @@ function loadAppData(){
      taskRecords:Array.isArray(raw.taskRecords)?raw.taskRecords:[],
      reminderMemo:String(raw.reminderMemo||''),
      memoRecords:Array.isArray(raw.memoRecords)?raw.memoRecords:[],
+     baseOccupationOptions:Array.isArray(raw.baseOccupationOptions)?raw.baseOccupationOptions:[],
      taskRulesVersion:Number(raw.taskRulesVersion||0)
    };
  }catch(_){
-   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],reminderMemo:'',memoRecords:[],taskRulesVersion:0};
+   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],reminderMemo:'',memoRecords:[],baseOccupationOptions:[],taskRulesVersion:0};
  }
 }
 function saveAppData(){
@@ -9400,6 +9594,7 @@ if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
 if(!Array.isArray(appData.links))appData.links=[];
 if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
 if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
+if(!Array.isArray(appData.baseOccupationOptions))appData.baseOccupationOptions=[];
 const STAT_KEYS=['STR','CON','POW','DEX','APP','SIZ','INT','EDU'];
 const STATUS=['新規','継続','継続不可','ロスト'];
 
@@ -9633,9 +9828,9 @@ function skillTemplate(ed){
 }
 function blank(ed){
  return {
-   id:uid(),edition:ed,number:'',name:'',reading:'',status:'新規',occupation:'',age:'',gender:'',birthplace:'',birthday:'',height:'',weight:'',
+   id:uid(),edition:ed,number:'',name:'',reading:'',status:'新規',occupation:'',baseOccupation:'',age:'',gender:'',birthplace:'',birthday:'',height:'',weight:'',
    feature1:'',feature2:'',thumbnail:'',notes:{basic:'',ho:'',setting:''},
-   cc:'#8AA0B6',sanCurrent:0,luck7:0,dFeaturePoints:0,occPointAdjust:0,interestPointAdjust:0,stats:Object.fromEntries(STAT_KEYS.map(k=>[k,0])),
+   cc:'#8AA0B6',sanCurrent:0,luck7:0,dFeaturePoints:0,dFeaturePoints1:0,dFeaturePoints2:0,occPointAdjust:0,interestPointAdjust:0,stats:Object.fromEntries(STAT_KEYS.map(k=>[k,0])),
    statMods:Object.fromEntries(STAT_KEYS.map(k=>[k,0])),
    occFormula:0,skills:skillTemplate(ed),insanities:[],weapons:[],items:[],cash:'',assets:'',spending:'',magic:[],
    backs:{},conditions:'',scenarios:[],
@@ -10050,6 +10245,7 @@ function normalizePublicPayload(payload){
      taskRecords:Array.isArray(payload.appData?.taskRecords)?payload.appData.taskRecords:[],
      reminderMemo:String(payload.appData?.reminderMemo||''),
      memoRecords:Array.isArray(payload.appData?.memoRecords)?payload.appData.memoRecords:[],
+     baseOccupationOptions:Array.isArray(payload.appData?.baseOccupationOptions)?payload.appData.baseOccupationOptions:[],
      taskRulesVersion:Number(payload.appData?.taskRulesVersion||0)
    },
    reportImages:Array.isArray(payload.reportImages)?payload.reportImages:[]
@@ -10124,6 +10320,7 @@ async function startMobileEditor(ownerSecret,viewerSecret){
  if(!Array.isArray(appData.links))appData.links=[];
  if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
  if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
+ if(!Array.isArray(appData.baseOccupationOptions))appData.baseOccupationOptions=[];
 
  publicRemoteMode='mobile-editor';
  document.body.classList.add('public-mobile-editor');
@@ -10417,7 +10614,27 @@ function ensureShape(x){
  x.statMods=x.statMods||{};
  STAT_KEYS.forEach(k=>{x.stats[k]=num(x.stats[k]);x.statMods[k]=num(x.statMods[k])});
  x.feature1=x.feature1||'';x.feature2=x.feature2||'';x.thumbnail=x.thumbnail||'';
- x.dFeaturePoints=num(x.dFeaturePoints);
+ x.baseOccupation=String(x.baseOccupation||'');
+ const legacyDPoints=Math.max(0,num(x.dFeaturePoints));
+ const hadDSlot1=x.dFeaturePoints1!==undefined&&x.dFeaturePoints1!==null&&x.dFeaturePoints1!=='';
+ const hadDSlot2=x.dFeaturePoints2!==undefined&&x.dFeaturePoints2!==null&&x.dFeaturePoints2!=='';
+ x.dFeaturePoints1=hadDSlot1?Math.max(0,num(x.dFeaturePoints1)):0;
+ x.dFeaturePoints2=hadDSlot2?Math.max(0,num(x.dFeaturePoints2)):0;
+ if(!hadDSlot1&&!hadDSlot2&&legacyDPoints>0){
+   const isD1=/^4-/.test(String(x.feature1||''));
+   const isD2=/^4-/.test(String(x.feature2||''));
+   if(isD1&&isD2){
+     x.dFeaturePoints1=Math.min(60,legacyDPoints);
+     x.dFeaturePoints2=Math.min(60,Math.max(0,legacyDPoints-x.dFeaturePoints1));
+   }else if(isD1){
+     x.dFeaturePoints1=Math.min(60,legacyDPoints);
+   }else if(isD2){
+     x.dFeaturePoints2=Math.min(60,legacyDPoints);
+   }
+ }
+ if(!/^4-/.test(String(x.feature1||'')))x.dFeaturePoints1=0;
+ if(!/^4-/.test(String(x.feature2||'')))x.dFeaturePoints2=0;
+ x.dFeaturePoints=x.dFeaturePoints1+x.dFeaturePoints2;
  x.occPointAdjust=num(x.occPointAdjust);
  x.interestPointAdjust=num(x.interestPointAdjust);
  x.taste=x.taste&&typeof x.taste==='object'?x.taste:{};
@@ -10563,7 +10780,9 @@ function syncFormToModel(){
    current.taste[key]=raw===''?'':Math.max(1,Math.min(100,Math.round(Number(raw)||1)));
  }
  current.sanCurrent=num(current.sanCurrent); current.age=f.age.value;
+ syncDFeaturePointsTotal();
  current.occFormula=num(f.occFormula.value);
+ if(f.baseOccupation) current.baseOccupation=f.baseOccupation.value;
  if(f.noteBasic) current.notes.basic=f.noteBasic.value;
  if(f.noteHO) current.notes.ho=f.noteHO.value;
  if(f.noteSetting) current.notes.setting=f.noteSetting.value;
@@ -10739,15 +10958,41 @@ function renderAbilityTable(){
 }
 function refreshAbilityCalculated(){renderAbilityTable();renderHeader();}function dFeatureCount(){
  if(!current||current.edition!=='6')return 0;
- return [...selectedFeatureCodes()].filter(code=>code.startsWith('4-')).length;
+ return [current.feature1,current.feature2].filter(v=>/^4-/.test(String(v||''))).length;
+}
+function isDFeatureSlot(slot){
+ return current?.edition==='6'&&/^4-/.test(String(current?.[`feature${slot}`]||''));
+}
+function syncDFeaturePointsTotal(){
+ if(!current)return;
+ current.dFeaturePoints1=isDFeatureSlot(1)?Math.max(0,Math.min(60,num(current.dFeaturePoints1))):0;
+ current.dFeaturePoints2=isDFeatureSlot(2)?Math.max(0,Math.min(60,num(current.dFeaturePoints2))):0;
+ current.dFeaturePoints=current.dFeaturePoints1+current.dFeaturePoints2;
+}
+function rollDFeaturePointSlot(slot){
+ if(!isDFeatureSlot(slot))return;
+ current[`dFeaturePoints${slot}`]=(Math.floor(Math.random()*6)+1)*10;
+ syncDFeaturePointsTotal();
+ renderPoints();
 }
 function rollDFeaturePoints(){
- const count=dFeatureCount();
- if(!count)return;
- let total=0;
- for(let i=0;i<count;i++)total+=(Math.floor(Math.random()*6)+1)*10;
- current.dFeaturePoints=total;
+ if(isDFeatureSlot(1))rollDFeaturePointSlot(1);
+ if(isDFeatureSlot(2))rollDFeaturePointSlot(2);
+}
+function rollFeatureSlot(slot){
+ if(!current||current.edition!=='6')return;
+ const d6=Math.floor(Math.random()*6)+1;
+ const d10=Math.floor(Math.random()*10)+1;
+ const prefix=`${d6}-${d10}：`;
+ const value=FEATURES6.find(v=>v.startsWith(prefix))||'';
+ current[`feature${slot}`]=value;
+ if(!/^4-/.test(String(value||'')))current[`dFeaturePoints${slot}`]=0;
+ syncDFeaturePointsTotal();
+ renderFeatureSelects();
+ renderAbilityTable();
+ renderSkills();
  renderPoints();
+ renderChatTools();
 }
 function renderPoints(){
  if(!current) return;
@@ -10787,12 +11032,22 @@ function renderPoints(){
  $('occPointBar').classList.toggle('mismatch',usedOcc!==maxOcc);
  $('interestPointBar').classList.toggle('mismatch',usedInt!==maxInt);
 
- const dCount=dFeatureCount();
- $('dFeaturePointsInput').value=Math.max(0,num(current.dFeaturePoints));
- const rollBtn=$('dFeatureRollBtn');
- rollBtn.disabled=dCount===0;
- rollBtn.textContent=dCount>0?`🎲 ${dCount}d6×10`:'D特徴なし';
- rollBtn.title=dCount>0?'D特徴の数だけ1d6×10を振ります':'D特徴を選択した場合にロールできます';
+ syncDFeaturePointsTotal();
+ for(const slot of [1,2]){
+   const enabled=isDFeatureSlot(slot);
+   const input=$(`dFeaturePoints${slot}Input`);
+   const rollBtn=$(`dFeaturePoints${slot}RollBtn`);
+   if(input){
+     input.value=Math.max(0,num(current[`dFeaturePoints${slot}`]));
+     input.disabled=!enabled;
+     input.title=enabled?'D特徴P（0～60P）':'D特徴を選択したときに使用します';
+   }
+   if(rollBtn){
+     rollBtn.disabled=!enabled;
+     rollBtn.textContent='🎲';
+     rollBtn.title=enabled?'1d6×10Pをロール':'D特徴を選択したときに使用します';
+   }
+ }
 }
 function renderSkills(){
  const a=$('skillsArea');
@@ -11256,15 +11511,57 @@ function renderScenarios(){
    body.appendChild(tr);
  });
 }
+function normalizeBaseOccupationOptions(list){
+ return [...new Set((Array.isArray(list)?list:[])
+   .map(v=>String(v||'').trim())
+   .filter(Boolean))];
+}
+function baseOccupationSelectOptions(value){
+ const master=normalizeBaseOccupationOptions(appData.baseOccupationOptions);
+ const currentValue=String(value||'').trim();
+ const values=currentValue&&!master.includes(currentValue)?[currentValue,...master]:master;
+ return '<option value="">未設定</option>'+values.map(v=>`<option value="${esc(v)}" ${v===currentValue?'selected':''}>${esc(v)}</option>`).join('');
+}
 function renderStory(){
  const area=$('storyArea');area.innerHTML='';
  const common=document.createElement('div');
  common.className='settings-story-grid';
  common.innerHTML=`
-   <div class="card settings-basic-card"><h3>基本情報</h3><textarea name="noteBasic">${esc(current.notes.basic||'')}</textarea></div>
+   <div class="card settings-basic-card">
+     <h3>基本情報</h3>
+     <div class="base-occupation-field">
+       <label>ベース職業
+         <select class="control" name="baseOccupation" id="baseOccupationSelect">${baseOccupationSelectOptions(current.baseOccupation)}</select>
+       </label>
+       <button type="button" class="btn small" id="baseOccupationMasterBtn">職業リスト編集</button>
+     </div>
+     <div class="base-occupation-master hidden" id="baseOccupationMasterEditor">
+       <div class="base-occupation-master-note">1行に1職業。ここへ職業一覧を貼り付けて保存できます。</div>
+       <textarea id="baseOccupationMasterText" rows="8" placeholder="例：探偵&#10;医師&#10;大学教授">${esc(normalizeBaseOccupationOptions(appData.baseOccupationOptions).join('\n'))}</textarea>
+       <div class="base-occupation-master-actions">
+         <button type="button" class="btn small" id="baseOccupationMasterCancelBtn">閉じる</button>
+         <button type="button" class="btn small primary" id="baseOccupationMasterSaveBtn">職業リストを保存</button>
+       </div>
+     </div>
+     <textarea name="noteBasic">${esc(current.notes.basic||'')}</textarea>
+   </div>
    <div class="card settings-ho-card"><h3>HO</h3><textarea name="noteHO">${esc(current.notes.ho||'')}</textarea><div class="ho-note">1ページ表示では初期状態で非表示になります。</div></div>
    <div class="card settings-main-card"><h3>設定</h3><textarea name="noteSetting">${esc(current.notes.setting||'')}</textarea></div>`;
  area.appendChild(common);
+
+ const baseSelect=$('baseOccupationSelect');
+ if(baseSelect)baseSelect.onchange=e=>{current.baseOccupation=e.target.value};
+
+ const masterEditor=$('baseOccupationMasterEditor');
+ $('baseOccupationMasterBtn').onclick=()=>masterEditor?.classList.toggle('hidden');
+ $('baseOccupationMasterCancelBtn').onclick=()=>masterEditor?.classList.add('hidden');
+ $('baseOccupationMasterSaveBtn').onclick=()=>{
+   const raw=String($('baseOccupationMasterText')?.value||'');
+   appData.baseOccupationOptions=normalizeBaseOccupationOptions(raw.split(/\r?\n/));
+   saveAppData();
+   renderStory();
+ };
+
  ['noteBasic','noteHO','noteSetting'].forEach(k=>{
    const el=$('editor').elements[k];
    if(el)el.oninput=e=>{
@@ -11345,6 +11642,23 @@ function renderAll(){
  setFormValue('tasteSalty',current.taste?.salty??'');
  if($('profileUpdatedAt'))$('profileUpdatedAt').textContent=`最終更新 ${formatUpdatedAtShort(current.updatedAt||current.createdAt)}`;
  renderFeatureSelects();renderHeader();renderAbilityTable();renderPoints();renderSkills();renderTables();renderStory();renderBackstory();renderList();
+}
+function rollAllTaste(){
+ if(!current)return;
+ current.taste=current.taste&&typeof current.taste==='object'?current.taste:{};
+ const values={
+   acid:Math.floor(Math.random()*100)+1,
+   bitter:Math.floor(Math.random()*100)+1,
+   sweet:Math.floor(Math.random()*100)+1,
+   spicy:Math.floor(Math.random()*100)+1,
+   salty:Math.floor(Math.random()*100)+1
+ };
+ Object.assign(current.taste,values);
+ const map={acid:'tasteAcid',bitter:'tasteBitter',sweet:'tasteSweet',spicy:'tasteSpicy',salty:'tasteSalty'};
+ for(const [key,fieldName] of Object.entries(map)){
+   const field=$('editor')?.elements?.[fieldName];
+   if(field)field.value=values[key];
+ }
 }
 function rollAll(){
  if(STAT_KEYS.some(k=>num(current.stats[k])) && !confirm('現在の能力値を一括ロールで上書きしますか？')) return;
@@ -12757,14 +13071,40 @@ async function openBirthCharacter(id){
  $('hubView').classList.add('hidden');
  renderAll();
 }
+async function saveBirthQuickEntry(characterId,monthValue,dayValue){
+ const month=Number(monthValue),day=Number(dayValue);
+ if(!Number.isInteger(month)||month<1||month>12||!Number.isInteger(day)||day<1||day>31){
+   alert('月・日を正しく入力してください。');
+   return false;
+ }
+ const maxDay=new Date(2024,month,0).getDate();
+ if(day>maxDay){
+   alert(`${month}月${day}日は存在しません。`);
+   return false;
+ }
+ const chars=await birthSourceCharacters();
+ const ch=chars.find(x=>x.id===characterId);
+ if(!ch)return false;
+ ch.birthday=`${month}/${day}`;
+ ch.updatedAt=new Date().toISOString();
+ if(current&&current.id===ch.id){
+   current.birthday=ch.birthday;
+   current.updatedAt=ch.updatedAt;
+   const field=$('editor')?.elements?.birthday;
+   if(field)field.value=ch.birthday;
+ }
+ await put(ensureShape(structuredClone(ch)));
+ return true;
+}
 async function renderBirthCalendar(){
  const wrap=$('birthCalendarWrap');
  if(!wrap)return;
  const chars=await birthSourceCharacters();
  const cells=new Map();
+ const unset=[];
  for(const ch of chars){
    const md=parseBirthdayMonthDay(ch.birthday);
-   if(!md)continue;
+   if(!md){unset.push(ch);continue}
    const key=`${md.month}-${md.day}`;
    if(!cells.has(key))cells.set(key,[]);
    cells.get(key).push(ch);
@@ -12772,6 +13112,7 @@ async function renderBirthCalendar(){
  for(const arr of cells.values()){
    arr.sort((a,b)=>compareText(a.reading||a.name,b.reading||b.name)||compareText(a.name,b.name));
  }
+ unset.sort((a,b)=>compareText(a.reading||a.name,b.reading||b.name)||compareText(a.name,b.name));
  const months=Array.from({length:12},(_,i)=>i+1);
  const rows=Array.from({length:31},(_,i)=>i+1).map(day=>{
    const cellsHtml=months.map(month=>{
@@ -12785,12 +13126,38 @@ async function renderBirthCalendar(){
    }).join('');
    return `<tr><th class="birth-day">${day}</th>${cellsHtml}</tr>`;
  }).join('');
+ const editable=!(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode());
+ const unsetHtml=unset.length?`<section class="birth-unset-section">
+   <div class="birth-unset-head"><strong>誕生日未設定</strong><span>${unset.length}人</span></div>
+   <div class="birth-unset-note">ここで入力すると、探索者本人の「誕生日」に保存され、BIRTH表・個別編集など全体に反映されます。</div>
+   <div class="birth-unset-list">
+     ${unset.map(ch=>`<div class="birth-unset-row" data-birth-id="${esc(ch.id)}">
+       <button type="button" class="birth-unset-name" data-open-id="${esc(ch.id)}">${esc(ch.name||'名前未設定')}</button>
+       <label><input class="birth-quick-month" type="number" min="1" max="12" inputmode="numeric" placeholder="月" ${editable?'':'disabled'}><span>月</span></label>
+       <label><input class="birth-quick-day" type="number" min="1" max="31" inputmode="numeric" placeholder="日" ${editable?'':'disabled'}><span>日</span></label>
+       ${editable?'<button type="button" class="btn small primary birth-quick-save">保存</button>':''}
+     </div>`).join('')}
+   </div>
+ </section>`:`<section class="birth-unset-section birth-unset-empty"><strong>誕生日未設定</strong><span>未設定の探索者はいません。</span></section>`;
  wrap.innerHTML=`<table class="birth-calendar">
    <thead><tr><th class="birth-corner">日＼月</th>${months.map(m=>`<th>${m}月</th>`).join('')}</tr></thead>
    <tbody>${rows}</tbody>
- </table>`;
+ </table>${unsetHtml}`;
  wrap.querySelectorAll('.birth-pc-chip').forEach(btn=>{
    btn.onclick=()=>openBirthCharacter(btn.dataset.id||'');
+ });
+ wrap.querySelectorAll('.birth-unset-name').forEach(btn=>{
+   btn.onclick=()=>openBirthCharacter(btn.dataset.openId||'');
+ });
+ wrap.querySelectorAll('.birth-unset-row').forEach(row=>{
+   const save=async()=>{
+     if(!editable)return;
+     const month=row.querySelector('.birth-quick-month')?.value;
+     const day=row.querySelector('.birth-quick-day')?.value;
+     if(await saveBirthQuickEntry(row.dataset.birthId||'',month,day))await renderBirthCalendar();
+   };
+   row.querySelector('.birth-quick-save')?.addEventListener('click',save);
+   row.querySelectorAll('input').forEach(inp=>inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save()}}));
  });
 }
 
@@ -15887,7 +16254,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.14',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.16',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -16870,10 +17237,20 @@ $('deleteSelectedListBtn').onclick=deleteSelectedCharacters;
 $('deleteAllListBtn').onclick=deleteAllCharacters;
 $('databaseCopyVisibleShareLinksBtn').onclick=copyVisiblePcShareLinks;
 $('databaseDeleteAllBtn').onclick=deleteAllCharacters;
-$('dFeatureRollBtn').onclick=rollDFeaturePoints;
-$('dFeaturePointsInput').oninput=e=>{
+$('feature1RollBtn').onclick=()=>rollFeatureSlot(1);
+$('feature2RollBtn').onclick=()=>rollFeatureSlot(2);
+$('dFeaturePoints1RollBtn').onclick=()=>rollDFeaturePointSlot(1);
+$('dFeaturePoints2RollBtn').onclick=()=>rollDFeaturePointSlot(2);
+$('dFeaturePoints1Input').oninput=e=>{
  if(!current)return;
- current.dFeaturePoints=Math.max(0,num(e.target.value));
+ current.dFeaturePoints1=Math.max(0,Math.min(60,num(e.target.value)));
+ syncDFeaturePointsTotal();
+ renderPoints();
+};
+$('dFeaturePoints2Input').oninput=e=>{
+ if(!current)return;
+ current.dFeaturePoints2=Math.max(0,Math.min(60,num(e.target.value)));
+ syncDFeaturePointsTotal();
  renderPoints();
 };
 $('occPointAdjustInput').oninput=e=>{
@@ -17186,6 +17563,7 @@ $('mobileNew6Btn').onclick=()=>makeNewCharacter('6');
 $('mobileNew7Btn').onclick=()=>makeNewCharacter('7');
 $('new7Btn').onclick=()=>makeNewCharacter('7');
 $('rollBtn').onclick=rollAll;
+$('tasteRollAllBtn').onclick=rollAllTaste;
 $('editor').onsubmit=saveCurrent;
 $('viewBtn').onclick=showViewer;
 $('duplicateBtn').onclick=async()=>{syncFormToModel();const x=structuredClone(current);x.id=uid();x.number=await nextCharacterNumber(x.edition);x.name=(x.name||'探索者')+'（コピー）';x.createdAt=x.updatedAt=new Date().toISOString();if(x.importSource)delete x.importSource;await put(x);current=x;renderAll()};
@@ -17202,8 +17580,8 @@ $('editor').elements.status.onchange=e=>{current.status=e.target.value};
 $('editor').elements.sanCurrent.oninput=e=>{current.sanCurrent=num(e.target.value);renderHeader()};
 $('editor').elements.cc.oninput=e=>{let v=e.target.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v)){current.cc=v;$('editor').elements.ccPicker.value=v;renderHeader();renderStory();renderBackstory();}};
 $('editor').elements.ccPicker.oninput=e=>{current.cc=e.target.value;$('editor').elements.cc.value=e.target.value.toUpperCase();renderHeader();renderStory();renderBackstory()};
-$('feature1Select').onchange=e=>{current.feature1=e.target.value;renderAbilityTable();renderSkills();renderPoints();renderChatTools()};
-$('feature2Select').onchange=e=>{current.feature2=e.target.value;renderAbilityTable();renderSkills();renderPoints();renderChatTools()};
+$('feature1Select').onchange=e=>{current.feature1=e.target.value;if(!/^4-/.test(String(current.feature1||'')))current.dFeaturePoints1=0;syncDFeaturePointsTotal();renderAbilityTable();renderSkills();renderPoints();renderChatTools()};
+$('feature2Select').onchange=e=>{current.feature2=e.target.value;if(!/^4-/.test(String(current.feature2||'')))current.dFeaturePoints2=0;syncDFeaturePointsTotal();renderAbilityTable();renderSkills();renderPoints();renderChatTools()};
 ['occupation','gender','birthplace','birthday','height','weight'].forEach(k=>$('editor').elements[k].oninput=e=>current[k]=e.target.value);
 function setThumbnail(file){
  if(!file||!file.type.startsWith('image/'))return;
