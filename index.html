@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.18</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.19</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8600,6 +8600,83 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
   text-align:center!important;
 }
 
+
+/* v7.12.19 -------------------------------------------------------- */
+/* Individual character image: file picker + clipboard paste. */
+.thumb-box:focus{
+  outline:2px solid rgba(92,130,155,.28);
+  outline-offset:2px;
+}
+.thumb-actions{
+  position:absolute;
+  left:6px;
+  right:6px;
+  bottom:6px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  z-index:3;
+}
+.thumb-actions .thumb-edit,
+.thumb-actions .thumb-paste{
+  position:static!important;
+  width:auto!important;
+  min-width:0!important;
+  padding:5px 4px!important;
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:6px;
+  background:rgba(30,42,52,.78);
+  color:#fff;
+  font-size:9px;
+  cursor:pointer;
+}
+.thumb-paste-status{
+  position:absolute;
+  left:6px;
+  right:6px;
+  bottom:38px;
+  z-index:3;
+  min-height:0;
+  padding:0 4px;
+  color:#fff;
+  background:rgba(25,35,43,.68);
+  border-radius:4px;
+  font-size:8px;
+  line-height:1.35;
+  text-align:center;
+}
+
+/* Mobile Editor: touch-friendly TASK/MEMO ordering and lane movement. */
+.mobile-kanban-move{
+  display:none;
+}
+body.public-mobile-editor .mobile-kanban-move{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:4px;
+  margin-top:7px;
+  padding-top:6px;
+  border-top:1px solid #e2e8ec;
+}
+body.public-mobile-editor .mobile-kanban-move button{
+  min-height:32px;
+  padding:3px;
+  border:1px solid #cfd9df;
+  border-radius:6px;
+  background:#f7fafb;
+  color:#50636f;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+}
+body.public-mobile-editor .mobile-kanban-move button:active{
+  background:#e7f1f6;
+}
+body.public-mobile-editor .task-drag-hint,
+body.public-mobile-editor .memo-drag-hint{
+  opacity:.35;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -8688,11 +8765,15 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
 
         <div class="profile-shell">
           <div class="profile-left">
-            <div class="thumb-box" id="thumbBox">
+            <div class="thumb-box" id="thumbBox" tabindex="0" title="画像ファイルを選択、または画像を貼り付け">
               <img id="thumbImage" class="hidden" alt="探索者サムネイル">
-              <div class="thumb-placeholder" id="thumbPlaceholder">NO IMAGE<br>クリックして画像を設定</div>
-              <button type="button" class="thumb-edit" id="thumbButton">画像を設定</button>
+              <div class="thumb-placeholder" id="thumbPlaceholder">NO IMAGE<br>クリック または Ctrl/⌘+V で画像を設定</div>
+              <div class="thumb-actions">
+                <button type="button" class="thumb-edit" id="thumbButton">画像を設定</button>
+                <button type="button" class="thumb-paste" id="thumbPasteButton">貼り付け</button>
+              </div>
               <input type="file" id="thumbFile" accept="image/*" hidden>
+              <div class="thumb-paste-status" id="thumbPasteStatus"></div>
             </div>
           </div>
 
@@ -9463,7 +9544,7 @@ body.public-mobile-editor .mobile-editor-create-panel .btn{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.18</p>
+    <p class="public-viewer-version">Viewer v7.12.19</p>
   </div>
 </div>
 
@@ -9570,7 +9651,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.18';
+const PUBLIC_VIEWER_VERSION='7.12.19';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -13567,6 +13648,7 @@ function taskStatusButtonHtml(rec,field,label,editable){
 }
 function taskCardHtml(rec,editable){
  const color=rec.color==='green'?'green':'red';
+ const mobileMove=editable&&isMobileEditorMode();
  return `<article class="task-kanban-card task-color-${color}${taskSelectedIds.has(rec.id)?' selected':''}" data-task-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
    <div class="task-card-top">
      ${editable?`<label class="task-select-box" title="選択"><input type="checkbox" data-task-select="${esc(rec.id)}" ${taskSelectedIds.has(rec.id)?'checked':''}><span></span></label>`:''}
@@ -13582,6 +13664,12 @@ function taskCardHtml(rec,editable){
      ${taskStatusButtonHtml(rec,'diff','差分',editable)}
      ${taskStatusButtonHtml(rec,'room','部屋',editable)}
    </div>
+   ${mobileMove?`<div class="mobile-kanban-move" aria-label="TASKを移動">
+     <button type="button" data-task-mobile-move="left" data-task-id="${esc(rec.id)}" title="左の列へ">←</button>
+     <button type="button" data-task-mobile-move="up" data-task-id="${esc(rec.id)}" title="上へ">↑</button>
+     <button type="button" data-task-mobile-move="down" data-task-id="${esc(rec.id)}" title="下へ">↓</button>
+     <button type="button" data-task-mobile-move="right" data-task-id="${esc(rec.id)}" title="右の列へ">→</button>
+   </div>`:''}
  </article>`;
 }
 function renderTaskCalendar(records){
@@ -13654,6 +13742,40 @@ function persistTaskBoardOrder(board){
  });
  saveAppData();
 }
+function normalizeTaskLaneOrders(lane){
+ const rows=(appData.taskRecords||[])
+   .filter(r=>taskNormalizeLane(r.lane)===lane)
+   .sort((a,b)=>(Number(a.order??999999)-Number(b.order??999999))||String(a.date||'').localeCompare(String(b.date||''))||compareText(a.title,b.title));
+ rows.forEach((r,i)=>r.order=i);
+}
+function moveTaskCardMobile(id,direction){
+ const rec=(appData.taskRecords||[]).find(r=>r.id===id);
+ if(!rec)return;
+ const lanes=taskLaneMeta().map(([key])=>key);
+ const lane=taskNormalizeLane(rec.lane);
+ if(direction==='left'||direction==='right'){
+   const idx=lanes.indexOf(lane);
+   const nextIdx=direction==='left'?idx-1:idx+1;
+   if(nextIdx<0||nextIdx>=lanes.length)return;
+   normalizeTaskLaneOrders(lane);
+   const target=lanes[nextIdx];
+   rec.lane=target;
+   rec.order=nextTaskLaneOrder(target);
+   normalizeTaskLaneOrders(lane);
+   normalizeTaskLaneOrders(target);
+ }else{
+   normalizeTaskLaneOrders(lane);
+   const rows=(appData.taskRecords||[]).filter(r=>taskNormalizeLane(r.lane)===lane).sort((a,b)=>Number(a.order)-Number(b.order));
+   const idx=rows.findIndex(r=>r.id===id);
+   const swap=direction==='up'?idx-1:idx+1;
+   if(idx<0||swap<0||swap>=rows.length)return;
+   [rows[idx].order,rows[swap].order]=[rows[swap].order,rows[idx].order];
+   normalizeTaskLaneOrders(lane);
+ }
+ rec.updatedAt=new Date().toISOString();
+ saveAppData();
+ renderTaskHub();
+}
 function bindTaskCardInteractions(editable){
  const board=$('taskBoard');if(!board)return;
 
@@ -13666,6 +13788,17 @@ function bindTaskCardInteractions(editable){
    };
    box.onclick=e=>e.stopPropagation();
    box.onpointerdown=e=>e.stopPropagation();
+ });
+
+ board.querySelectorAll('[data-task-mobile-move]').forEach(btn=>{
+   btn.onclick=e=>{
+     e.preventDefault();
+     e.stopPropagation();
+     if(!editable)return;
+     moveTaskCardMobile(btn.dataset.taskId,btn.dataset.taskMobileMove);
+   };
+   btn.onpointerdown=e=>e.stopPropagation();
+   btn.ondragstart=e=>e.preventDefault();
  });
 
  board.querySelectorAll('[data-task-color-toggle]').forEach(btn=>{
@@ -14044,6 +14177,7 @@ function memoFilteredRecords(){
    .sort((a,b)=>(a.order-b.order)||compareText(a.date||'99999999',b.date||'99999999')||compareText(a.title,b.title));
 }
 function memoCardHtml(rec,editable){
+ const mobileMove=editable&&isMobileEditorMode();
  return `<article class="memo-card${memoSelectedIds.has(rec.id)?' selected':''}" data-memo-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
    <div class="memo-card-top">
      ${editable?`<label class="memo-select-box" title="選択"><input type="checkbox" data-memo-select="${esc(rec.id)}" ${memoSelectedIds.has(rec.id)?'checked':''}><span></span></label>`:''}
@@ -14058,6 +14192,12 @@ function memoCardHtml(rec,editable){
      ${!rec.kpMembers.length&&!rec.plMembers.length?'<span class="memo-member-empty">MEMBER未設定</span>':''}
    </div>
    ${rec.remarks?`<div class="memo-card-remarks">${esc(rec.remarks)}</div>`:'<div class="memo-card-remarks muted">覚書なし</div>'}
+   ${mobileMove?`<div class="mobile-kanban-move" aria-label="MEMOを移動">
+     <button type="button" data-memo-mobile-move="left" data-memo-id="${esc(rec.id)}" title="左の列へ">←</button>
+     <button type="button" data-memo-mobile-move="up" data-memo-id="${esc(rec.id)}" title="上へ">↑</button>
+     <button type="button" data-memo-mobile-move="down" data-memo-id="${esc(rec.id)}" title="下へ">↓</button>
+     <button type="button" data-memo-mobile-move="right" data-memo-id="${esc(rec.id)}" title="右の列へ">→</button>
+   </div>`:''}
  </article>`;
 }
 function refreshMemoMemberFilter(){
@@ -14112,6 +14252,40 @@ function persistMemoBoardOrder(board){
  });
  saveAppData();
 }
+function normalizeMemoLaneOrders(lane){
+ const rows=(appData.memoRecords||[])
+   .filter(r=>memoNormalizeLane(r.lane)===lane)
+   .sort((a,b)=>(Number(a.order??999999)-Number(b.order??999999))||compareText(a.date||'99999999',b.date||'99999999')||compareText(a.title,b.title));
+ rows.forEach((r,i)=>r.order=i);
+}
+function moveMemoCardMobile(id,direction){
+ const rec=(appData.memoRecords||[]).find(r=>r.id===id);
+ if(!rec)return;
+ const lanes=memoLaneMeta().map(([key])=>key);
+ const lane=memoNormalizeLane(rec.lane);
+ if(direction==='left'||direction==='right'){
+   const idx=lanes.indexOf(lane);
+   const nextIdx=direction==='left'?idx-1:idx+1;
+   if(nextIdx<0||nextIdx>=lanes.length)return;
+   normalizeMemoLaneOrders(lane);
+   const target=lanes[nextIdx];
+   rec.lane=target;
+   rec.order=nextMemoLaneOrder(target);
+   normalizeMemoLaneOrders(lane);
+   normalizeMemoLaneOrders(target);
+ }else{
+   normalizeMemoLaneOrders(lane);
+   const rows=(appData.memoRecords||[]).filter(r=>memoNormalizeLane(r.lane)===lane).sort((a,b)=>Number(a.order)-Number(b.order));
+   const idx=rows.findIndex(r=>r.id===id);
+   const swap=direction==='up'?idx-1:idx+1;
+   if(idx<0||swap<0||swap>=rows.length)return;
+   [rows[idx].order,rows[swap].order]=[rows[swap].order,rows[idx].order];
+   normalizeMemoLaneOrders(lane);
+ }
+ rec.updatedAt=new Date().toISOString();
+ saveAppData();
+ renderMemoKanban();
+}
 function bindMemoInteractions(editable){
  const board=$('memoBoard');if(!board)return;
 
@@ -14120,6 +14294,17 @@ function bindMemoInteractions(editable){
      if(!editable)return;
      openMemoEditor(null,btn.dataset.memoAddLane||'later');
    };
+ });
+
+ board.querySelectorAll('[data-memo-mobile-move]').forEach(btn=>{
+   btn.onclick=e=>{
+     e.preventDefault();
+     e.stopPropagation();
+     if(!editable)return;
+     moveMemoCardMobile(btn.dataset.memoId,btn.dataset.memoMobileMove);
+   };
+   btn.onpointerdown=e=>e.stopPropagation();
+   btn.ondragstart=e=>e.preventDefault();
  });
 
  board.querySelectorAll('[data-memo-select]').forEach(box=>{
@@ -16373,7 +16558,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.18',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.19',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -17702,14 +17887,84 @@ $('editor').elements.ccPicker.oninput=e=>{current.cc=e.target.value;$('editor').
 $('feature1Select').onchange=e=>{current.feature1=e.target.value;if(!/^4-/.test(String(current.feature1||'')))current.dFeaturePoints1=0;syncDFeaturePointsTotal();renderAbilityTable();renderSkills();renderPoints();renderChatTools()};
 $('feature2Select').onchange=e=>{current.feature2=e.target.value;if(!/^4-/.test(String(current.feature2||'')))current.dFeaturePoints2=0;syncDFeaturePointsTotal();renderAbilityTable();renderSkills();renderPoints();renderChatTools()};
 ['occupation','gender','birthplace','birthday','height','weight'].forEach(k=>$('editor').elements[k].oninput=e=>current[k]=e.target.value);
+function setThumbnailSource(value){
+ if(!current)return;
+ const src=String(value||'').trim();
+ if(!src)return;
+ current.thumbnail=src;
+ renderHeader();
+ const status=$('thumbPasteStatus');
+ if(status){
+   status.textContent='画像を反映しました。保存ボタンで確定します。';
+   clearTimeout(setThumbnailSource._timer);
+   setThumbnailSource._timer=setTimeout(()=>{if(status)status.textContent=''},2200);
+ }
+}
 function setThumbnail(file){
  if(!file||!file.type.startsWith('image/'))return;
  const reader=new FileReader();
- reader.onload=()=>{current.thumbnail=reader.result;renderHeader()};
+ reader.onload=()=>setThumbnailSource(reader.result);
  reader.readAsDataURL(file);
 }
-$('thumbButton').onclick=()=>$('thumbFile').click();
-$('thumbBox').onclick=e=>{if(e.target.id!=='thumbButton')$('thumbFile').click()};
+function thumbnailFromPasteData(data){
+ if(!data)return false;
+ const items=[...(data.items||[])];
+ const imageItem=items.find(item=>item.kind==='file'&&String(item.type||'').startsWith('image/'));
+ if(imageItem){
+   const file=imageItem.getAsFile();
+   if(file){setThumbnail(file);return true}
+ }
+ const files=[...(data.files||[])];
+ const imageFile=files.find(file=>String(file.type||'').startsWith('image/'));
+ if(imageFile){setThumbnail(imageFile);return true}
+ const textValue=String(data.getData?.('text/plain')||'').trim();
+ if(/^data:image\//i.test(textValue)||/^https?:\/\/\S+$/i.test(textValue)){
+   setThumbnailSource(textValue);
+   return true;
+ }
+ return false;
+}
+async function pasteThumbnailFromClipboard(){
+ if(!current)return;
+ const status=$('thumbPasteStatus');
+ try{
+   if(navigator.clipboard?.read){
+     const items=await navigator.clipboard.read();
+     for(const item of items){
+       const imageType=item.types.find(type=>type.startsWith('image/'));
+       if(imageType){
+         const blob=await item.getType(imageType);
+         setThumbnail(new File([blob],'clipboard-image',{type:imageType}));
+         return;
+       }
+       if(item.types.includes('text/plain')){
+         const blob=await item.getType('text/plain');
+         const value=(await blob.text()).trim();
+         if(/^data:image\//i.test(value)||/^https?:\/\/\S+$/i.test(value)){
+           setThumbnailSource(value);
+           return;
+         }
+       }
+     }
+   }
+   if(status)status.textContent='画像をコピー後、画像枠を選択して Ctrl/⌘+V で貼り付けてください。';
+ }catch(_){
+   if(status)status.textContent='画像枠を選択して Ctrl/⌘+V で貼り付けてください。';
+ }
+}
+$('thumbButton').onclick=e=>{e.stopPropagation();$('thumbFile').click()};
+$('thumbPasteButton').onclick=e=>{e.stopPropagation();pasteThumbnailFromClipboard()};
+$('thumbBox').onclick=e=>{
+ if(e.target.closest('button'))return;
+ $('thumbBox').focus();
+ $('thumbFile').click();
+};
+$('thumbBox').onpaste=e=>{
+ if(thumbnailFromPasteData(e.clipboardData)){
+   e.preventDefault();
+   e.stopPropagation();
+ }
+};
 $('thumbFile').onchange=e=>{const f=e.target.files[0];if(f)setThumbnail(f)};
 
 document.querySelectorAll('.tab-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab-btn,.tab-panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('tab-'+b.dataset.tab).classList.add('active')});
