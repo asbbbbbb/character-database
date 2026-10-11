@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.19</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.20</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8677,6 +8677,77 @@ body.public-mobile-editor .memo-drag-hint{
   opacity:.35;
 }
 
+
+/* v7.12.20 -------------------------------------------------------- */
+/* REMIND > TASK: left-side BUCKET / free-form TODO list. */
+.task-board-v712{
+  grid-template-columns:minmax(220px,1.08fr) repeat(5,minmax(185px,1fr))!important;
+}
+.task-bucket-lane{
+  min-width:0;
+  border:1px solid #d9e0e5;
+  border-radius:11px;
+  overflow:hidden;
+  background:#f6f8fa;
+}
+.task-bucket-head{
+  display:grid;
+  grid-template-columns:auto 1fr auto auto;
+  align-items:center;
+  gap:7px;
+  min-height:46px;
+  padding:8px 10px;
+  border-bottom:1px solid #dce2e7;
+  background:#e7edf2;
+}
+.task-bucket-head strong{font-size:13px}
+.task-bucket-head>b{
+  min-width:22px;height:22px;padding:0 6px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.8);font-size:9px;
+}
+.task-bucket-add{
+  width:25px;height:25px;padding:0;border:1px solid #c9d4db;border-radius:6px;
+  background:#fff;color:#50636f;font-size:15px;font-weight:900;cursor:pointer;
+}
+.task-bucket-body{display:grid;gap:8px;min-height:260px;padding:8px}
+.task-bucket-empty{padding:34px 8px;color:#9aa5ad;text-align:center;font-size:9px}
+.task-bucket-card{
+  padding:9px;
+  border:1px solid #dce3e8;
+  border-left:4px solid #778b99;
+  border-radius:9px;
+  background:#fff;
+  box-shadow:0 1px 3px rgba(34,51,64,.05);
+}
+.task-bucket-card-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:5px;align-items:center}
+.task-bucket-dot{font-size:14px;color:#70838f}
+.task-bucket-title{
+  width:100%;min-width:0;border:0;border-bottom:1px solid #dfe5e9;background:transparent;
+  padding:4px 2px;color:#24323d;font:inherit;font-size:12px;font-weight:900;
+}
+.task-bucket-title:focus{outline:none;border-bottom-color:#7599af}
+.task-bucket-delete{border:0;background:transparent;color:#a26b6b;font-size:14px;cursor:pointer}
+.task-bucket-progress{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin:8px 0 7px}
+.task-bucket-progress button{height:16px;padding:0;border:0;background:transparent;cursor:pointer}
+.task-bucket-progress button span{display:block;width:100%;height:7px;border-radius:999px;background:#e1e7eb}
+.task-bucket-progress button.active span{background:#4aa77b}
+.task-bucket-progress button:nth-child(4).active span,
+.task-bucket-progress button:nth-child(5).active span{background:#2f8e68}
+.task-bucket-progress button:disabled{cursor:default}
+.task-bucket-memo{
+  width:100%;min-height:45px;max-height:100px;resize:vertical;
+  padding:6px 7px;border:1px solid #d7dfe5;border-radius:6px;
+  font:inherit;font-size:10px;line-height:1.4;
+}
+@media(max-width:1180px){
+  .task-board-v712{grid-template-columns:245px repeat(5,235px)!important;overflow-x:auto!important}
+}
+@media(max-width:700px){
+  .task-board-v712{grid-template-columns:minmax(250px,84vw) repeat(5,minmax(250px,84vw))!important}
+  .task-bucket-lane,.task-lane{scroll-snap-align:start}
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -9544,7 +9615,7 @@ body.public-mobile-editor .memo-drag-hint{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.19</p>
+    <p class="public-viewer-version">Viewer v7.12.20</p>
   </div>
 </div>
 
@@ -9651,7 +9722,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.19';
+const PUBLIC_VIEWER_VERSION='7.12.20';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9663,13 +9734,14 @@ function loadAppData(){
      reportHiddenKeys:Array.isArray(raw.reportHiddenKeys)?raw.reportHiddenKeys:[],
      links:Array.isArray(raw.links)?raw.links:[],
      taskRecords:Array.isArray(raw.taskRecords)?raw.taskRecords:[],
+     bucketTasks:Array.isArray(raw.bucketTasks)?raw.bucketTasks:[],
      reminderMemo:String(raw.reminderMemo||''),
      memoRecords:Array.isArray(raw.memoRecords)?raw.memoRecords:[],
      baseOccupationOptions:Array.isArray(raw.baseOccupationOptions)?raw.baseOccupationOptions:[],
      taskRulesVersion:Number(raw.taskRulesVersion||0)
    };
  }catch(_){
-   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],reminderMemo:'',memoRecords:[],baseOccupationOptions:[],taskRulesVersion:0};
+   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],bucketTasks:[],reminderMemo:'',memoRecords:[],baseOccupationOptions:[],taskRulesVersion:0};
  }
 }
 function saveAppData(){
@@ -9685,6 +9757,7 @@ let appData=loadAppData();
 if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
 if(!Array.isArray(appData.links))appData.links=[];
 if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
+if(!Array.isArray(appData.bucketTasks))appData.bucketTasks=[];
 if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
 if(!Array.isArray(appData.baseOccupationOptions))appData.baseOccupationOptions=[];
 const STAT_KEYS=['STR','CON','POW','DEX','APP','SIZ','INT','EDU'];
@@ -10335,6 +10408,7 @@ function normalizePublicPayload(payload){
      reportHiddenKeys:Array.isArray(payload.appData?.reportHiddenKeys)?payload.appData.reportHiddenKeys:[],
      links:Array.isArray(payload.appData?.links)?payload.appData.links:[],
      taskRecords:Array.isArray(payload.appData?.taskRecords)?payload.appData.taskRecords:[],
+     bucketTasks:Array.isArray(payload.appData?.bucketTasks)?payload.appData.bucketTasks:[],
      reminderMemo:String(payload.appData?.reminderMemo||''),
      memoRecords:Array.isArray(payload.appData?.memoRecords)?payload.appData.memoRecords:[],
      baseOccupationOptions:Array.isArray(payload.appData?.baseOccupationOptions)?payload.appData.baseOccupationOptions:[],
@@ -10411,6 +10485,7 @@ async function startMobileEditor(ownerSecret,viewerSecret){
  if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
  if(!Array.isArray(appData.links))appData.links=[];
  if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
+ if(!Array.isArray(appData.bucketTasks))appData.bucketTasks=[];
  if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
  if(!Array.isArray(appData.baseOccupationOptions))appData.baseOccupationOptions=[];
 
@@ -13625,6 +13700,97 @@ function rebucketTaskByDate(showMessage=true){
  }
  return {moved,removed};
 }
+function bucketNormalizeRecord(rec={}){
+ return {
+   id:rec.id||uid(),
+   title:String(rec.title||''),
+   progress:Math.max(0,Math.min(5,Math.round(Number(rec.progress)||0))),
+   memo:String(rec.memo||''),
+   order:Number.isFinite(Number(rec.order))?Number(rec.order):999999,
+   createdAt:rec.createdAt||new Date().toISOString(),
+   updatedAt:rec.updatedAt||new Date().toISOString()
+ };
+}
+function bucketRecords(){
+ return (appData.bucketTasks||[]).map(bucketNormalizeRecord)
+   .sort((a,b)=>(a.order-b.order)||String(a.createdAt).localeCompare(String(b.createdAt)));
+}
+function nextBucketOrder(){
+ const values=(appData.bucketTasks||[]).map(r=>Number(r.order)).filter(Number.isFinite);
+ return values.length?Math.max(...values)+1:0;
+}
+function addBucketTask(){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ appData.bucketTasks||(appData.bucketTasks=[]);
+ const rec=bucketNormalizeRecord({title:'',progress:0,memo:'',order:nextBucketOrder()});
+ appData.bucketTasks.push(rec);
+ saveAppData();
+ renderTaskHub();
+ setTimeout(()=>document.querySelector(`[data-bucket-title="${rec.id}"]`)?.focus(),0);
+}
+function deleteBucketTask(id){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const rec=(appData.bucketTasks||[]).find(r=>r.id===id);
+ if(!rec)return;
+ if((rec.title||rec.memo)&&!confirm(`「${rec.title||'このTODO'}」を削除しますか？`))return;
+ appData.bucketTasks=(appData.bucketTasks||[]).filter(r=>r.id!==id);
+ saveAppData();
+ renderTaskHub();
+}
+function renderTaskBucket(editable){
+ const rows=bucketRecords();
+ return `<section class="task-bucket-lane">
+   <div class="task-bucket-head">
+     <span>🪣</span><strong>BUCKET</strong><b>${rows.length}</b>
+     ${editable?'<button type="button" class="task-bucket-add" id="taskBucketAddBtn" title="TODOを追加">＋</button>':''}
+   </div>
+   <div class="task-bucket-body">
+     ${rows.length?rows.map(rec=>`<article class="task-bucket-card" data-bucket-id="${esc(rec.id)}">
+       <div class="task-bucket-card-top">
+         <span class="task-bucket-dot">○</span>
+         <input class="task-bucket-title" data-bucket-title="${esc(rec.id)}" value="${esc(rec.title)}" placeholder="内容" ${editable?'':'readonly'}>
+         ${editable?`<button type="button" class="task-bucket-delete" data-bucket-delete="${esc(rec.id)}" title="削除">×</button>`:''}
+       </div>
+       <div class="task-bucket-progress" aria-label="進捗 5段階">
+         ${[1,2,3,4,5].map(step=>`<button type="button" data-bucket-progress="${esc(rec.id)}" data-progress-step="${step}" class="${rec.progress>=step?'active':''}" ${editable?'':'disabled'} title="進捗 ${step}/5"><span></span></button>`).join('')}
+       </div>
+       <textarea class="task-bucket-memo" data-bucket-memo="${esc(rec.id)}" rows="2" placeholder="メモ" ${editable?'':'readonly'}>${esc(rec.memo)}</textarea>
+     </article>`).join(''):'<div class="task-bucket-empty">＋ からTODOを追加</div>'}
+   </div>
+ </section>`;
+}
+function bindTaskBucketInteractions(editable){
+ const board=$('taskBoard');if(!board)return;
+ $('taskBucketAddBtn')?.addEventListener('click',addBucketTask);
+ board.querySelectorAll('[data-bucket-delete]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();deleteBucketTask(btn.dataset.bucketDelete)});
+ board.querySelectorAll('[data-bucket-title]').forEach(input=>{
+   input.oninput=()=>{
+     if(!editable)return;
+     const rec=(appData.bucketTasks||[]).find(r=>r.id===input.dataset.bucketTitle);if(!rec)return;
+     rec.title=input.value;rec.updatedAt=new Date().toISOString();
+     clearTimeout(bindTaskBucketInteractions._titleTimer);
+     bindTaskBucketInteractions._titleTimer=setTimeout(()=>saveAppData(),350);
+   };
+ });
+ board.querySelectorAll('[data-bucket-memo]').forEach(area=>{
+   area.oninput=()=>{
+     if(!editable)return;
+     const rec=(appData.bucketTasks||[]).find(r=>r.id===area.dataset.bucketMemo);if(!rec)return;
+     rec.memo=area.value;rec.updatedAt=new Date().toISOString();
+     clearTimeout(bindTaskBucketInteractions._memoTimer);
+     bindTaskBucketInteractions._memoTimer=setTimeout(()=>saveAppData(),350);
+   };
+ });
+ board.querySelectorAll('[data-bucket-progress]').forEach(btn=>btn.onclick=()=>{
+   if(!editable)return;
+   const rec=(appData.bucketTasks||[]).find(r=>r.id===btn.dataset.bucketProgress);if(!rec)return;
+   const step=Math.max(1,Math.min(5,Number(btn.dataset.progressStep)||1));
+   rec.progress=rec.progress===step?0:step;
+   rec.updatedAt=new Date().toISOString();
+   saveAppData();
+   renderTaskHub();
+ });
+}
 function taskLaneMeta(){
  return [
    ['today','🔥','TODAY'],
@@ -14398,6 +14564,7 @@ function setReminderTab(tab){
 }
 async function renderTaskHub(){
  if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
+ if(!Array.isArray(appData.bucketTasks))appData.bucketTasks=[];
  const removed=prunePastTaskRecords();
  let migrated=!!removed;
 
@@ -14429,7 +14596,7 @@ async function renderTaskHub(){
  const groups=new Map(taskLaneMeta().map(([key])=>[key,[]]));
  rows.forEach(r=>groups.get(taskNormalizeLane(r.lane)).push(r));
 
- $('taskBoard').innerHTML=taskLaneMeta().map(([key,icon,label])=>{
+ $('taskBoard').innerHTML=renderTaskBucket(editable)+taskLaneMeta().map(([key,icon,label])=>{
    const list=groups.get(key)||[];
    return `<section class="task-lane task-lane-${key}">
      <div class="task-lane-head">
@@ -14441,6 +14608,7 @@ async function renderTaskHub(){
    </section>`;
  }).join('');
 
+ bindTaskBucketInteractions(editable);
  bindTaskCardInteractions(editable);
  updateTaskSelectionUi();
  $('taskImportSessionBtn')?.classList.toggle('hidden',!editable);
@@ -16558,7 +16726,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.19',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.20',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
