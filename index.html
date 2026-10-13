@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.23</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.25</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8905,6 +8905,27 @@ body.public-mobile-editor .memo-drag-hint{
   }
 }
 
+
+/* v7.12.24 -------------------------------------------------------- */
+/* Custom MEMO kanbans do not receive an automatic pin icon. */
+.memo-lane-icon-empty{
+  display:none!important;
+}
+.memo-lane-head:has(.memo-lane-icon-empty){
+  grid-template-columns:minmax(0,1fr) auto auto auto!important;
+}
+
+
+/* v7.12.25 -------------------------------------------------------- */
+/* Custom MEMO kanbans can be deleted. Default kanbans stay protected. */
+.kanban-lane-tools .kanban-lane-delete{
+  color:#a34f57;
+}
+.kanban-lane-tools .kanban-lane-delete:hover{
+  background:#fff0f1;
+  border-color:#e7c5c9;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -9773,7 +9794,7 @@ body.public-mobile-editor .memo-drag-hint{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.23</p>
+    <p class="public-viewer-version">Viewer v7.12.25</p>
   </div>
 </div>
 
@@ -9880,7 +9901,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.23';
+const PUBLIC_VIEWER_VERSION='7.12.25';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -14340,7 +14361,9 @@ function normalizeMemoLaneConfig(){
    const id=String(raw?.id||'').trim();
    if(!id||seen.has(id))continue;
    const fallback=defaults.find(x=>x.id===id);
-   out.push({id,icon:String(raw?.icon||fallback?.icon||'📌'),label:String(raw?.label||fallback?.label||'KANBAN').trim()||'KANBAN'});
+   const rawIcon=String(raw?.icon||'');
+   const icon=fallback?.icon||(rawIcon==='📌'?'':rawIcon);
+   out.push({id,icon,label:String(raw?.label||fallback?.label||'KANBAN').trim()||'KANBAN'});
    seen.add(id);
  }
  for(const lane of defaults){
@@ -14363,7 +14386,7 @@ function addMemoLane(){
  if(label===null)return;
  const clean=String(label).trim();if(!clean)return;
  normalizeMemoLaneConfig();
- appData.memoLanes.push({id:'memo-'+uid(),icon:'📌',label:clean});
+ appData.memoLanes.push({id:'memo-'+uid(),icon:'',label:clean});
  saveAppData();renderMemoKanban();
 }
 function renameMemoLane(id){
@@ -14382,6 +14405,32 @@ function moveMemoLane(id,dir){
  if(j<0||j>=lanes.length)return;
  [lanes[i],lanes[j]]=[lanes[j],lanes[i]];
  appData.memoLanes=lanes;saveAppData();renderMemoKanban();
+}
+function deleteMemoLane(id){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const defaults=new Set(defaultMemoLanes().map(x=>x.id));
+ if(defaults.has(id)){
+   alert('既定カンバンは削除できません。');
+   return;
+ }
+ const lanes=normalizeMemoLaneConfig();
+ const lane=lanes.find(x=>x.id===id);if(!lane)return;
+ const count=(appData.memoRecords||[]).filter(r=>memoNormalizeLane(r.lane)===id).length;
+ const message=count
+   ? `「${lane.label}」を削除しますか？\n中のMEMO ${count}件は LATER へ移動します。`
+   : `「${lane.label}」を削除しますか？`;
+ if(!confirm(message))return;
+
+ let nextOrder=nextMemoLaneOrder('later');
+ for(const rec of appData.memoRecords||[]){
+   if(memoNormalizeLane(rec.lane)!==id)continue;
+   rec.lane='later';
+   rec.order=nextOrder++;
+   rec.updatedAt=new Date().toISOString();
+ }
+ appData.memoLanes=lanes.filter(x=>x.id!==id);
+ saveAppData();
+ renderMemoKanban();
 }
 function refreshMemoLaneSelect(selected=''){
  const sel=$('memoEditLane');if(!sel)return;
@@ -14779,6 +14828,7 @@ function bindMemoInteractions(editable){
 
  board.querySelectorAll('[data-memo-lane-rename]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();renameMemoLane(btn.dataset.memoLaneRename)});
  board.querySelectorAll('[data-memo-lane-move]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();if(!btn.disabled)moveMemoLane(btn.dataset.laneId,btn.dataset.memoLaneMove)});
+ board.querySelectorAll('[data-memo-lane-delete]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();deleteMemoLane(btn.dataset.memoLaneDelete)});
 
  board.querySelectorAll('[data-memo-add-lane]').forEach(btn=>{
    btn.onclick=()=>{
@@ -14863,11 +14913,12 @@ function renderMemoKanban(){
    const list=groups.get(key)||[];
    return `<section class="memo-lane memo-lane-${key}">
      <div class="memo-lane-head">
-       <span>${icon}</span><strong>${esc(label)}</strong><b>${list.length}</b>
+       ${icon?`<span>${esc(icon)}</span>`:'<span class="memo-lane-icon-empty" aria-hidden="true"></span>'}<strong>${esc(label)}</strong><b>${list.length}</b>
        ${editable?`<div class="kanban-lane-tools">
          <button type="button" data-memo-lane-move="left" data-lane-id="${esc(key)}" ${laneIndex===0?'disabled':''} title="カンバンを左へ">←</button>
          <button type="button" data-memo-lane-rename="${esc(key)}" title="カンバン名変更">✎</button>
          <button type="button" data-memo-lane-move="right" data-lane-id="${esc(key)}" ${laneIndex===memoLanes.length-1?'disabled':''} title="カンバンを右へ">→</button>
+         ${defaultMemoLanes().some(x=>x.id===key)?'':`<button type="button" class="kanban-lane-delete" data-memo-lane-delete="${esc(key)}" title="カンバンを削除">×</button>`}
        </div>
        <button type="button" class="memo-lane-add" data-memo-add-lane="${key}" title="${esc(label)}に追加">＋</button>`:''}
      </div>
@@ -17061,7 +17112,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.23',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.25',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
