@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.20</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.23</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8748,6 +8748,163 @@ body.public-mobile-editor .memo-drag-hint{
   .task-bucket-lane,.task-lane{scroll-snap-align:start}
 }
 
+
+/* v7.12.21 -------------------------------------------------------- */
+/* Story: base occupation + rulebook/supplement pair */
+.story-master-pair{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:8px;
+}
+.story-master-item{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:5px;
+  align-items:end;
+}
+.story-master-item label{
+  display:grid;
+  gap:4px;
+  min-width:0;
+  font-size:10px;
+  font-weight:800;
+  color:#5f6f79;
+}
+.story-master-item .control{
+  width:100%;
+  min-width:0;
+}
+.private-setting-memo{
+  flex:0 0 auto;
+  margin-top:9px;
+  padding-top:9px;
+  border-top:1px solid #dde4e9;
+}
+.private-setting-memo-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:5px;
+}
+.private-setting-memo-head strong{
+  font-size:10px;
+}
+.private-setting-memo-head span{
+  color:#8b6267;
+  font-size:8px;
+  font-weight:700;
+}
+.settings-main-card .private-setting-memo textarea{
+  min-height:90px!important;
+  max-height:180px;
+  flex:0 0 auto!important;
+  background:#fff9f5;
+}
+@media(max-width:900px){
+  .story-master-pair{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .story-master-item{grid-template-columns:1fr}
+}
+
+
+/* v7.12.22 -------------------------------------------------------- */
+/* REMIND: editable kanban names/order/additions. BUCKET stays fixed at far left. */
+.task-board-v712{
+  grid-template-columns:minmax(220px,1.08fr) repeat(var(--task-lane-count,5),minmax(185px,1fr))!important;
+  overflow-x:auto!important;
+}
+.memo-board{
+  grid-template-columns:repeat(var(--memo-lane-count,5),minmax(185px,1fr))!important;
+  overflow-x:auto!important;
+}
+.task-lane-head{
+  grid-template-columns:auto minmax(0,1fr) auto auto!important;
+}
+.memo-lane-head{
+  grid-template-columns:auto minmax(0,1fr) auto auto auto!important;
+}
+.kanban-lane-tools{
+  display:flex;
+  align-items:center;
+  gap:2px;
+}
+.kanban-lane-tools button{
+  width:22px;height:22px;min-width:22px;padding:0;
+  border:1px solid rgba(77,101,116,.16);
+  border-radius:5px;background:rgba(255,255,255,.72);
+  color:#526672;font-size:10px;line-height:1;cursor:pointer;
+}
+.kanban-lane-tools button:hover{background:#fff}
+.kanban-lane-tools button:disabled{opacity:.28;cursor:default}
+.lane-add-toolbar{white-space:nowrap}
+@media(max-width:1180px){
+  .task-board-v712{grid-template-columns:245px repeat(var(--task-lane-count,5),235px)!important}
+  .memo-board{grid-template-columns:repeat(var(--memo-lane-count,5),235px)!important}
+}
+@media(max-width:700px){
+  .task-board-v712{grid-template-columns:minmax(250px,84vw) repeat(var(--task-lane-count,5),minmax(250px,84vw))!important}
+  .memo-board{grid-template-columns:repeat(var(--memo-lane-count,5),minmax(250px,84vw))!important}
+  .kanban-lane-tools button{width:28px;height:28px;min-width:28px;font-size:12px}
+}
+
+
+/* v7.12.23 -------------------------------------------------------- */
+/* TASK returns to fixed kanban lanes. BUCKET stays fixed at far left. */
+.task-board-v712{
+  grid-template-columns:minmax(220px,1.08fr) repeat(5,minmax(185px,1fr))!important;
+}
+.task-lane-head{
+  grid-template-columns:auto minmax(0,1fr) auto!important;
+}
+
+/* MEMO top controls: compact horizontal toolbar instead of the oversized empty panel. */
+.memo-toolbar.memo-toolbar-compact{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:flex-end!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  min-height:0!important;
+  margin-bottom:10px!important;
+  padding:8px 10px!important;
+}
+.memo-toolbar.memo-toolbar-compact label{
+  flex:0 0 190px!important;
+  width:190px!important;
+  min-width:160px!important;
+}
+.memo-toolbar.memo-toolbar-compact .memo-selected-count{
+  flex:0 0 auto!important;
+  align-self:center!important;
+  white-space:nowrap!important;
+}
+.memo-toolbar.memo-toolbar-compact .btn{
+  flex:0 0 auto!important;
+  align-self:flex-end!important;
+  min-height:34px!important;
+}
+.memo-toolbar.memo-toolbar-compact #memoDeleteAllBtn{
+  margin:0!important;
+}
+@media(max-width:700px){
+  .memo-toolbar.memo-toolbar-compact{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:end!important;
+  }
+  .memo-toolbar.memo-toolbar-compact label{
+    width:auto!important;
+    min-width:0!important;
+    flex:auto!important;
+  }
+  .memo-toolbar.memo-toolbar-compact .memo-selected-count{
+    align-self:center!important;
+  }
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -9310,6 +9467,7 @@ body.public-mobile-editor .memo-drag-hint{
               <select class="control" id="memoMemberFilter"><option value="">すべて</option></select>
             </label>
             <span class="memo-selected-count" id="memoSelectedCount">0件選択</span>
+            <button type="button" class="btn lane-add-toolbar" id="memoAddLaneBtn">＋ カンバン</button>
             <button type="button" class="btn danger" id="memoDeleteSelectedBtn" disabled>選択削除</button>
             <button type="button" class="btn danger" id="memoDeleteAllBtn">一括削除</button>
           </div>
@@ -9615,7 +9773,7 @@ body.public-mobile-editor .memo-drag-hint{
     <h1>共有キャラクター閲覧ページ</h1>
     <p>このページは共有URLから探索者シートを表示するための閲覧専用ページです。</p>
     <p class="note">キャラクターの共有URLを開いてください。</p>
-    <p class="public-viewer-version">Viewer v7.12.20</p>
+    <p class="public-viewer-version">Viewer v7.12.23</p>
   </div>
 </div>
 
@@ -9722,7 +9880,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.20';
+const PUBLIC_VIEWER_VERSION='7.12.23';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -9735,13 +9893,16 @@ function loadAppData(){
      links:Array.isArray(raw.links)?raw.links:[],
      taskRecords:Array.isArray(raw.taskRecords)?raw.taskRecords:[],
      bucketTasks:Array.isArray(raw.bucketTasks)?raw.bucketTasks:[],
+     taskLanes:Array.isArray(raw.taskLanes)?raw.taskLanes:[],
+     memoLanes:Array.isArray(raw.memoLanes)?raw.memoLanes:[],
      reminderMemo:String(raw.reminderMemo||''),
      memoRecords:Array.isArray(raw.memoRecords)?raw.memoRecords:[],
      baseOccupationOptions:Array.isArray(raw.baseOccupationOptions)?raw.baseOccupationOptions:[],
+     rulebookSupplementOptions:Array.isArray(raw.rulebookSupplementOptions)?raw.rulebookSupplementOptions:[],
      taskRulesVersion:Number(raw.taskRulesVersion||0)
    };
  }catch(_){
-   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],bucketTasks:[],reminderMemo:'',memoRecords:[],baseOccupationOptions:[],taskRulesVersion:0};
+   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],bucketTasks:[],taskLanes:[],memoLanes:[],reminderMemo:'',memoRecords:[],baseOccupationOptions:[],rulebookSupplementOptions:[],taskRulesVersion:0};
  }
 }
 function saveAppData(){
@@ -9758,8 +9919,11 @@ if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
 if(!Array.isArray(appData.links))appData.links=[];
 if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
 if(!Array.isArray(appData.bucketTasks))appData.bucketTasks=[];
+if(!Array.isArray(appData.taskLanes))appData.taskLanes=[];
+if(!Array.isArray(appData.memoLanes))appData.memoLanes=[];
 if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
 if(!Array.isArray(appData.baseOccupationOptions))appData.baseOccupationOptions=[];
+if(!Array.isArray(appData.rulebookSupplementOptions))appData.rulebookSupplementOptions=[];
 const STAT_KEYS=['STR','CON','POW','DEX','APP','SIZ','INT','EDU'];
 const STATUS=['新規','継続','継続不可','ロスト'];
 
@@ -9993,8 +10157,8 @@ function skillTemplate(ed){
 }
 function blank(ed){
  return {
-   id:uid(),edition:ed,number:'',name:'',reading:'',status:'新規',occupation:'',baseOccupation:'',age:'',gender:'',birthplace:'',birthday:'',height:'',weight:'',
-   feature1:'',feature2:'',thumbnail:'',notes:{basic:'',ho:'',setting:''},
+   id:uid(),edition:ed,number:'',name:'',reading:'',status:'新規',occupation:'',baseOccupation:'',rulebookSupplement:'',age:'',gender:'',birthplace:'',birthday:'',height:'',weight:'',
+   feature1:'',feature2:'',thumbnail:'',notes:{basic:'',ho:'',setting:'',private:''},
    cc:'#8AA0B6',sanCurrent:0,luck7:0,dFeaturePoints:0,dFeaturePoints1:0,dFeaturePoints2:0,occPointAdjust:0,interestPointAdjust:0,stats:Object.fromEntries(STAT_KEYS.map(k=>[k,0])),
    statMods:Object.fromEntries(STAT_KEYS.map(k=>[k,0])),
    occFormula:0,skills:skillTemplate(ed),insanities:[],weapons:[],items:[],cash:'',assets:'',spending:'',magic:[],
@@ -10409,9 +10573,12 @@ function normalizePublicPayload(payload){
      links:Array.isArray(payload.appData?.links)?payload.appData.links:[],
      taskRecords:Array.isArray(payload.appData?.taskRecords)?payload.appData.taskRecords:[],
      bucketTasks:Array.isArray(payload.appData?.bucketTasks)?payload.appData.bucketTasks:[],
+     taskLanes:Array.isArray(payload.appData?.taskLanes)?payload.appData.taskLanes:[],
+     memoLanes:Array.isArray(payload.appData?.memoLanes)?payload.appData.memoLanes:[],
      reminderMemo:String(payload.appData?.reminderMemo||''),
      memoRecords:Array.isArray(payload.appData?.memoRecords)?payload.appData.memoRecords:[],
      baseOccupationOptions:Array.isArray(payload.appData?.baseOccupationOptions)?payload.appData.baseOccupationOptions:[],
+     rulebookSupplementOptions:Array.isArray(payload.appData?.rulebookSupplementOptions)?payload.appData.rulebookSupplementOptions:[],
      taskRulesVersion:Number(payload.appData?.taskRulesVersion||0)
    },
    reportImages:Array.isArray(payload.reportImages)?payload.reportImages:[]
@@ -10486,8 +10653,11 @@ async function startMobileEditor(ownerSecret,viewerSecret){
  if(!Array.isArray(appData.links))appData.links=[];
  if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
  if(!Array.isArray(appData.bucketTasks))appData.bucketTasks=[];
+ if(!Array.isArray(appData.taskLanes))appData.taskLanes=[];
+ if(!Array.isArray(appData.memoLanes))appData.memoLanes=[];
  if(!Array.isArray(appData.memoRecords))appData.memoRecords=[];
  if(!Array.isArray(appData.baseOccupationOptions))appData.baseOccupationOptions=[];
+ if(!Array.isArray(appData.rulebookSupplementOptions))appData.rulebookSupplementOptions=[];
 
  publicRemoteMode='mobile-editor';
  document.body.classList.add('public-mobile-editor');
@@ -10580,6 +10750,7 @@ function compactShareThumbnail(src,maxSide=420,quality=.78){
 }
 async function prepareShareCharacter(source){
  const ch=ensureShape(structuredClone(source));
+ if(ch.notes)delete ch.notes.private;
  if(ch.thumbnail?.startsWith('data:image/')){
    ch.thumbnail=await compactShareThumbnail(ch.thumbnail);
  }
@@ -10782,6 +10953,7 @@ function ensureShape(x){
  STAT_KEYS.forEach(k=>{x.stats[k]=num(x.stats[k]);x.statMods[k]=num(x.statMods[k])});
  x.feature1=x.feature1||'';x.feature2=x.feature2||'';x.thumbnail=x.thumbnail||'';
  x.baseOccupation=String(x.baseOccupation||'');
+ x.rulebookSupplement=String(x.rulebookSupplement||'');
  const legacyDPoints=Math.max(0,num(x.dFeaturePoints));
  const hadDSlot1=x.dFeaturePoints1!==undefined&&x.dFeaturePoints1!==null&&x.dFeaturePoints1!=='';
  const hadDSlot2=x.dFeaturePoints2!==undefined&&x.dFeaturePoints2!==null&&x.dFeaturePoints2!=='';
@@ -10820,7 +10992,11 @@ function ensureShape(x){
    x.feature1=normalizeFeature(x.feature1);
    x.feature2=normalizeFeature(x.feature2);
  }
- x.notes=x.notes||{basic:'',ho:'',setting:''};
+ x.notes=x.notes||{basic:'',ho:'',setting:'',private:''};
+ x.notes.basic=String(x.notes.basic||'');
+ x.notes.ho=String(x.notes.ho||'');
+ x.notes.setting=String(x.notes.setting||'');
+ x.notes.private=String(x.notes.private||'');
  if(!x.notes.setting) x.notes.setting=x.conditions||x.backs?.general||'';
  if(x.edition==='6' && x.skills && x.skills['信用']){
    delete x.skills['信用'];
@@ -10950,9 +11126,11 @@ function syncFormToModel(){
  syncDFeaturePointsTotal();
  current.occFormula=num(f.occFormula.value);
  if(f.baseOccupation) current.baseOccupation=f.baseOccupation.value;
+ if(f.rulebookSupplement) current.rulebookSupplement=f.rulebookSupplement.value;
  if(f.noteBasic) current.notes.basic=f.noteBasic.value;
  if(f.noteHO) current.notes.ho=f.noteHO.value;
  if(f.noteSetting) current.notes.setting=f.noteSetting.value;
+ if(f.notePrivate) current.notes.private=f.notePrivate.value;
 }
 function setFormValue(name,value){const e=$('editor').elements[name]; if(e)e.value=value??''}
 
@@ -11698,6 +11876,25 @@ function baseOccupationSelectOptions(value){
  const values=currentValue&&!master.includes(currentValue)?[currentValue,...master]:master;
  return '<option value="">未設定</option>'+values.map(v=>`<option value="${esc(v)}" ${v===currentValue?'selected':''}>${esc(v)}</option>`).join('');
 }
+function normalizeRulebookSupplementOptions(list){
+ return [...new Set((Array.isArray(list)?list:[])
+   .map(v=>String(v||'').trim())
+   .filter(Boolean))];
+}
+function rulebookSupplementSelectOptions(value){
+ const master=normalizeRulebookSupplementOptions(appData.rulebookSupplementOptions);
+ const currentValue=String(value||'').trim();
+ const values=currentValue&&!master.includes(currentValue)?[currentValue,...master]:master;
+ return '<option value="">未設定</option>'+values.map(v=>`<option value="${esc(v)}" ${v===currentValue?'selected':''}>${esc(v)}</option>`).join('');
+}
+function occupationDisplayText(ch=current){
+ const base=String(ch?.baseOccupation||'').trim();
+ const supplement=String(ch?.rulebookSupplement||'').trim();
+ const fallback=String(ch?.occupation||'').trim();
+ const occupation=base||fallback;
+ if(!occupation)return supplement?`(${supplement})`:'';
+ return supplement?`${occupation}(${supplement})`:occupation;
+}
 function renderStory(){
  const area=$('storyArea');area.innerHTML='';
  const common=document.createElement('div');
@@ -11705,12 +11902,21 @@ function renderStory(){
  common.innerHTML=`
    <div class="card settings-basic-card">
      <h3>基本情報</h3>
-     <div class="base-occupation-field">
-       <label>ベース職業
-         <select class="control" name="baseOccupation" id="baseOccupationSelect">${baseOccupationSelectOptions(current.baseOccupation)}</select>
-       </label>
-       <button type="button" class="btn small" id="baseOccupationMasterBtn">職業リスト編集</button>
+     <div class="story-master-pair">
+       <div class="story-master-item">
+         <label>ベース職業
+           <select class="control" name="baseOccupation" id="baseOccupationSelect">${baseOccupationSelectOptions(current.baseOccupation)}</select>
+         </label>
+         <button type="button" class="btn small" id="baseOccupationMasterBtn">職業リスト編集</button>
+       </div>
+       <div class="story-master-item">
+         <label>ルルブ・サプリ
+           <select class="control" name="rulebookSupplement" id="rulebookSupplementSelect">${rulebookSupplementSelectOptions(current.rulebookSupplement)}</select>
+         </label>
+         <button type="button" class="btn small" id="rulebookSupplementMasterBtn">ルルブ・サプリ編集</button>
+       </div>
      </div>
+
      <div class="base-occupation-master hidden" id="baseOccupationMasterEditor">
        <div class="base-occupation-master-note">1行に1職業。ここへ職業一覧を貼り付けて保存できます。</div>
        <textarea id="baseOccupationMasterText" rows="8" placeholder="例：探偵&#10;医師&#10;大学教授">${esc(normalizeBaseOccupationOptions(appData.baseOccupationOptions).join('\n'))}</textarea>
@@ -11719,18 +11925,41 @@ function renderStory(){
          <button type="button" class="btn small primary" id="baseOccupationMasterSaveBtn">職業リストを保存</button>
        </div>
      </div>
+
+     <div class="base-occupation-master hidden" id="rulebookSupplementMasterEditor">
+       <div class="base-occupation-master-note">1行に1冊。ルルブ・サプリの表示名を貼り付けて保存できます。</div>
+       <textarea id="rulebookSupplementMasterText" rows="8" placeholder="例：基本ルルブ&#10;クトゥルフ'25&#10;2015">${esc(normalizeRulebookSupplementOptions(appData.rulebookSupplementOptions).join('\n'))}</textarea>
+       <div class="base-occupation-master-actions">
+         <button type="button" class="btn small" id="rulebookSupplementMasterCancelBtn">閉じる</button>
+         <button type="button" class="btn small primary" id="rulebookSupplementMasterSaveBtn">ルルブ・サプリを保存</button>
+       </div>
+     </div>
+
      <textarea name="noteBasic">${esc(current.notes.basic||'')}</textarea>
    </div>
    <div class="card settings-ho-card"><h3>HO</h3><textarea name="noteHO">${esc(current.notes.ho||'')}</textarea><div class="ho-note">1ページ表示では初期状態で非表示になります。</div></div>
-   <div class="card settings-main-card"><h3>設定</h3><textarea name="noteSetting">${esc(current.notes.setting||'')}</textarea></div>`;
+   <div class="card settings-main-card">
+     <h3>設定</h3>
+     <textarea name="noteSetting">${esc(current.notes.setting||'')}</textarea>
+     <div class="private-setting-memo">
+       <div class="private-setting-memo-head">
+         <strong>非公開メモ</strong>
+         <span>1ページ表示・共有リンクには表示しません</span>
+       </div>
+       <textarea name="notePrivate" rows="5" placeholder="自分用メモ">${esc(current.notes.private||'')}</textarea>
+     </div>
+   </div>`;
  area.appendChild(common);
 
  const baseSelect=$('baseOccupationSelect');
  if(baseSelect)baseSelect.onchange=e=>{current.baseOccupation=e.target.value};
 
- const masterEditor=$('baseOccupationMasterEditor');
- $('baseOccupationMasterBtn').onclick=()=>masterEditor?.classList.toggle('hidden');
- $('baseOccupationMasterCancelBtn').onclick=()=>masterEditor?.classList.add('hidden');
+ const rulebookSelect=$('rulebookSupplementSelect');
+ if(rulebookSelect)rulebookSelect.onchange=e=>{current.rulebookSupplement=e.target.value};
+
+ const baseMasterEditor=$('baseOccupationMasterEditor');
+ $('baseOccupationMasterBtn').onclick=()=>baseMasterEditor?.classList.toggle('hidden');
+ $('baseOccupationMasterCancelBtn').onclick=()=>baseMasterEditor?.classList.add('hidden');
  $('baseOccupationMasterSaveBtn').onclick=()=>{
    const raw=String($('baseOccupationMasterText')?.value||'');
    appData.baseOccupationOptions=normalizeBaseOccupationOptions(raw.split(/\r?\n/));
@@ -11738,12 +11967,23 @@ function renderStory(){
    renderStory();
  };
 
- ['noteBasic','noteHO','noteSetting'].forEach(k=>{
+ const rulebookMasterEditor=$('rulebookSupplementMasterEditor');
+ $('rulebookSupplementMasterBtn').onclick=()=>rulebookMasterEditor?.classList.toggle('hidden');
+ $('rulebookSupplementMasterCancelBtn').onclick=()=>rulebookMasterEditor?.classList.add('hidden');
+ $('rulebookSupplementMasterSaveBtn').onclick=()=>{
+   const raw=String($('rulebookSupplementMasterText')?.value||'');
+   appData.rulebookSupplementOptions=normalizeRulebookSupplementOptions(raw.split(/\r?\n/));
+   saveAppData();
+   renderStory();
+ };
+
+ ['noteBasic','noteHO','noteSetting','notePrivate'].forEach(k=>{
    const el=$('editor').elements[k];
    if(el)el.oninput=e=>{
      if(k==='noteBasic')current.notes.basic=e.target.value;
      if(k==='noteHO')current.notes.ho=e.target.value;
      if(k==='noteSetting')current.notes.setting=e.target.value;
+     if(k==='notePrivate')current.notes.private=e.target.value;
    };
  });
 }
@@ -13595,6 +13835,33 @@ function taskNormalizeStatus(value){
 function taskStatusKind(value){return value==='済'?'done':value==='-'?'none':'pending'}
 function taskNextStatus(value){return value==='未'?'済':value==='済'?'-':'未'}
 function taskRecordKey(rec){return `${rec.role}|${rec.date}|${normalizeSessionDuplicateText(rec.title)}`}
+function defaultTaskLanes(){
+ return [
+   {id:'today',icon:'🔥',label:'TODAY'},
+   {id:'next',icon:'⏳',label:'NEXT'},
+   {id:'backlog',icon:'📦',label:'BACKLOG'},
+   {id:'someday',icon:'💤',label:'SOMEDAY'},
+   {id:'done',icon:'✅',label:'DONE'}
+ ];
+}
+function normalizeTaskLaneConfig(){
+ const defaults=defaultTaskLanes();
+ const source=Array.isArray(appData.taskLanes)?appData.taskLanes:[];
+ const out=[],seen=new Set();
+ for(const raw of source){
+   const id=String(raw?.id||'').trim();
+   if(!id||seen.has(id)||id==='bucket')continue;
+   const fallback=defaults.find(x=>x.id===id);
+   out.push({id,icon:String(raw?.icon||fallback?.icon||'🗂️'),label:String(raw?.label||fallback?.label||'KANBAN').trim()||'KANBAN'});
+   seen.add(id);
+ }
+ for(const lane of defaults){
+   if(seen.has(lane.id))continue;
+   out.push({...lane});seen.add(lane.id);
+ }
+ appData.taskLanes=out;
+ return out;
+}
 function taskNormalizeLane(value){
  return ['today','next','backlog','someday','done'].includes(value)?value:'today';
 }
@@ -14056,17 +14323,71 @@ let memoSelectedKpMembers=new Set();
 let memoSelectedPlMembers=new Set();
 const memoSelectedIds=new Set();
 
-function memoLaneMeta(){
+function defaultMemoLanes(){
  return [
-   ['action','📣','ACTION'],
-   ['wait','⏳','WAIT'],
-   ['later','🗓️','LATER'],
-   ['coord','🤝','COORD'],
-   ['recruit','📢','RECRUIT']
+   {id:'action',icon:'📣',label:'ACTION'},
+   {id:'wait',icon:'⏳',label:'WAIT'},
+   {id:'later',icon:'🗓️',label:'LATER'},
+   {id:'coord',icon:'🤝',label:'COORD'},
+   {id:'recruit',icon:'📢',label:'RECRUIT'}
  ];
 }
+function normalizeMemoLaneConfig(){
+ const defaults=defaultMemoLanes();
+ const source=Array.isArray(appData.memoLanes)?appData.memoLanes:[];
+ const out=[],seen=new Set();
+ for(const raw of source){
+   const id=String(raw?.id||'').trim();
+   if(!id||seen.has(id))continue;
+   const fallback=defaults.find(x=>x.id===id);
+   out.push({id,icon:String(raw?.icon||fallback?.icon||'📌'),label:String(raw?.label||fallback?.label||'KANBAN').trim()||'KANBAN'});
+   seen.add(id);
+ }
+ for(const lane of defaults){
+   if(seen.has(lane.id))continue;
+   out.push({...lane});seen.add(lane.id);
+ }
+ appData.memoLanes=out;
+ return out;
+}
+function memoLaneMeta(){
+ return normalizeMemoLaneConfig().map(x=>[x.id,x.icon,x.label]);
+}
 function memoNormalizeLane(value){
- return ['action','wait','later','coord','recruit'].includes(value)?value:'later';
+ const id=String(value||'');
+ return normalizeMemoLaneConfig().some(x=>x.id===id)?id:'later';
+}
+function addMemoLane(){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const label=prompt('追加するMEMOカンバン名を入力してください。','NEW');
+ if(label===null)return;
+ const clean=String(label).trim();if(!clean)return;
+ normalizeMemoLaneConfig();
+ appData.memoLanes.push({id:'memo-'+uid(),icon:'📌',label:clean});
+ saveAppData();renderMemoKanban();
+}
+function renameMemoLane(id){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const lane=normalizeMemoLaneConfig().find(x=>x.id===id);if(!lane)return;
+ const next=prompt('カンバン名を変更します。',lane.label);
+ if(next===null)return;
+ const clean=String(next).trim();if(!clean)return;
+ lane.label=clean;saveAppData();renderMemoKanban();
+}
+function moveMemoLane(id,dir){
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return;
+ const lanes=normalizeMemoLaneConfig();
+ const i=lanes.findIndex(x=>x.id===id);if(i<0)return;
+ const j=dir==='left'?i-1:i+1;
+ if(j<0||j>=lanes.length)return;
+ [lanes[i],lanes[j]]=[lanes[j],lanes[i]];
+ appData.memoLanes=lanes;saveAppData();renderMemoKanban();
+}
+function refreshMemoLaneSelect(selected=''){
+ const sel=$('memoEditLane');if(!sel)return;
+ const lanes=memoLaneMeta();
+ sel.innerHTML=lanes.map(([id,icon,label])=>`<option value="${esc(id)}">${esc(icon)} ${esc(label)}</option>`).join('');
+ sel.value=memoNormalizeLane(selected||sel.value);
 }
 function memoNormalizeRecord(rec={}){
  const legacyMembers=Array.isArray(rec.members)?rec.members:[];
@@ -14272,6 +14593,7 @@ function openMemoEditor(rec=null,presetLane='later'){
  memoSelectedKpMembers=new Set(r.kpMembers);
  memoSelectedPlMembers=new Set(r.plMembers);
  $('memoEditorTitle').textContent=editingMemoId?'MEMOを編集':'MEMOを追加';
+ refreshMemoLaneSelect(r.lane);
  $('memoEditLane').value=r.lane;
  $('memoEditDate').value=r.date;
  $('memoEditTitle').value=r.title;
@@ -14455,6 +14777,9 @@ function moveMemoCardMobile(id,direction){
 function bindMemoInteractions(editable){
  const board=$('memoBoard');if(!board)return;
 
+ board.querySelectorAll('[data-memo-lane-rename]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();renameMemoLane(btn.dataset.memoLaneRename)});
+ board.querySelectorAll('[data-memo-lane-move]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();if(!btn.disabled)moveMemoLane(btn.dataset.laneId,btn.dataset.memoLaneMove)});
+
  board.querySelectorAll('[data-memo-add-lane]').forEach(btn=>{
    btn.onclick=()=>{
      if(!editable)return;
@@ -14532,12 +14857,19 @@ function renderMemoKanban(){
  const rows=memoFilteredRecords();
  const groups=new Map(memoLaneMeta().map(([key])=>[key,[]]));
  rows.forEach(r=>groups.get(memoNormalizeLane(r.lane)).push(r));
- $('memoBoard').innerHTML=memoLaneMeta().map(([key,icon,label])=>{
+ const memoLanes=memoLaneMeta();
+ $('memoBoard').style.setProperty('--memo-lane-count',memoLanes.length);
+ $('memoBoard').innerHTML=memoLanes.map(([key,icon,label],laneIndex)=>{
    const list=groups.get(key)||[];
    return `<section class="memo-lane memo-lane-${key}">
      <div class="memo-lane-head">
-       <span>${icon}</span><strong>${label}</strong><b>${list.length}</b>
-       ${editable?`<button type="button" class="memo-lane-add" data-memo-add-lane="${key}" title="${label}に追加">＋</button>`:''}
+       <span>${icon}</span><strong>${esc(label)}</strong><b>${list.length}</b>
+       ${editable?`<div class="kanban-lane-tools">
+         <button type="button" data-memo-lane-move="left" data-lane-id="${esc(key)}" ${laneIndex===0?'disabled':''} title="カンバンを左へ">←</button>
+         <button type="button" data-memo-lane-rename="${esc(key)}" title="カンバン名変更">✎</button>
+         <button type="button" data-memo-lane-move="right" data-lane-id="${esc(key)}" ${laneIndex===memoLanes.length-1?'disabled':''} title="カンバンを右へ">→</button>
+       </div>
+       <button type="button" class="memo-lane-add" data-memo-add-lane="${key}" title="${esc(label)}に追加">＋</button>`:''}
      </div>
      <div class="memo-lane-body" data-memo-lane="${key}">
        ${list.length?list.map(r=>memoCardHtml(r,editable)).join(''):'<div class="memo-lane-empty">なし</div>'}
@@ -14548,6 +14880,7 @@ function renderMemoKanban(){
  updateMemoSelectionUi();
  $('memoDeleteSelectedBtn')?.classList.toggle('hidden',!editable);
  $('memoDeleteAllBtn')?.classList.toggle('hidden',!editable);
+ $('memoAddLaneBtn')?.classList.toggle('hidden',!editable);
 }
 function renderReminderMemo(){
  renderMemoKanban();
@@ -14596,11 +14929,13 @@ async function renderTaskHub(){
  const groups=new Map(taskLaneMeta().map(([key])=>[key,[]]));
  rows.forEach(r=>groups.get(taskNormalizeLane(r.lane)).push(r));
 
- $('taskBoard').innerHTML=renderTaskBucket(editable)+taskLaneMeta().map(([key,icon,label])=>{
+ const taskLanes=taskLaneMeta();
+ $('taskBoard').style.setProperty('--task-lane-count',taskLanes.length);
+ $('taskBoard').innerHTML=renderTaskBucket(editable)+taskLanes.map(([key,icon,label])=>{
    const list=groups.get(key)||[];
    return `<section class="task-lane task-lane-${key}">
      <div class="task-lane-head">
-       <span class="task-lane-icon">${icon}</span><strong>${label}</strong><b>${list.length}</b>
+       <span class="task-lane-icon">${icon}</span><strong>${esc(label)}</strong><b>${list.length}</b>
      </div>
      <div class="task-lane-body" data-task-lane="${key}">
        ${list.length?list.map(r=>taskCardHtml(r,editable)).join(''):'<div class="task-lane-empty">なし</div>'}
@@ -16477,7 +16812,7 @@ function showViewer(){
    : `<div class="noimg">NO IMAGE</div>`;
 
  const personal=[
-   ['職業',current.occupation],
+   ['職業',occupationDisplayText(current)],
    ['年齢',current.age],
    ['性別',current.gender],
    ['身長 (m)',current.height],
@@ -16726,7 +17061,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.20',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.23',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -16745,6 +17080,9 @@ function importBackup(file){
          reportHiddenKeys:Array.isArray(j.appData.reportHiddenKeys)?j.appData.reportHiddenKeys:[],
          links:Array.isArray(j.appData.links)?j.appData.links:[],
          taskRecords:Array.isArray(j.appData.taskRecords)?j.appData.taskRecords:[],
+         bucketTasks:Array.isArray(j.appData.bucketTasks)?j.appData.bucketTasks:[],
+         taskLanes:Array.isArray(j.appData.taskLanes)?j.appData.taskLanes:[],
+         memoLanes:Array.isArray(j.appData.memoLanes)?j.appData.memoLanes:[],
          reminderMemo:String(j.appData.reminderMemo||''),
          memoRecords:Array.isArray(j.appData.memoRecords)?j.appData.memoRecords:[],
          taskRulesVersion:Number(j.appData.taskRulesVersion||0)
@@ -17840,6 +18178,7 @@ $('taskRoleFilter').onchange=renderTaskHub;
 $('taskSearchInput').oninput=renderTaskHub;
 $('taskImportSessionBtn').onclick=async()=>{await syncTaskSessionsFromSession(true);await renderTaskHub();};
 $('taskRebucketBtn').onclick=async()=>{rebucketTaskByDate(true);await renderTaskHub();};
+$('memoAddLaneBtn').onclick=addMemoLane;
 $('taskDeleteSelectedBtn').onclick=deleteSelectedTasks;
 $('reminderTaskTabBtn').onclick=()=>setReminderTab('task');
 $('reminderMemoTabBtn').onclick=()=>setReminderTab('memo');
