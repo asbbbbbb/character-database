@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.25</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.26</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -9474,7 +9474,7 @@ body.public-mobile-editor .memo-drag-hint{
             <button type="button" class="btn task-refresh-btn" id="taskRebucketBtn">TASKを更新</button>
             <button type="button" class="btn danger task-selection-delete" id="taskDeleteSelectedBtn" disabled>選択削除</button>
             <span class="task-selected-count" id="taskSelectedCount">0件選択</span>
-            <span class="task-sync-note">SESSIONから追加＝未登録のみ。TASKを更新＝NEXT/BACKLOG/SOMEDAYだけ日付で再配置。TODAY/DONEは触りません。</span>
+            <span class="task-sync-note">SESSIONから追加＝未登録のみ。TASKを更新＝NEXT/BACKLOG/SOMEDAYを日付で再配置し、各カンバン内を日付順に並べ替え。TODAY/DONEの所属は触りません。</span>
           </div>
 
           <div class="task-calendar-strip" id="taskCalendarStrip"></div>
@@ -9901,7 +9901,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.25';
+const PUBLIC_VIEWER_VERSION='7.12.26';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -13968,8 +13968,32 @@ async function syncTaskSessionsFromSession(showMessage=true){
  }
  return added;
 }
+function sortTaskLanesByDate(){
+ let reordered=0;
+ for(const [lane] of taskLaneMeta()){
+   const rows=(appData.taskRecords||[])
+     .filter(r=>taskNormalizeLane(r.lane)===lane)
+     .sort((a,b)=>{
+       const ad=String(a.date||'');
+       const bd=String(b.date||'');
+       if(ad&&bd){
+         const c=ad.localeCompare(bd);
+         if(c)return c;
+       }else if(ad&&!bd)return -1;
+       else if(!ad&&bd)return 1;
+       const ao=Number.isFinite(Number(a.order))?Number(a.order):999999;
+       const bo=Number.isFinite(Number(b.order))?Number(b.order):999999;
+       return (ao-bo)||compareText(a.title||'',b.title||'');
+     });
+   rows.forEach((rec,index)=>{
+     if(Number(rec.order)!==index)reordered++;
+     rec.order=index;
+   });
+ }
+ return reordered;
+}
 function rebucketTaskByDate(showMessage=true){
- if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return {moved:0,removed:0};
+ if(PUBLIC_VIEWER_ONLY&&!isMobileEditorMode())return {moved:0,removed:0,reordered:0};
  const removed=prunePastTaskRecords();
  let moved=0;
  for(const rec of appData.taskRecords||[]){
@@ -13982,11 +14006,12 @@ function rebucketTaskByDate(showMessage=true){
      moved++;
    }
  }
- if(removed||moved)saveAppData();
+ const reordered=sortTaskLanesByDate();
+ if(removed||moved||reordered)saveAppData();
  if(showMessage){
-   alert(`TASKを更新しました。\\n列移動 ${moved}件 / 過去日付の削除 ${removed}件\\nTODAY・DONE・未/済/-・メモは変更していません。`);
+   alert(`TASKを更新しました。\n列移動 ${moved}件 / 過去日付の削除 ${removed}件\n各カンバン内を日付の古い順に並べ替えました。\nTODAY・DONEの所属、未/済/-・メモは変更していません。`);
  }
- return {moved,removed};
+ return {moved,removed,reordered};
 }
 function bucketNormalizeRecord(rec={}){
  return {
@@ -17112,7 +17137,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.25',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.26',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
