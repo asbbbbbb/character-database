@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.26</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.29</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8926,6 +8926,50 @@ body.public-mobile-editor .memo-drag-hint{
   border-color:#e7c5c9;
 }
 
+
+/* v7.12.27 -------------------------------------------------------- */
+/* BUCKET: drag to reorder TODO cards. */
+.task-bucket-card[draggable="true"]{cursor:grab}
+.task-bucket-card.dragging{opacity:.42!important;cursor:grabbing}
+.task-bucket-card-top{grid-template-columns:auto minmax(0,1fr) auto auto!important}
+.task-bucket-drag{
+  color:#96a2aa;
+  font-size:15px;
+  line-height:1;
+  cursor:grab;
+  user-select:none;
+}
+.task-bucket-body:has(.task-bucket-card.dragging){background:#eef7fb}
+
+
+/* v7.12.28 -------------------------------------------------------- */
+/* Settings > Insanity: multiline content with automatic height growth. */
+.insanity-content{
+  width:100%!important;
+  min-width:340px;
+  min-height:34px;
+  padding:6px 7px;
+  line-height:1.45;
+  resize:vertical;
+  overflow:hidden;
+  white-space:pre-wrap;
+  font:inherit;
+}
+#insanityBody td:has(.insanity-content){
+  vertical-align:top;
+}
+.viewer-insanity-content{
+  white-space:pre-wrap;
+}
+
+
+/* v7.12.29 -------------------------------------------------------- */
+/* Settings > Insanity: period is consistently entered/displayed as YYYYMMDD. */
+.insanity-period{
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.02em;
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -9901,7 +9945,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.26';
+const PUBLIC_VIEWER_VERSION='7.12.29';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -11022,7 +11066,7 @@ function ensureShape(x){
  if(x.edition==='6' && x.skills && x.skills['信用']){
    delete x.skills['信用'];
  }
- x.insanities=(x.insanities||[]).map(v=>({completed:!!v.completed,duration:v.duration||'',content:v.content||'',...v}));
+ x.insanities=(x.insanities||[]).map(v=>({...v,completed:!!v.completed,duration:normalizeInsanityDuration(v.duration||''),content:v.content||''}));
  x.weapons=(x.weapons||[]).map(v=>({name:v.name||'',success:v.success||v.skill||'',damage:v.damage||'',range:v.range||'',attacks:v.attacks||'',ammo:v.ammo||'',durability:v.durability||'',other:v.other||v.note||''}));
  x.items=(x.items||[]).map(v=>({name:v.name||'',unitPrice:v.unitPrice||'',qty:v.qty||'',price:v.price||'',note:v.note||''}));
  x.magic=(x.magic||[]).map(v=>({name:v.name||'',pages:v.pages||'',effect:v.effect||v.note||''}));
@@ -11197,7 +11241,7 @@ function chatPaletteText(){
  }
  return lines.join('\r\n');
 }
-function pieceJsonText(){
+function pieceJsonText(externalUrl=''){
  if(!current)return '';
  syncFormToModel();
  const s=currentStats(), d=derived();
@@ -11213,6 +11257,7 @@ function pieceJsonText(){
  const data={
    name:current.name||'名前未設定',
    initiative:num(s.DEX),
+   externalUrl:String(externalUrl||''),
    memo,
    color:pieceColor,
    commands:chatPaletteText(),
@@ -11548,20 +11593,29 @@ function rowDragHandle(){
  return `<span class="row-drag-handle" title="ドラッグして並べ替え" aria-label="ドラッグして並べ替え">☰</span>`;
 }
 
+function autoGrowInsanityContent(el){
+ if(!el)return;
+ el.style.height='auto';
+ el.style.height=Math.max(34,el.scrollHeight)+'px';
+}
+
 function renderTables(){
  $('insanityBody').innerHTML='';
  current.insanities.forEach((x,i)=>{
    const tr=document.createElement('tr');
    tr.innerHTML=`<td class="insanity-done"><div class="drag-cell">${rowDragHandle()}<input type="checkbox" ${x.completed?'checked':''}></div></td>
-     <td><input class="insanity-period" value="${esc(normalizeInsanityDuration(x.duration||''))}"></td>
-     <td><input class="insanity-content" list="insanityOptions" value="${esc(x.content||'')}"></td>
+     <td><input class="insanity-period" inputmode="numeric" maxlength="8" placeholder="YYYYMMDD" value="${esc(normalizeInsanityDuration(x.duration||''))}"></td>
+     <td><textarea class="insanity-content" rows="1" placeholder="内容（Enterで改行）">${esc(x.content||'')}</textarea></td>
      <td class="row-actions"><button type="button" class="btn small danger">×</button></td>`;
    const inputs=tr.querySelectorAll('input');
+   const content=tr.querySelector('.insanity-content');
    inputs[0].onchange=e=>x.completed=e.target.checked;
    inputs[1].oninput=e=>x.duration=e.target.value;
-   inputs[2].oninput=e=>x.content=e.target.value;
+   inputs[1].onblur=e=>{const value=normalizeInsanityDuration(e.target.value);x.duration=value;e.target.value=value};
+   content.oninput=e=>{x.content=e.target.value;autoGrowInsanityContent(e.target)};
    tr.querySelector('button').onclick=()=>{current.insanities.splice(i,1);renderTables()};
    $('insanityBody').appendChild(tr);
+   requestAnimationFrame(()=>autoGrowInsanityContent(content));
  });
 
  $('weaponBody').innerHTML='';
@@ -14058,11 +14112,11 @@ function renderTaskBucket(editable){
      ${editable?'<button type="button" class="task-bucket-add" id="taskBucketAddBtn" title="TODOを追加">＋</button>':''}
    </div>
    <div class="task-bucket-body">
-     ${rows.length?rows.map(rec=>`<article class="task-bucket-card" data-bucket-id="${esc(rec.id)}">
+     ${rows.length?rows.map(rec=>`<article class="task-bucket-card" data-bucket-id="${esc(rec.id)}" draggable="${editable?'true':'false'}">
        <div class="task-bucket-card-top">
          <span class="task-bucket-dot">○</span>
          <input class="task-bucket-title" data-bucket-title="${esc(rec.id)}" value="${esc(rec.title)}" placeholder="内容" ${editable?'':'readonly'}>
-         ${editable?`<button type="button" class="task-bucket-delete" data-bucket-delete="${esc(rec.id)}" title="削除">×</button>`:''}
+         ${editable?`<span class="task-bucket-drag" title="ドラッグして並べ替え">⠿</span><button type="button" class="task-bucket-delete" data-bucket-delete="${esc(rec.id)}" title="削除">×</button>`:''}
        </div>
        <div class="task-bucket-progress" aria-label="進捗 5段階">
          ${[1,2,3,4,5].map(step=>`<button type="button" data-bucket-progress="${esc(rec.id)}" data-progress-step="${step}" class="${rec.progress>=step?'active':''}" ${editable?'':'disabled'} title="進捗 ${step}/5"><span></span></button>`).join('')}
@@ -14071,6 +14125,16 @@ function renderTaskBucket(editable){
      </article>`).join(''):'<div class="task-bucket-empty">＋ からTODOを追加</div>'}
    </div>
  </section>`;
+}
+function persistBucketOrder(body){
+ if(!body)return;
+ const byId=new Map((appData.bucketTasks||[]).map(r=>[r.id,r]));
+ [...body.querySelectorAll('.task-bucket-card')].forEach((card,index)=>{
+   const rec=byId.get(card.dataset.bucketId);if(!rec)return;
+   rec.order=index;
+   rec.updatedAt=new Date().toISOString();
+ });
+ saveAppData();
 }
 function bindTaskBucketInteractions(editable){
  const board=$('taskBoard');if(!board)return;
@@ -14103,6 +14167,40 @@ function bindTaskBucketInteractions(editable){
    saveAppData();
    renderTaskHub();
  });
+
+ const body=board.querySelector('.task-bucket-body');
+ board.querySelectorAll('.task-bucket-card').forEach(card=>{
+   card.ondragstart=e=>{
+     if(!editable||e.target.closest('input,textarea,button')){e.preventDefault();return}
+     e.dataTransfer.setData('text/bucket-id',card.dataset.bucketId||'');
+     e.dataTransfer.effectAllowed='move';
+     card.classList.add('dragging');
+   };
+   card.ondragend=()=>card.classList.remove('dragging');
+ });
+ if(body){
+   body.ondragover=e=>{
+     if(!editable)return;
+     e.preventDefault();
+     e.dataTransfer.dropEffect='move';
+     const dragging=body.querySelector('.task-bucket-card.dragging');
+     if(!dragging)return;
+     const target=e.target.closest('.task-bucket-card');
+     if(target&&target!==dragging&&target.parentElement===body){
+       const rect=target.getBoundingClientRect();
+       body.insertBefore(dragging,e.clientY<rect.top+rect.height/2?target:target.nextSibling);
+     }else if(!target){
+       body.appendChild(dragging);
+     }
+   };
+   body.ondrop=e=>{
+     if(!editable)return;
+     e.preventDefault();
+     if(!e.dataTransfer.getData('text/bucket-id'))return;
+     persistBucketOrder(body);
+     renderTaskHub();
+   };
+ }
 }
 function taskLaneMeta(){
  return [
@@ -16952,7 +17050,7 @@ function showViewer(){
      .map(([cat,arr])=>skillTableHtml(arr,cat)).join('')}</div>`;
  }
  const insanityRows=current.insanities.map(x=>`<tr>
-   <td>${x.completed?'✓':''}</td><td>${esc(normalizeInsanityDuration(x.duration||''))}</td><td>${esc(x.content||'')}</td>
+   <td>${x.completed?'✓':''}</td><td>${esc(normalizeInsanityDuration(x.duration||''))}</td><td class="viewer-insanity-content">${esc(x.content||'').replace(/\n/g,'<br>')}</td>
  </tr>`);
  const weaponRows=current.weapons.map(x=>`<tr>
    <td>${esc(x.name)}</td><td>${esc(x.success)}</td><td>${esc(x.damage)}</td><td>${esc(x.range)}</td>
@@ -17137,7 +17235,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.26',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.29',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -17460,7 +17558,7 @@ function normalizeInsanityDuration(value){
  const raw=excelClean(value);
  if(!raw)return '';
 
- // Excel/Sheets上で 20250613 が 2.0250613E7 のような指数表記になった場合も戻す。
+ // Excel/Sheets上で 20250613 が 2.0250613E7 のような指数表記になった場合もYYYYMMDDへ戻す。
  const numeric=Number(raw.replace(/,/g,''));
  if(Number.isFinite(numeric)){
    const integer=Math.trunc(numeric);
@@ -17468,22 +17566,17 @@ function normalizeInsanityDuration(value){
    if(digits.length===8){
      const y=digits.slice(0,4),m=digits.slice(4,6),d=digits.slice(6,8);
      const mi=Number(m),di=Number(d);
-     if(Number(y)>=1000&&mi>=1&&mi<=12&&di>=1&&di<=31){
-       return `${y}-${m}-${d}`;
-     }
+     if(Number(y)>=1000&&mi>=1&&mi<=12&&di>=1&&di<=31)return `${y}${m}${d}`;
    }
  }
 
- // 通常の YYYYMMDD 文字列にも対応。
+ // 旧版で保存された YYYY-MM-DD / YYYY/MM/DD も、従来形式 YYYYMMDD に統一。
  const compact=raw.replace(/[^\d]/g,'');
  if(compact.length===8){
    const y=compact.slice(0,4),m=compact.slice(4,6),d=compact.slice(6,8);
    const mi=Number(m),di=Number(d);
-   if(Number(y)>=1000&&mi>=1&&mi<=12&&di>=1&&di<=31){
-     return `${y}-${m}-${d}`;
-   }
+   if(Number(y)>=1000&&mi>=1&&mi<=12&&di>=1&&di<=31)return `${y}${m}${d}`;
  }
-
  return raw;
 }
 function importInsanities(cells,ch){
@@ -18444,7 +18537,17 @@ document.addEventListener('paste',e=>{
 });
 
 $('copyChatPaletteBtn').onclick=()=>{if(current)copyPlainText(chatPaletteText(),'チャットパレットをコピーしました')};
-$('copyPieceJsonBtn').onclick=()=>{if(current){syncFormToModel();copyPlainText(pieceJsonText(),'駒データ(JSON)をコピーしました')}};
+$('copyPieceJsonBtn').onclick=async()=>{
+ if(!current)return;
+ syncFormToModel();
+ let shareUrl='';
+ try{
+   shareUrl=await buildCharacterShareUrl(current);
+ }catch(err){
+   console.warn('駒URL用の共有リンクを作成できませんでした',err);
+ }
+ copyPlainText(pieceJsonText(shareUrl),shareUrl?'駒データ(JSON)をコピーしました（共有URL入り）':'駒データ(JSON)をコピーしました');
+};
 $('new6Btn').onclick=()=>makeNewCharacter('6');
 $('mobileNew6Btn').onclick=()=>makeNewCharacter('6');
 $('mobileNew7Btn').onclick=()=>makeNewCharacter('7');
