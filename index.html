@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.30</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.31</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -6971,11 +6971,51 @@ body.session-fill-dragging{
 .today-grid .report-image-button:not(:has(img)){
   cursor:default;
 }
+.today-date-search{
+  margin-top:34px;
+  padding-top:18px;
+  border-top:1px solid #d9e0e5;
+}
+.today-date-search-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.today-date-search-head h4{
+  margin:0 0 3px;
+  font-size:15px;
+}
+.today-date-search-toolbar{
+  display:grid;
+  grid-template-columns:minmax(170px,240px) auto auto;
+  gap:7px;
+  align-items:center;
+  justify-content:start;
+  margin-bottom:12px;
+}
+.today-date-results{
+  min-height:92px;
+}
+.today-date-placeholder{
+  grid-column:1 / -1;
+  padding:18px;
+  border:1px dashed #d5dde3;
+  border-radius:9px;
+  color:#7a8790;
+  font-size:10px;
+  background:rgba(255,255,255,.45);
+}
 @media(max-width:700px){
   .today-grid{
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:8px;
   }
+  .today-date-search-toolbar{
+    grid-template-columns:1fr 1fr;
+  }
+  .today-date-search-toolbar input{grid-column:1 / -1}
 }
 
 
@@ -8963,7 +9003,7 @@ body.public-mobile-editor .memo-drag-hint{
 }
 
 
-/* v7.12.30 -------------------------------------------------------- */
+/* v7.12.31 -------------------------------------------------------- */
 /* Settings > Insanity: period is consistently entered/displayed as YYYYMMDD. */
 .insanity-period{
   font-variant-numeric:tabular-nums;
@@ -8972,7 +9012,7 @@ body.public-mobile-editor .memo-drag-hint{
 
 
 
-/* v7.12.30 Mobile Editor desktop mode ----------------------------- */
+/* v7.12.31 Mobile Editor desktop mode ----------------------------- */
 /* Keep remote editing/sync, but use the normal PC layout at >=1181px. */
 body.public-mobile-editor-desktop .mobile-editor-sync-status{
   display:block;
@@ -9714,6 +9754,24 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
             <div class="today-count" id="todayCount">0件</div>
           </div>
           <div class="today-grid" id="todayGrid"></div>
+
+          <div class="today-date-search">
+            <div class="today-date-search-head">
+              <div>
+                <h4>日付で調べる</h4>
+                <div class="today-note">指定した日付に遊んだシナリオを表示します。</div>
+              </div>
+              <div class="today-count" id="todayDateCount">—</div>
+            </div>
+            <div class="today-date-search-toolbar">
+              <input class="control" type="date" id="todayDateInput">
+              <button type="button" class="btn primary" id="todayDateSearchBtn">検索</button>
+              <button type="button" class="btn" id="todayDateResetBtn">解除</button>
+            </div>
+            <div class="today-grid today-date-results" id="todayDateGrid">
+              <div class="today-date-placeholder">日付を選んで検索してください。</div>
+            </div>
+          </div>
         </section>
 
         <section class="other-tab-panel hidden" id="otherLinkPanel">
@@ -9995,7 +10053,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.30';
+const PUBLIC_VIEWER_VERSION='7.12.31';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -15696,9 +15754,88 @@ async function collectReportRows(){
                 String(b.no||'').localeCompare(String(a.no||''),undefined,{numeric:true}));
 }
 
+function todayReportCardHtml(r,imageMap,extraClass=''){
+ const img=imageMap.get(r.reportKey)||r.reportImage||'';
+ const imgUrls=reportImageUrls(img);
+ return `<article class="report-card today-card ${extraClass}" data-report-key="${esc(r.reportKey)}">
+   <div class="report-card-top">
+     <span>${esc(r.date||'日付未設定')}</span>
+     <span class="session-edition-badge">${esc(r.edition||'6')}版</span>
+   </div>
+   <div class="report-image-shell">
+     <button type="button" class="report-image-button today-image-button" title="${imgUrls.primary?'画像を拡大':'画像なし'}">
+       ${imgUrls.primary?`<img data-primary="${esc(imgUrls.primary)}" data-fallback="${esc(imgUrls.fallback)}" data-fallback2="${esc(imgUrls.fallback2)}" data-fallback3="${esc(imgUrls.fallback3)}" alt="">`:'<span>NO IMAGE</span>'}
+     </button>
+   </div>
+   <div class="report-title">${esc(r.title||'—')}</div>
+   <div class="report-uchi">${esc(r.uchi||'—')}</div>
+   <div class="report-yoso">${esc(r.yoso||'')}</div>
+ </article>`;
+}
+function bindTodayCards(grid,rows){
+ if(!grid)return;
+ grid.querySelectorAll('.today-image-button img').forEach(img=>{
+   const sources=[img.dataset.primary||'',img.dataset.fallback||'',img.dataset.fallback2||'',img.dataset.fallback3||''].filter(Boolean);
+   let sourceIndex=0;
+   img.onerror=()=>{
+     sourceIndex++;
+     if(sourceIndex<sources.length){img.src=sources[sourceIndex];return;}
+     const btn=img.closest('.today-image-button');
+     if(btn)btn.innerHTML='<span>NO IMAGE</span>';
+   };
+   if(sources.length)img.src=sources[0];
+ });
+ grid.querySelectorAll('.today-card').forEach(card=>{
+   const row=rows.find(r=>r.reportKey===card.dataset.reportKey);
+   const imageBtn=card.querySelector('.today-image-button');
+   if(!imageBtn||!row)return;
+   imageBtn.onclick=()=>{
+     const liveImg=imageBtn.querySelector('img');
+     if(liveImg&&liveImg.complete&&liveImg.naturalWidth>0)openReportLightbox(liveImg,row);
+   };
+ });
+}
+async function renderTodayDateSearch(){
+ const input=$('todayDateInput');
+ const grid=$('todayDateGrid');
+ const count=$('todayDateCount');
+ if(!input||!grid||!count)return;
+ const date=String(input.value||'');
+ if(!date){
+   count.textContent='—';
+   grid.innerHTML='<div class="today-date-placeholder">日付を選んで検索してください。</div>';
+   return;
+ }
+ const allRows=await collectReportRows();
+ const imageRows=await allReportImages();
+ const imageMap=new Map(imageRows.map(x=>[x.id,x.data]));
+ const rows=allRows.filter(r=>String(r.date||'')===date)
+   .sort((a,b)=>compareText(a.title||'',b.title||''));
+ count.textContent=`${rows.length}件`;
+ if(!rows.length){
+   grid.innerHTML=`<div class="today-date-placeholder">${esc(date.replace(/-/g,'/'))} に遊んだシナリオはありません。</div>`;
+   return;
+ }
+ grid.innerHTML=rows.map(r=>todayReportCardHtml(r,imageMap,'today-date-card')).join('');
+ bindTodayCards(grid,rows);
+}
+function setupTodayDateSearch(){
+ const input=$('todayDateInput');
+ const searchBtn=$('todayDateSearchBtn');
+ const resetBtn=$('todayDateResetBtn');
+ if(!input||!searchBtn||!resetBtn)return;
+ searchBtn.onclick=()=>renderTodayDateSearch();
+ input.onchange=()=>renderTodayDateSearch();
+ resetBtn.onclick=()=>{
+   input.value='';
+   renderTodayDateSearch();
+ };
+}
+
 async function renderTodayAnniversary(){
  const grid=$('todayGrid');
  if(!grid)return;
+ setupTodayDateSearch();
 
  const md=todayMonthDay();
  const allRows=await collectReportRows();
@@ -15720,56 +15857,8 @@ async function renderTodayAnniversary(){
    return;
  }
 
- grid.innerHTML=rows.map(r=>{
-   const img=imageMap.get(r.reportKey)||r.reportImage||'';
-   const imgUrls=reportImageUrls(img);
-   return `<article class="report-card today-card" data-report-key="${esc(r.reportKey)}">
-     <div class="report-card-top">
-       <span>${esc(r.date||'日付未設定')}</span>
-       <span class="session-edition-badge">${esc(r.edition||'6')}版</span>
-     </div>
-     <div class="report-image-shell">
-       <button type="button" class="report-image-button today-image-button" title="${imgUrls.primary?'画像を拡大':'画像なし'}">
-         ${imgUrls.primary?`<img data-primary="${esc(imgUrls.primary)}" data-fallback="${esc(imgUrls.fallback)}" data-fallback2="${esc(imgUrls.fallback2)}" data-fallback3="${esc(imgUrls.fallback3)}" alt="">`:'<span>NO IMAGE</span>'}
-       </button>
-     </div>
-     <div class="report-title">${esc(r.title||'—')}</div>
-     <div class="report-uchi">${esc(r.uchi||'—')}</div>
-     <div class="report-yoso">${esc(r.yoso||'')}</div>
-   </article>`;
- }).join('');
-
- grid.querySelectorAll('.today-image-button img').forEach(img=>{
-   const sources=[
-     img.dataset.primary||'',
-     img.dataset.fallback||'',
-     img.dataset.fallback2||'',
-     img.dataset.fallback3||''
-   ].filter(Boolean);
-   let sourceIndex=0;
-   img.onerror=()=>{
-     sourceIndex++;
-     if(sourceIndex<sources.length){
-       img.src=sources[sourceIndex];
-       return;
-     }
-     const btn=img.closest('.today-image-button');
-     if(btn)btn.innerHTML='<span>NO IMAGE</span>';
-   };
-   if(sources.length)img.src=sources[0];
- });
-
- grid.querySelectorAll('.today-card').forEach(card=>{
-   const row=rows.find(r=>r.reportKey===card.dataset.reportKey);
-   const imageBtn=card.querySelector('.today-image-button');
-   if(!imageBtn||!row)return;
-   imageBtn.onclick=()=>{
-     const liveImg=imageBtn.querySelector('img');
-     if(liveImg&&liveImg.complete&&liveImg.naturalWidth>0){
-       openReportLightbox(liveImg,row);
-     }
-   };
- });
+ grid.innerHTML=rows.map(r=>todayReportCardHtml(r,imageMap)).join('');
+ bindTodayCards(grid,rows);
 }
 
 function reportPostText(row){
@@ -15865,28 +15954,8 @@ async function handleReportImagePaste(e){
 
 async function shareReportCard(card,row){
  const text=reportPostText(row);
- const img=card.querySelector('.report-image-button img');
-
- // Best case: native share with the actual image file.
- // On supported phones/tablets this opens the OS share sheet, where X can be chosen.
- if(navigator.share && img){
-   const file=await reportImageToFile(img,row);
-   if(file && (!navigator.canShare || navigator.canShare({files:[file]}))){
-     try{
-       await navigator.share({
-         title:`CoC「${row?.title||''}」`,
-         text,
-         files:[file]
-       });
-       return;
-     }catch(err){
-       if(err?.name==='AbortError')return;
-     }
-   }
- }
-
- // Fallback: open X compose with the text prefilled.
- const xUrl='https://x.com/intent/post?text='+encodeURIComponent(text);
+ // REPORT共有はOSの共有シートを使わず、Xの投稿画面へ直接遷移する。
+ const xUrl='https://twitter.com/intent/tweet?text='+encodeURIComponent(text);
  try{
    const w=window.open(xUrl,'_blank','noopener');
    if(!w)window.location.href=xUrl;
@@ -17292,7 +17361,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.30',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.31',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
