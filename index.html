@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.29</title>
+<title>CHARACTER DATABASE | Shared Viewer v7.12.30</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -8963,11 +8963,61 @@ body.public-mobile-editor .memo-drag-hint{
 }
 
 
-/* v7.12.29 -------------------------------------------------------- */
+/* v7.12.30 -------------------------------------------------------- */
 /* Settings > Insanity: period is consistently entered/displayed as YYYYMMDD. */
 .insanity-period{
   font-variant-numeric:tabular-nums;
   letter-spacing:.02em;
+}
+
+
+
+/* v7.12.30 Mobile Editor desktop mode ----------------------------- */
+/* Keep remote editing/sync, but use the normal PC layout at >=1181px. */
+body.public-mobile-editor-desktop .mobile-editor-sync-status{
+  display:block;
+  flex:0 0 auto;
+  padding:5px 9px;
+  border:1px solid #ced7de;
+  border-radius:999px;
+  background:#fff;
+  color:#687681;
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+}
+body.public-mobile-editor-desktop .mobile-editor-sync-status[data-state="ok"]{color:#37754e}
+body.public-mobile-editor-desktop .mobile-editor-sync-status[data-state="busy"],
+body.public-mobile-editor-desktop .mobile-editor-sync-status[data-state="pending"]{color:#856b2e}
+body.public-mobile-editor-desktop .mobile-editor-sync-status[data-state="error"]{color:#a33c3c}
+/* Public-build-only controls that cannot operate locally stay hidden. */
+body.public-mobile-editor-desktop .header-utilities{display:none!important}
+/* PC LIST still needs the remote-safe new-character buttons. */
+body.public-mobile-editor-desktop .mobile-editor-create-panel.mobile-editor-only{
+  display:grid!important;
+  grid-template-columns:auto auto auto!important;
+  align-items:center!important;
+  justify-content:start!important;
+  gap:8px!important;
+  width:auto!important;
+  max-width:560px!important;
+  margin:0 0 10px!important;
+  padding:8px 10px!important;
+  border:1px solid #d5dee5!important;
+  border-radius:9px!important;
+  background:#fff!important;
+}
+body.public-mobile-editor-desktop .mobile-editor-create-title{
+  grid-column:auto!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  color:#53636f!important;
+  margin-right:2px!important;
+}
+body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
+  min-height:34px!important;
+  padding:7px 11px!important;
+  font-size:11px!important;
 }
 
 </style>
@@ -9945,7 +9995,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.29';
+const PUBLIC_VIEWER_VERSION='7.12.30';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -10032,6 +10082,13 @@ let mobileEditorSyncRunning=false;
 let mobileEditorSyncAgain=false;
 function isMobileEditorMode(){
  return PUBLIC_VIEWER_ONLY&&publicRemoteMode==='mobile-editor'&&!!publicRemoteData;
+}
+
+function applyMobileEditorResponsiveLayout(){
+ if(!(PUBLIC_VIEWER_ONLY&&publicRemoteMode==='mobile-editor'&&publicRemoteData))return;
+ const desktop=window.matchMedia('(min-width:1181px)').matches;
+ document.body.classList.toggle('public-mobile-editor',!desktop);
+ document.body.classList.toggle('public-mobile-editor-desktop',desktop);
 }
 const selectedCharacterIds=new Set();
 
@@ -10725,7 +10782,7 @@ async function startMobileEditor(ownerSecret,viewerSecret){
  if(!Array.isArray(appData.rulebookSupplementOptions))appData.rulebookSupplementOptions=[];
 
  publicRemoteMode='mobile-editor';
- document.body.classList.add('public-mobile-editor');
+ applyMobileEditorResponsiveLayout();
  updateMobileEditorSyncStatus('同期済み','ok');
  await showDatabaseView();
  document.body.classList.remove('public-route-loading');
@@ -17235,7 +17292,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.29',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.30',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -18667,7 +18724,10 @@ document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{
 }
  renderTables();
 });
-window.addEventListener('resize',()=>{if(current&&document.querySelector('.ability-tables'))renderAbilityTable()});
+window.addEventListener('resize',()=>{
+ if(isMobileEditorMode())applyMobileEditorResponsiveLayout();
+ if(current&&document.querySelector('.ability-tables'))renderAbilityTable();
+});
 async function initCharacterDatabase(){
  // Backward-compatible old embedded #share= URL.
  const shared=await tryStartSharedViewer();
