@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE v7.12.33</title>
+<title>CHARACTER DATABASE v7.12.32</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -9003,7 +9003,7 @@ body.public-mobile-editor .memo-drag-hint{
 }
 
 
-/* v7.12.33 -------------------------------------------------------- */
+/* v7.12.32 -------------------------------------------------------- */
 /* Settings > Insanity: period is consistently entered/displayed as YYYYMMDD. */
 .insanity-period{
   font-variant-numeric:tabular-nums;
@@ -9012,7 +9012,7 @@ body.public-mobile-editor .memo-drag-hint{
 
 
 
-/* v7.12.33 Mobile Editor desktop mode ----------------------------- */
+/* v7.12.32 Mobile Editor desktop mode ----------------------------- */
 /* Keep remote editing/sync, but use the normal PC layout at >=1181px. */
 body.public-mobile-editor-desktop .mobile-editor-sync-status{
   display:block;
@@ -10053,7 +10053,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.33';
+const PUBLIC_VIEWER_VERSION='7.12.32';
 const PUBLIC_VIEWER_ONLY=false;
 function loadAppData(){
  try{
@@ -15961,32 +15961,10 @@ async function handleReportImagePaste(e){
  if(!ok)$('reportImageEditorStatus').textContent='画像の貼り付けに失敗しました。';
 }
 
-function reportCardShareUrl(row){
- const cfg=loadOnlineSyncConfig();
- if(!onlineSyncConfigured(cfg)||!row?.reportKey)return '';
- try{
-   const base=normalizeSupabaseUrl(cfg.supabaseUrl);
-   if(!base)return '';
-   const u=new URL(base+'/functions/v1/report-card');
-   u.searchParams.set('dataset',cfg.datasetId);
-   u.searchParams.set('token',cfg.viewerSecret);
-   u.searchParams.set('key',String(row.reportKey));
-   // X側のOGPキャッシュが古い画像を保持しにくいよう、共有ごとにURLだけ更新する。
-   u.searchParams.set('v',Date.now().toString(36));
-   return u.toString();
- }catch(_){
-   return '';
- }
-}
 async function shareReportCard(card,row){
  const text=reportPostText(row);
- const shareUrl=reportCardShareUrl(row);
- if(!shareUrl){
-   alert('REPORTのサムネイル付き共有には、公開同期のSupabase設定と report-card Edge Function が必要です。');
-   return;
- }
- // 画像自体は投稿せず、REPORT固有URLだけをXへ渡す。XはURLのOGP画像をサムネイルとして取得する。
- const xUrl='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(shareUrl);
+ // REPORT共有はOSの共有シートを使わず、Xの投稿画面へ直接遷移する。
+ const xUrl='https://twitter.com/intent/tweet?text='+encodeURIComponent(text);
  try{
    const w=window.open(xUrl,'_blank','noopener');
    if(!w)window.location.href=xUrl;
@@ -17392,7 +17370,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.33',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.32',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
