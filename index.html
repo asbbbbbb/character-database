@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE | Shared Viewer v7.12.31</title>
+<title>CHARACTER DATABASE v7.12.33</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -9003,7 +9003,7 @@ body.public-mobile-editor .memo-drag-hint{
 }
 
 
-/* v7.12.31 -------------------------------------------------------- */
+/* v7.12.33 -------------------------------------------------------- */
 /* Settings > Insanity: period is consistently entered/displayed as YYYYMMDD. */
 .insanity-period{
   font-variant-numeric:tabular-nums;
@@ -9012,7 +9012,7 @@ body.public-mobile-editor .memo-drag-hint{
 
 
 
-/* v7.12.31 Mobile Editor desktop mode ----------------------------- */
+/* v7.12.33 Mobile Editor desktop mode ----------------------------- */
 /* Keep remote editing/sync, but use the normal PC layout at >=1181px. */
 body.public-mobile-editor-desktop .mobile-editor-sync-status{
   display:block;
@@ -9062,7 +9062,7 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
 
 </style>
 </head>
-<body class="public-route-loading">
+<body>
 <header class="app-header">
   <button type="button" class="brand brand-button" id="homeViewBtn" title="通常画面へ戻る"><h1>DATABASE</h1><p>CALL OF CTHULHU INVESTIGATOR ARCHIVE</p></button>
   <nav class="app-nav">
@@ -9759,7 +9759,7 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
             <div class="today-date-search-head">
               <div>
                 <h4>日付で調べる</h4>
-                <div class="today-note">指定した日付に遊んだシナリオを表示します。</div>
+                <div class="today-note">指定した月日と同じ日に遊んだシナリオを、年を問わず表示します。</div>
               </div>
               <div class="today-count" id="todayDateCount">—</div>
             </div>
@@ -10053,8 +10053,8 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.31';
-const PUBLIC_VIEWER_ONLY=true;
+const PUBLIC_VIEWER_VERSION='7.12.33';
+const PUBLIC_VIEWER_ONLY=false;
 function loadAppData(){
  try{
    const raw=JSON.parse(localStorage.getItem(APP_DATA_KEY)||'{}');
@@ -15809,11 +15809,20 @@ async function renderTodayDateSearch(){
  const allRows=await collectReportRows();
  const imageRows=await allReportImages();
  const imageMap=new Map(imageRows.map(x=>[x.id,x.data]));
- const rows=allRows.filter(r=>String(r.date||'')===date)
-   .sort((a,b)=>compareText(a.title||'',b.title||''));
+ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+ if(!m){
+   count.textContent='0件';
+   grid.innerHTML='<div class="today-date-placeholder">日付の形式を確認してください。</div>';
+   return;
+ }
+ const month=m[2], day=m[3];
+ const rows=allRows.filter(r=>{
+   const rm=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(r.date||''));
+   return !!rm&&rm[2]===month&&rm[3]===day;
+ }).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||compareText(a.title||'',b.title||''));
  count.textContent=`${rows.length}件`;
  if(!rows.length){
-   grid.innerHTML=`<div class="today-date-placeholder">${esc(date.replace(/-/g,'/'))} に遊んだシナリオはありません。</div>`;
+   grid.innerHTML=`<div class="today-date-placeholder">${Number(month)}月${Number(day)}日に遊んだシナリオはありません。</div>`;
    return;
  }
  grid.innerHTML=rows.map(r=>todayReportCardHtml(r,imageMap,'today-date-card')).join('');
@@ -15952,10 +15961,32 @@ async function handleReportImagePaste(e){
  if(!ok)$('reportImageEditorStatus').textContent='画像の貼り付けに失敗しました。';
 }
 
+function reportCardShareUrl(row){
+ const cfg=loadOnlineSyncConfig();
+ if(!onlineSyncConfigured(cfg)||!row?.reportKey)return '';
+ try{
+   const base=normalizeSupabaseUrl(cfg.supabaseUrl);
+   if(!base)return '';
+   const u=new URL(base+'/functions/v1/report-card');
+   u.searchParams.set('dataset',cfg.datasetId);
+   u.searchParams.set('token',cfg.viewerSecret);
+   u.searchParams.set('key',String(row.reportKey));
+   // X側のOGPキャッシュが古い画像を保持しにくいよう、共有ごとにURLだけ更新する。
+   u.searchParams.set('v',Date.now().toString(36));
+   return u.toString();
+ }catch(_){
+   return '';
+ }
+}
 async function shareReportCard(card,row){
  const text=reportPostText(row);
- // REPORT共有はOSの共有シートを使わず、Xの投稿画面へ直接遷移する。
- const xUrl='https://twitter.com/intent/tweet?text='+encodeURIComponent(text);
+ const shareUrl=reportCardShareUrl(row);
+ if(!shareUrl){
+   alert('REPORTのサムネイル付き共有には、公開同期のSupabase設定と report-card Edge Function が必要です。');
+   return;
+ }
+ // 画像自体は投稿せず、REPORT固有URLだけをXへ渡す。XはURLのOGP画像をサムネイルとして取得する。
+ const xUrl='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(shareUrl);
  try{
    const w=window.open(xUrl,'_blank','noopener');
    if(!w)window.location.href=xUrl;
@@ -17361,7 +17392,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.31',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.33',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
