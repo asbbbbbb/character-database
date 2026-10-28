@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE v7.12.34</title>
+<title>CHARACTER DATABASE v7.12.35</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -10053,7 +10053,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.34';
+const PUBLIC_VIEWER_VERSION='7.12.35';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -11763,6 +11763,22 @@ function normalizeScenarioDate(value){
  return s;
 }
 
+function sortScenariosByDate(scenarios){
+ if(!Array.isArray(scenarios))return scenarios;
+ scenarios.forEach(sc=>{
+   if(sc)sc.date=normalizeScenarioDate(sc.date||'');
+ });
+ // 日付の古い順。日付がない記録は最後に置く。同日は元の順番を維持。
+ scenarios.sort((a,b)=>{
+   const da=String(a?.date||'');
+   const db=String(b?.date||'');
+   if(da&&!db)return -1;
+   if(!da&&db)return 1;
+   return da.localeCompare(db);
+ });
+ return scenarios;
+}
+
 function normalizeYosoNameKey(value){
  return String(value||'').normalize('NFKC').trim().replace(/\s+/g,' ').toLowerCase();
 }
@@ -11836,6 +11852,7 @@ async function persistCurrentScenarioChanges(){
  if(!current)return;
  syncFormToModel();
  for(const sc of current.scenarios||[])ensureYosoNames(sc.pcs||'');
+ sortScenariosByDate(current.scenarios);
  current.updatedAt=new Date().toISOString();
  await put(structuredClone(current));
  renderHeader();
@@ -11856,6 +11873,7 @@ function scenarioPcChips(value,removable=false){
  return `<div class="scenario-chip-list">${names.map((name,i)=>`<span class="scenario-chip">${esc(name)}${removable?`<button type="button" class="scenario-chip-remove" data-chip-index="${i}" aria-label="${esc(name)}を外す">×</button>`:''}</span>`).join('')}</div>`;
 }
 function renderScenarios(){
+ sortScenariosByDate(current.scenarios);
  const body=$('scenarioBody'); body.innerHTML='';
  const totalEl=$('scenarioTotalCount');
  if(totalEl)totalEl.textContent=`${current.scenarios.length}件`;
@@ -17350,7 +17368,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.34',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.35',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
