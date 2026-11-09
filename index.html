@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE v7.12.37</title>
+<title>CHARACTER DATABASE v7.12.38</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -9061,7 +9061,7 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
 }
 
 
-/* v7.12.37: multiple profile images and Mythos creature ledger refinements */
+/* v7.12.38: Mythos creature autocomplete suggestions */
 .thumb-carousel-controls{display:flex;align-items:center;justify-content:center;gap:12px;padding:5px 0;color:var(--muted);font-size:11px;font-weight:800}
 .thumb-carousel-controls button,.viewer-image-controls button{border:1px solid #cfd8df;border-radius:6px;background:#fff;color:#31404c;min-width:30px;min-height:26px;cursor:pointer}
 .thumb-carousel-controls button:disabled,.viewer-image-controls button:disabled{opacity:.35;cursor:default}
@@ -9076,6 +9076,12 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
 .mythos-encounter-table th,.mythos-encounter-table td{padding:7px 6px;border-bottom:1px solid #e6ebef;text-align:left;vertical-align:middle;font-size:11px}
 .mythos-encounter-table th:nth-child(1){width:42%}.mythos-encounter-table th:nth-child(2){width:48%}.mythos-encounter-table th:nth-child(3){width:10%}
 .mythos-encounter-table select,.mythos-encounter-table input{width:100%;min-width:0;min-height:32px;border:1px solid #d5dde4;border-radius:6px;padding:5px 6px;background:#fff;color:#263542;font:inherit}
+.mythos-creature-autocomplete{position:relative;width:100%;min-width:0}
+.mythos-creature-input{box-sizing:border-box}
+.mythos-creature-suggestions{position:absolute;z-index:90;left:0;right:0;top:calc(100% + 3px);max-height:210px;overflow:auto;padding:3px;border:1px solid #cfd9e0;border-radius:7px;background:#fff;box-shadow:0 8px 24px rgba(38,52,62,.16)}
+.mythos-creature-suggestion{display:block;width:100%;border:0;border-radius:5px;background:transparent;padding:7px 8px;color:#33424d;text-align:left;font:inherit;font-size:11px;cursor:pointer}
+.mythos-creature-suggestion:hover,.mythos-creature-suggestion.active{background:#eef4f7}
+.mythos-creature-suggestion-empty{padding:9px;color:#87939c;font-size:10px;line-height:1.5}
 .mythos-row-delete{border:1px solid #e0c6c6;border-radius:6px;background:#fff;color:#9a5050;min-height:30px;min-width:30px;cursor:pointer}
 .viewer-mythos-summary{margin:0 0 12px;padding:12px 14px;border:1px solid #dbe2e7;border-radius:9px;background:#fff}
 .viewer-mythos-summary h3{margin:0 0 8px;font-size:13px}
@@ -9406,7 +9412,7 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
       <section class="tab-panel" id="tab-scenarios">
         <div class="card mythos-encounter-card">
           <div class="section-head">
-            <div><h3>遭遇した神話生物</h3><div class="note">探索者ごとに記録します。シナリオとの紐付けは任意です。</div></div>
+            <div><h3>遭遇した神話生物</h3><div class="note">探索者ごとに記録します。神話生物名は入力すると候補が絞り込まれます。シナリオとの紐付けは任意です。</div></div>
             <div class="mythos-encounter-actions">
               <button type="button" class="btn small" id="openMythosMasterBtn">神話生物一覧</button>
               <button type="button" class="btn small" id="addMythosEncounterBtn">＋ 遭遇を登録</button>
@@ -10148,7 +10154,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.37';
+const PUBLIC_VIEWER_VERSION='7.12.38';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -12022,23 +12028,74 @@ function renderMythosEncounters(){
  if(!rows.length){body.innerHTML='<tr><td colspan="3" class="mythos-empty">遭遇記録はありません。</td></tr>';return;}
  body.innerHTML=rows.map((enc,i)=>{
    const currentId=String(enc.creatureId||'');
-   const options=catalog.map(r=>`<option value="${esc(r.id)}" ${r.id===currentId?'selected':''}>${esc(r.name)}</option>`).join('');
    const cachedName=String(enc.name||'');
-   const hiddenMatch=mythosCatalog().find(r=>r.id===currentId&&r.active===false);
-   const legacyOption=(!catalog.some(r=>r.id===currentId)&&currentId)?`<option value="${esc(currentId)}" selected>${esc(mythosDisplayName(enc))}（一覧から非表示）</option>`:'';
+   const selectedName=mythosDisplayName(enc);
+   const isHidden=currentId&&mythosCatalog().some(r=>r.id===currentId&&r.active===false);
    const scenarioOptions=scenarios.map(sc=>`<option value="${esc(sc.id)}" ${String(sc.id)===String(enc.scenarioId||'')?'selected':''}>${esc(sc.title||'シナリオ名未入力')}</option>`).join('');
    return `<tr data-mythos-id="${esc(enc.id)}">
-     <td><select class="mythos-creature-select" aria-label="神話生物名"><option value="">選択してください</option>${options}${legacyOption}</select>${(!currentId&&cachedName)?`<div class="note">${esc(cachedName)}</div>`:''}</td>
+     <td><div class="mythos-creature-autocomplete">
+       <input type="text" class="mythos-creature-input" value="${esc(selectedName)}" placeholder="神話生物名を入力して検索" autocomplete="off" aria-label="神話生物名" aria-autocomplete="list" aria-expanded="false">
+       <div class="mythos-creature-suggestions hidden" role="listbox"></div>
+     </div>${isHidden?'<div class="note">一覧から非表示の生物です（過去の記録は保持）</div>':''}${(!currentId&&cachedName)?`<div class="note">${esc(cachedName)}</div>`:''}</td>
      <td><select class="mythos-scenario-select" aria-label="遭遇したシナリオ"><option value="">紐付けなし</option>${scenarioOptions}</select></td>
      <td><button type="button" class="mythos-row-delete" title="遭遇記録を削除" aria-label="遭遇記録を削除">×</button></td>
    </tr>`;
  }).join('');
  body.querySelectorAll('tr[data-mythos-id]').forEach(tr=>{
    const enc=rows.find(x=>x.id===tr.dataset.mythosId);if(!enc)return;
-   tr.querySelector('.mythos-creature-select').onchange=e=>{
-     const rec=mythosCatalog().find(x=>x.id===e.target.value);
-     enc.creatureId=rec?.id||'';enc.name=rec?.name||'';
-     renderMythosEncounters();
+   const creatureInput=tr.querySelector('.mythos-creature-input');
+   const creatureList=tr.querySelector('.mythos-creature-suggestions');
+   let creatureMatches=[];
+   let creatureIndex=-1;
+   const renderCreatureSuggestions=(showAll=false)=>{
+     const query=showAll?'':normalizeMythosName(creatureInput.value);
+     const activeCatalog=mythosCatalog().filter(x=>x.active!==false);
+     creatureMatches=activeCatalog
+       .filter(x=>!query||normalizeMythosName(x.name).includes(query))
+       .sort((a,b)=>{
+         if(!query)return compareText(a.name,b.name);
+         const an=normalizeMythosName(a.name),bn=normalizeMythosName(b.name);
+         const ap=an.startsWith(query)?0:1,bp=bn.startsWith(query)?0:1;
+         return ap-bp||compareText(a.name,b.name);
+       }).slice(0,10);
+     creatureIndex=creatureMatches.length?0:-1;
+     creatureList.innerHTML=creatureMatches.length
+       ?creatureMatches.map((r,idx)=>`<button type="button" class="mythos-creature-suggestion${idx===creatureIndex?' active':''}" data-index="${idx}" role="option" aria-selected="${idx===creatureIndex?'true':'false'}">${esc(r.name)}</button>`).join('')
+       :'<div class="mythos-creature-suggestion-empty">該当する神話生物がありません。OTHER ＞ MYTHOSで一覧に追加できます。</div>';
+     creatureList.classList.remove('hidden');
+     creatureInput.setAttribute('aria-expanded','true');
+     creatureList.querySelectorAll('.mythos-creature-suggestion').forEach(btn=>{
+       btn.onmousedown=e=>e.preventDefault();
+       btn.onclick=()=>selectCreature(creatureMatches[Number(btn.dataset.index)]);
+     });
+   };
+   const selectCreature=rec=>{
+     if(!rec)return;
+     enc.creatureId=rec.id;enc.name=rec.name;
+     creatureInput.value=rec.name;
+     creatureList.classList.add('hidden');
+     creatureInput.setAttribute('aria-expanded','false');
+   };
+   const updateCreatureActive=()=>{
+     creatureList.querySelectorAll('.mythos-creature-suggestion').forEach((btn,idx)=>{
+       const active=idx===creatureIndex;
+       btn.classList.toggle('active',active);
+       btn.setAttribute('aria-selected',active?'true':'false');
+       if(active)btn.scrollIntoView({block:'nearest'});
+     });
+   };
+   creatureInput.onfocus=()=>{creatureInput.select();renderCreatureSuggestions(true);};
+   creatureInput.oninput=()=>renderCreatureSuggestions(false);
+   creatureInput.onblur=()=>setTimeout(()=>{
+     creatureList.classList.add('hidden');
+     creatureInput.setAttribute('aria-expanded','false');
+     creatureInput.value=mythosDisplayName(enc);
+   },140);
+   creatureInput.onkeydown=e=>{
+     if(e.key==='ArrowDown'&&creatureMatches.length){e.preventDefault();creatureIndex=(creatureIndex+1)%creatureMatches.length;updateCreatureActive();return;}
+     if(e.key==='ArrowUp'&&creatureMatches.length){e.preventDefault();creatureIndex=(creatureIndex-1+creatureMatches.length)%creatureMatches.length;updateCreatureActive();return;}
+     if(e.key==='Escape'){creatureList.classList.add('hidden');creatureInput.setAttribute('aria-expanded','false');creatureInput.value=mythosDisplayName(enc);return;}
+     if(e.key==='Enter'&&creatureMatches.length){e.preventDefault();selectCreature(creatureMatches[creatureIndex>=0?creatureIndex:0]);}
    };
    tr.querySelector('.mythos-scenario-select').onchange=e=>{enc.scenarioId=e.target.value||'';};
    tr.querySelector('.mythos-row-delete').onclick=()=>{
@@ -17725,7 +17782,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.37',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.38',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
