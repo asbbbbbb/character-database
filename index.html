@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE v7.12.35</title>
+<title>CHARACTER DATABASE v7.12.36</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -1617,7 +1617,7 @@ body.database-mode #databaseView{display:block!important}
 .brand-button{border:0;background:transparent;color:inherit;padding:0;text-align:left;cursor:pointer}
 .brand-button:hover h1{text-decoration:underline;text-underline-offset:4px}
 .app-nav{display:flex;align-items:stretch;gap:6px;margin-left:auto;margin-right:10px}
-.app-nav-btn{min-width:105px;min-height:38px;border:1px solid rgba(255,255,255,.22);border-radius:7px;background:rgba(255,255,255,.07);color:#fff;font-weight:800;letter-spacing:.05em;cursor:pointer}
+.app-nav-btn{min-width:78px;min-height:38px;padding:0 7px;font-size:11px;border:1px solid rgba(255,255,255,.22);border-radius:7px;background:rgba(255,255,255,.07);color:#fff;font-weight:800;letter-spacing:.05em;cursor:pointer}
 .app-nav-btn:hover,.app-nav-btn.active{background:rgba(255,255,255,.18)}
 body.hub-mode .layout{grid-template-columns:1fr}
 body.hub-mode .sidebar,body.hub-mode .right-rail{display:none!important}
@@ -9060,6 +9060,49 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
   font-size:11px!important;
 }
 
+
+/* v7.12.36: multiple profile images and Mythos creature ledger */
+.thumb-carousel-controls{display:flex;align-items:center;justify-content:center;gap:12px;padding:5px 0;color:var(--muted);font-size:11px;font-weight:800}
+.thumb-carousel-controls button,.viewer-image-controls button{border:1px solid #cfd8df;border-radius:6px;background:#fff;color:#31404c;min-width:30px;min-height:26px;cursor:pointer}
+.thumb-carousel-controls button:disabled,.viewer-image-controls button:disabled{opacity:.35;cursor:default}
+.thumb-remove{border:1px solid #e0c6c6;border-radius:6px;background:#fff;color:#9a5050;padding:5px 7px;font-size:10px;cursor:pointer}
+.thumb-actions{grid-template-columns:repeat(3,minmax(0,1fr))}
+.viewer-image-carousel{width:100%;height:100%;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:6px}
+.viewer-image-carousel .viewer-image-frame{display:block;width:100%;height:100%;min-height:0;object-fit:cover;aspect-ratio:1/1;border-radius:9px;background:#eef1f4}
+.viewer-image-controls{display:flex;align-items:center;justify-content:center;gap:12px;color:#7b858f;font-size:9px;font-weight:800}
+.viewer-image-controls button{min-width:28px;min-height:24px;font-size:10px}
+.mythos-encounter-actions{display:flex;gap:6px;flex-wrap:wrap}
+.mythos-encounter-table{width:100%;table-layout:fixed;border-collapse:collapse}
+.mythos-encounter-table th,.mythos-encounter-table td{padding:7px 6px;border-bottom:1px solid #e6ebef;text-align:left;vertical-align:middle;font-size:11px}
+.mythos-encounter-table th:nth-child(1){width:31%}.mythos-encounter-table th:nth-child(2){width:43%}.mythos-encounter-table th:nth-child(3){width:12%}.mythos-encounter-table th:nth-child(4){width:14%}
+.mythos-encounter-table select,.mythos-encounter-table input{width:100%;min-width:0;min-height:32px;border:1px solid #d5dde4;border-radius:6px;padding:5px 6px;background:#fff;color:#263542;font:inherit}
+.mythos-encounter-table .mythos-count-input{text-align:center;font-variant-numeric:tabular-nums}
+.mythos-row-delete{border:1px solid #e0c6c6;border-radius:6px;background:#fff;color:#9a5050;min-height:30px;min-width:30px;cursor:pointer}
+.viewer-mythos-summary{margin:0 0 12px;padding:12px 14px;border:1px solid #dbe2e7;border-radius:9px;background:#fff}
+.viewer-mythos-summary h3{margin:0 0 8px;font-size:13px}
+.viewer-mythos-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 12px}
+.viewer-mythos-item{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid #edf0f2;font-size:11px}
+.viewer-mythos-item span:first-child{overflow-wrap:anywhere}
+.viewer-mythos-count{white-space:nowrap;font-weight:800;font-variant-numeric:tabular-nums}
+.mythos-hub-head{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;flex-wrap:wrap;margin:5px 0 14px}
+.mythos-add-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.mythos-search{max-width:260px}
+.mythos-master-list{display:grid;gap:7px}
+.mythos-master-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #e8edf0}
+.mythos-master-row input{min-width:0;width:100%}
+.mythos-master-status{font-size:10px;color:#77838d;white-space:nowrap}
+.mythos-master-row .btn{white-space:nowrap}
+.mythos-empty{padding:18px;color:#7b8791;text-align:center;font-size:12px}
+@media(max-width:700px){
+ .mythos-encounter-table th:nth-child(1){width:36%}.mythos-encounter-table th:nth-child(2){width:36%}.mythos-encounter-table th:nth-child(3){width:14%}.mythos-encounter-table th:nth-child(4){width:14%}
+ .mythos-encounter-table th,.mythos-encounter-table td{padding:5px 3px;font-size:9px}
+ .viewer-mythos-list{grid-template-columns:1fr}
+ .mythos-master-row{grid-template-columns:minmax(0,1fr) auto;}
+ .mythos-master-status{grid-column:1;grid-row:2}
+ .mythos-master-row .btn:last-child{grid-column:2;grid-row:1 / span 2}
+ .mythos-add-row{grid-template-columns:minmax(0,1fr) auto}
+}
+
 </style>
 </head>
 <body class="public-route-loading">
@@ -9071,6 +9114,7 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
     <button type="button" class="app-nav-btn" id="sessionViewBtn">SESSION</button>
     <button type="button" class="app-nav-btn" id="reportViewBtn">REPORT</button>
     <button type="button" class="app-nav-btn" id="otherPcViewBtn">YOSO</button>
+    <button type="button" class="app-nav-btn" id="mythosViewBtn">MYTHOS</button>
     <button type="button" class="app-nav-btn" id="taskViewBtn">REMIND</button>
     <button type="button" class="app-nav-btn" id="linkViewBtn">OTHER</button>
   </nav>
@@ -9149,13 +9193,19 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
         <div class="profile-shell">
           <div class="profile-left">
             <div class="thumb-box" id="thumbBox" tabindex="0" title="画像ファイルを選択、または画像を貼り付け">
-              <img id="thumbImage" class="hidden" alt="探索者サムネイル">
-              <div class="thumb-placeholder" id="thumbPlaceholder">NO IMAGE<br>クリック または Ctrl/⌘+V で画像を設定</div>
-              <div class="thumb-actions">
-                <button type="button" class="thumb-edit" id="thumbButton">画像を設定</button>
-                <button type="button" class="thumb-paste" id="thumbPasteButton">貼り付け</button>
+              <img id="thumbImage" class="hidden" alt="探索者プロフィール画像">
+              <div class="thumb-placeholder" id="thumbPlaceholder">NO IMAGE<br>クリック または Ctrl/⌘+V で画像を追加</div>
+              <div class="thumb-carousel-controls" id="thumbCarouselControls">
+                <button type="button" id="thumbPrevBtn" aria-label="前の画像">◀</button>
+                <span id="thumbImageCount">0 / 0</span>
+                <button type="button" id="thumbNextBtn" aria-label="次の画像">▶</button>
               </div>
-              <input type="file" id="thumbFile" accept="image/*" hidden>
+              <div class="thumb-actions">
+                <button type="button" class="thumb-edit" id="thumbButton">画像を追加</button>
+                <button type="button" class="thumb-paste" id="thumbPasteButton">貼り付け</button>
+                <button type="button" class="thumb-remove" id="thumbRemoveButton">表示中を削除</button>
+              </div>
+              <input type="file" id="thumbFile" accept="image/*" multiple hidden>
               <div class="thumb-paste-status" id="thumbPasteStatus"></div>
             </div>
           </div>
@@ -9353,6 +9403,22 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
       </section>
 
       <section class="tab-panel" id="tab-scenarios">
+        <div class="card mythos-encounter-card">
+          <div class="section-head">
+            <div><h3>遭遇した神話生物</h3><div class="note">探索者ごとに記録します。シナリオとの紐付けは任意です。</div></div>
+            <div class="mythos-encounter-actions">
+              <button type="button" class="btn small" id="openMythosMasterBtn">神話生物一覧</button>
+              <button type="button" class="btn small" id="addMythosEncounterBtn">＋ 遭遇を登録</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="mythos-encounter-table">
+              <thead><tr><th>神話生物名</th><th>遭遇したシナリオ（任意）</th><th>回数</th><th></th></tr></thead>
+              <tbody id="mythosEncounterBody"></tbody>
+            </table>
+          </div>
+          <div class="note" id="mythosEncounterNote">同じ神話生物を複数のシナリオで記録すると、共有ページでは合算して表示します。</div>
+        </div>
         <div class="card">
           <div class="section-head">
             <div><h3>通過シナリオ <span class="scenario-total-count" id="scenarioTotalCount">0件</span></h3><div class="note">リンク → 日時 → シナリオ名 → 同卓PC名</div></div>
@@ -9575,6 +9641,32 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
         </div>
         <div class="yoso-csv-note">CSV列：PL / かな / 名前 / URL　※空欄は既存データを消しません</div>
         <div class="session-table-wrap" id="yosoTable"></div>
+      </div>
+
+      <div id="mythosHub" class="hub-content hidden">
+        <div class="hub-view-head mythos-hub-head">
+          <div>
+            <div class="hub-kicker">CHARACTER DATABASE</div>
+            <h2>MYTHOS CREATURES</h2>
+            <div class="note">神話生物の名前を管理します。一覧から非表示にしても、過去の遭遇記録は残ります。</div>
+          </div>
+          <button type="button" class="btn" id="mythosBackBtn">← 前の画面へ戻る</button>
+        </div>
+        <div class="card mythos-master-card">
+          <div class="section-head"><h3>神話生物を追加</h3></div>
+          <div class="mythos-add-row">
+            <input class="control" id="mythosNewName" placeholder="神話生物名を入力">
+            <button type="button" class="btn primary" id="mythosAddBtn">＋ 追加</button>
+          </div>
+          <div class="note" id="mythosMasterMessage"></div>
+        </div>
+        <div class="card mythos-master-card">
+          <div class="section-head">
+            <div><h3>神話生物一覧 <span class="scenario-total-count" id="mythosMasterCount">0件</span></h3></div>
+            <input class="control mythos-search" id="mythosSearch" placeholder="名前で検索">
+          </div>
+          <div id="mythosMasterList" class="mythos-master-list"></div>
+        </div>
       </div>
 
       <div id="taskHub" class="hub-content task-content hidden">
@@ -10053,7 +10145,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.35';
+const PUBLIC_VIEWER_VERSION='7.12.36';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -10061,6 +10153,7 @@ function loadAppData(){
    return {
      kpSessions:Array.isArray(raw.kpSessions)?raw.kpSessions:[],
      yosoRecords:Array.isArray(raw.yosoRecords)?raw.yosoRecords:[],
+     mythosCatalog:Array.isArray(raw.mythosCatalog)?raw.mythosCatalog:[],
      plExtraSessions:Array.isArray(raw.plExtraSessions)?raw.plExtraSessions:[],
      reportHiddenKeys:Array.isArray(raw.reportHiddenKeys)?raw.reportHiddenKeys:[],
      links:Array.isArray(raw.links)?raw.links:[],
@@ -10075,7 +10168,7 @@ function loadAppData(){
      taskRulesVersion:Number(raw.taskRulesVersion||0)
    };
  }catch(_){
-   return {kpSessions:[],yosoRecords:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],bucketTasks:[],taskLanes:[],memoLanes:[],reminderMemo:'',memoRecords:[],baseOccupationOptions:[],rulebookSupplementOptions:[],taskRulesVersion:0};
+   return {kpSessions:[],yosoRecords:[],mythosCatalog:[],plExtraSessions:[],reportHiddenKeys:[],links:[],taskRecords:[],bucketTasks:[],taskLanes:[],memoLanes:[],reminderMemo:'',memoRecords:[],baseOccupationOptions:[],rulebookSupplementOptions:[],taskRulesVersion:0};
  }
 }
 function saveAppData(){
@@ -10088,6 +10181,7 @@ function saveAppData(){
  schedulePublicSync();
 }
 let appData=loadAppData();
+if(!Array.isArray(appData.mythosCatalog))appData.mythosCatalog=[];
 if(!Array.isArray(appData.reportHiddenKeys))appData.reportHiddenKeys=[];
 if(!Array.isArray(appData.links))appData.links=[];
 if(!Array.isArray(appData.taskRecords))appData.taskRecords=[];
@@ -10130,6 +10224,7 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const num=v=>Number(v)||0;
 const uid=()=>crypto.randomUUID?.() || String(Date.now())+Math.random().toString(16).slice(2);
 let db=null, current=null;
+let currentThumbnailIndex=0;
 let publicRemoteData=null;
 let publicRemoteMode='';
 let mobileEditorOwnerSecret='';
@@ -10338,7 +10433,7 @@ function skillTemplate(ed){
 function blank(ed){
  return {
    id:uid(),edition:ed,number:'',name:'',reading:'',status:'新規',occupation:'',baseOccupation:'',rulebookSupplement:'',age:'',gender:'',birthplace:'',birthday:'',height:'',weight:'',
-   feature1:'',feature2:'',thumbnail:'',notes:{basic:'',ho:'',setting:'',private:''},
+   feature1:'',feature2:'',thumbnail:'',profileImages:[],mythosEncounters:[],notes:{basic:'',ho:'',setting:'',private:''},
    cc:'#8AA0B6',sanCurrent:0,luck7:0,dFeaturePoints:0,dFeaturePoints1:0,dFeaturePoints2:0,occPointAdjust:0,interestPointAdjust:0,stats:Object.fromEntries(STAT_KEYS.map(k=>[k,0])),
    statMods:Object.fromEntries(STAT_KEYS.map(k=>[k,0])),
    occFormula:0,skills:skillTemplate(ed),insanities:[],weapons:[],items:[],cash:'',assets:'',spending:'',magic:[],
@@ -10451,6 +10546,8 @@ async function buildPublicDatabasePayload(){
  const chars=(await all()).map(x=>ensureShape(structuredClone(x)));
  for(const ch of chars){
    if(ch.thumbnail?.startsWith('data:image/'))ch.thumbnail=await compactPublicImage(ch.thumbnail,560,.8);
+   ch.profileImages=await Promise.all(characterProfileImages(ch).map(src=>compactPublicImage(src,560,.8)));
+   ch.thumbnail=ch.profileImages[0]||ch.thumbnail||'';
    delete ch.importSource;
    ch.scenarios=(ch.scenarios||[]).map(sc=>{
      const x={...sc};
@@ -10934,6 +11031,9 @@ async function prepareShareCharacter(source){
  if(ch.thumbnail?.startsWith('data:image/')){
    ch.thumbnail=await compactShareThumbnail(ch.thumbnail);
  }
+ ch.profileImages=await Promise.all(characterProfileImages(ch).map(src=>compactShareThumbnail(src)));
+ ch.thumbnail=ch.profileImages[0]||ch.thumbnail||'';
+ (ch.mythosEncounters||[]).forEach(enc=>{enc.name=mythosDisplayName(enc);});
  delete ch.importSource;
  delete ch.createdAt;
  delete ch.updatedAt;
@@ -11132,6 +11232,12 @@ function ensureShape(x){
  x.statMods=x.statMods||{};
  STAT_KEYS.forEach(k=>{x.stats[k]=num(x.stats[k]);x.statMods[k]=num(x.statMods[k])});
  x.feature1=x.feature1||'';x.feature2=x.feature2||'';x.thumbnail=x.thumbnail||'';
+ x.profileImages=Array.isArray(x.profileImages)?x.profileImages.filter(v=>typeof v==='string'&&v.trim()):[];
+ if(!x.profileImages.length&&x.thumbnail)x.profileImages=[x.thumbnail];
+ if(x.profileImages.length)x.thumbnail=x.profileImages[0];
+ x.mythosEncounters=Array.isArray(x.mythosEncounters)?x.mythosEncounters.map((r,i)=>({
+   id:String(r?.id||uid()),creatureId:String(r?.creatureId||''),name:String(r?.name||''),scenarioId:String(r?.scenarioId||''),count:Math.max(1,Math.floor(num(r?.count)||1))
+ })):[];
  x.baseOccupation=String(x.baseOccupation||'');
  x.rulebookSupplement=String(x.rulebookSupplement||'');
  const legacyDPoints=Math.max(0,num(x.dFeaturePoints));
@@ -11194,12 +11300,12 @@ function selectedFeatureCodes(){
  return new Set([current.feature1,current.feature2].filter(Boolean).map(x=>String(x).split('：')[0]));
 }
 function featureStatMods(){
- // v7.12.34: 特徴表は記録・表示のみ。能力値補正は自動適用しない。
+ // v7.12.36: 特徴表は記録・表示のみ。能力値補正は自動適用しない。
  // 必要な補正は「増減分」へ手入力する。
  return Object.fromEntries(STAT_KEYS.map(k=>[k,0]));
 }
 function featureSkillBase(name,base){
- // v7.12.34: 特徴表による技能値補正は自動適用しない。
+ // v7.12.36: 特徴表による技能値補正は自動適用しない。
  // 必要な補正は技能の修正欄へ手入力する。
  return base;
 }
@@ -11393,14 +11499,33 @@ async function copyPlainText(value,message){
  return ok;
 }
 
+function characterProfileImages(ch){
+ if(!ch)return [];
+ const list=Array.isArray(ch.profileImages)?ch.profileImages.filter(v=>typeof v==='string'&&v.trim()):[];
+ return list.length?list:(ch.thumbnail?[ch.thumbnail]:[]);
+}
+function syncCharacterProfileImages(ch){
+ if(!ch)return [];
+ ch.profileImages=characterProfileImages(ch);
+ ch.thumbnail=ch.profileImages[0]||'';
+ return ch.profileImages;
+}
 function renderHeader(){
  $('sheetHead').style.setProperty('--cc',current.cc||'#8AA0B6');
  $('editionBadge').textContent=current.edition+'版';
  $('headSanIndef').textContent=sanIndef();
  $('headSanMax').textContent=sanMax();
  const img=$('thumbImage'), ph=$('thumbPlaceholder');
- if(current.thumbnail){img.src=current.thumbnail;img.classList.remove('hidden');ph.classList.add('hidden')}
+ const profileImages=syncCharacterProfileImages(current);
+ currentThumbnailIndex=Math.max(0,Math.min(currentThumbnailIndex,Math.max(0,profileImages.length-1)));
+ if(profileImages.length){img.src=profileImages[currentThumbnailIndex];img.classList.remove('hidden');ph.classList.add('hidden')}
  else{img.removeAttribute('src');img.classList.add('hidden');ph.classList.remove('hidden')}
+ const count=$('thumbImageCount'),controls=$('thumbCarouselControls');
+ if(count)count.textContent=profileImages.length?`${currentThumbnailIndex+1} / ${profileImages.length}`:'0 / 0';
+ if(controls)controls.classList.toggle('hidden',profileImages.length<2);
+ if($('thumbPrevBtn'))$('thumbPrevBtn').disabled=profileImages.length<2;
+ if($('thumbNextBtn'))$('thumbNextBtn').disabled=profileImages.length<2;
+ if($('thumbRemoveButton'))$('thumbRemoveButton').disabled=!profileImages.length;
  renderChatTools();
 }
 function abilityColumns(){
@@ -11762,22 +11887,17 @@ function normalizeScenarioDate(value){
  if(m)return `${m[1].slice(-4)}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
  return s;
 }
-
 function sortScenariosByDate(scenarios){
  if(!Array.isArray(scenarios))return scenarios;
- scenarios.forEach(sc=>{
-   if(sc)sc.date=normalizeScenarioDate(sc.date||'');
- });
- // 日付の古い順。日付がない記録は最後に置く。同日は元の順番を維持。
+ scenarios.forEach(sc=>{if(sc)sc.date=normalizeScenarioDate(sc.date||'');});
  scenarios.sort((a,b)=>{
-   const da=String(a?.date||'');
-   const db=String(b?.date||'');
-   if(da&&!db)return -1;
-   if(!da&&db)return 1;
+   const da=String(a?.date||''),db=String(b?.date||'');
+   if(da&&!db)return -1;if(!da&&db)return 1;
    return da.localeCompare(db);
  });
  return scenarios;
 }
+
 
 function normalizeYosoNameKey(value){
  return String(value||'').normalize('NFKC').trim().replace(/\s+/g,' ').toLowerCase();
@@ -11871,6 +11991,73 @@ function scenarioPcChips(value,removable=false){
  const names=scenarioPcNames(value);
  if(!names.length)return removable?'<span class="scenario-chip-empty">未選択</span>':'—';
  return `<div class="scenario-chip-list">${names.map((name,i)=>`<span class="scenario-chip">${esc(name)}${removable?`<button type="button" class="scenario-chip-remove" data-chip-index="${i}" aria-label="${esc(name)}を外す">×</button>`:''}</span>`).join('')}</div>`;
+}
+function mythosCatalog(){
+ if(!Array.isArray(appData.mythosCatalog))appData.mythosCatalog=[];
+ return appData.mythosCatalog;
+}
+function normalizeMythosName(value){return String(value||'').normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase('ja');}
+function mythosDisplayName(encounter){
+ const master=mythosCatalog().find(x=>x.id===encounter?.creatureId);
+ return String(master?.name||encounter?.name||'未設定');
+}
+function addMythosCatalogEntry(value){
+ const name=String(value||'').trim();
+ if(!name)return null;
+ const key=normalizeMythosName(name);
+ const found=mythosCatalog().find(x=>normalizeMythosName(x.name)===key);
+ if(found){found.active=true;saveAppData();return found;}
+ const record={id:uid(),name,active:true,createdAt:new Date().toISOString()};
+ mythosCatalog().push(record);saveAppData();return record;
+}
+function renderMythosEncounters(){
+ const body=$('mythosEncounterBody');
+ if(!body||!current)return;
+ const rows=Array.isArray(current.mythosEncounters)?current.mythosEncounters:[];
+ const catalog=mythosCatalog().filter(x=>x.active!==false).slice().sort((a,b)=>compareText(a.name,b.name));
+ const scenarios=(current.scenarios||[]).slice().sort((a,b)=>compareText(a.title||'',b.title||''));
+ if(!rows.length){body.innerHTML='<tr><td colspan="4" class="mythos-empty">遭遇記録はありません。</td></tr>';return;}
+ body.innerHTML=rows.map((enc,i)=>{
+   const currentId=String(enc.creatureId||'');
+   const options=catalog.map(r=>`<option value="${esc(r.id)}" ${r.id===currentId?'selected':''}>${esc(r.name)}</option>`).join('');
+   const cachedName=String(enc.name||'');
+   const hiddenMatch=mythosCatalog().find(r=>r.id===currentId&&r.active===false);
+   const legacyOption=(!catalog.some(r=>r.id===currentId)&&currentId)?`<option value="${esc(currentId)}" selected>${esc(mythosDisplayName(enc))}（一覧から非表示）</option>`:'';
+   const scenarioOptions=scenarios.map(sc=>`<option value="${esc(sc.id)}" ${String(sc.id)===String(enc.scenarioId||'')?'selected':''}>${esc(sc.title||'シナリオ名未入力')}</option>`).join('');
+   return `<tr data-mythos-id="${esc(enc.id)}">
+     <td><select class="mythos-creature-select" aria-label="神話生物名"><option value="">選択してください</option>${options}${legacyOption}</select>${(!currentId&&cachedName)?`<div class="note">${esc(cachedName)}</div>`:''}</td>
+     <td><select class="mythos-scenario-select" aria-label="遭遇したシナリオ"><option value="">紐付けなし</option>${scenarioOptions}</select></td>
+     <td><input class="mythos-count-input" type="number" min="1" step="1" value="${esc(enc.count||1)}" aria-label="遭遇回数"></td>
+     <td><button type="button" class="mythos-row-delete" title="遭遇記録を削除" aria-label="遭遇記録を削除">×</button></td>
+   </tr>`;
+ }).join('');
+ body.querySelectorAll('tr[data-mythos-id]').forEach(tr=>{
+   const enc=rows.find(x=>x.id===tr.dataset.mythosId);if(!enc)return;
+   tr.querySelector('.mythos-creature-select').onchange=e=>{
+     const rec=mythosCatalog().find(x=>x.id===e.target.value);
+     enc.creatureId=rec?.id||'';enc.name=rec?.name||'';
+     renderMythosEncounters();
+   };
+   tr.querySelector('.mythos-scenario-select').onchange=e=>{enc.scenarioId=e.target.value||'';};
+   tr.querySelector('.mythos-count-input').onchange=e=>{enc.count=Math.max(1,Math.floor(num(e.target.value)||1));e.target.value=enc.count;};
+   tr.querySelector('.mythos-row-delete').onclick=()=>{
+     if(!confirm('この遭遇記録を削除しますか？'))return;
+     current.mythosEncounters=current.mythosEncounters.filter(x=>x.id!==enc.id);
+     renderMythosEncounters();
+   };
+ });
+}
+function addMythosEncounter(){
+ if(!current)return;
+ const available=mythosCatalog().filter(x=>x.active!==false);
+ if(!available.length){
+   alert('先に「神話生物一覧」から神話生物を追加してください。');
+   showHubView('mythos');
+   return;
+ }
+ if(!Array.isArray(current.mythosEncounters))current.mythosEncounters=[];
+ current.mythosEncounters.push({id:uid(),creatureId:available[0].id,name:available[0].name,scenarioId:'',count:1});
+ renderMythosEncounters();
 }
 function renderScenarios(){
  sortScenariosByDate(current.scenarios);
@@ -12052,6 +12239,7 @@ function renderScenarios(){
    }
    body.appendChild(tr);
  });
+ renderMythosEncounters();
 }
 function normalizeBaseOccupationOptions(list){
  return [...new Set((Array.isArray(list)?list:[])
@@ -12232,6 +12420,7 @@ function renderAll(){
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
+ $('mythosHub').classList.add('hidden');
  $('taskHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
  $('emptyState').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').classList.remove('hidden');
@@ -12245,7 +12434,7 @@ function renderAll(){
  setFormValue('tasteSpicy',current.taste?.spicy??'');
  setFormValue('tasteSalty',current.taste?.salty??'');
  if($('profileUpdatedAt'))$('profileUpdatedAt').textContent=`最終更新 ${formatUpdatedAtShort(current.updatedAt||current.createdAt)}`;
- renderFeatureSelects();renderHeader();renderAbilityTable();renderPoints();renderSkills();renderTables();renderStory();renderBackstory();renderList();
+ renderFeatureSelects();renderHeader();renderAbilityTable();renderPoints();renderSkills();renderTables();renderStory();renderBackstory();renderMythosEncounters();renderList();
 }
 function rollAllTaste(){
  if(!current)return;
@@ -12478,11 +12667,12 @@ function setTopNav(active){
  if(active==='session')$('sessionViewBtn')?.classList.add('active');
  if(active==='report')$('reportViewBtn')?.classList.add('active');
  if(active==='other')$('otherPcViewBtn')?.classList.add('active');
+ if(active==='mythos')$('mythosViewBtn')?.classList.add('active');
  if(active==='task')$('taskViewBtn')?.classList.add('active');
  if(active==='link')$('linkViewBtn')?.classList.add('active');
 }
 function showHomeWorkspace(){
- document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('taskHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').style.display='';if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
+ document.body.classList.remove('database-mode','viewer-mode','hub-mode','choice-mode');setTopNav('');$('databaseView').classList.add('hidden');$('choiceView').classList.add('hidden');$('hubView').classList.add('hidden');$('sessionHub').classList.add('hidden');$('reportHub').classList.add('hidden');$('yosoHub').classList.add('hidden');$('mythosHub').classList.add('hidden');$('taskHub').classList.add('hidden');$('linkHub').classList.add('hidden');$('viewer').classList.add('hidden');$('editor').style.display='';if(current){renderAll()}else{$('editor').classList.add('hidden');$('emptyState').classList.remove('hidden')}
 }
 let activeSessionTab='pl';
 let sessionUnlinkedOnly=false;
@@ -16394,6 +16584,53 @@ async function renderSessionHub(){
  $('sessionCsvDownloadBtn')?.classList.toggle('hidden',activeSessionTab!=='pl');
  if(activeSessionTab==='pl')await renderSessionPL();else renderSessionKP();
 }
+function renderMythosHub(){
+ const search=$('mythosSearch');
+ const query=normalizeMythosName(search?.value||'');
+ const list=mythosCatalog().slice().sort((a,b)=>compareText(a.name,b.name));
+ const visible=list.filter(x=>!query||normalizeMythosName(x.name).includes(query));
+ $('mythosMasterCount').textContent=`${list.length}件`;
+ const wrap=$('mythosMasterList');
+ if(!visible.length){wrap.innerHTML='<div class="mythos-empty">該当する神話生物はありません。</div>';}
+ else{
+   wrap.innerHTML=visible.map(rec=>`<div class="mythos-master-row" data-master-id="${esc(rec.id)}">
+     <input class="control mythos-master-name" value="${esc(rec.name||'')}" aria-label="神話生物名">
+     <span class="mythos-master-status">${rec.active===false?'非表示':'使用中'}</span>
+     <div class="mythos-master-buttons">
+       <button type="button" class="btn small mythos-master-save">名前を保存</button>
+       <button type="button" class="btn small ${rec.active===false?'':'danger'} mythos-master-toggle">${rec.active===false?'復元':'一覧から削除'}</button>
+     </div>
+   </div>`).join('');
+   wrap.querySelectorAll('[data-master-id]').forEach(row=>{
+     const rec=mythosCatalog().find(x=>x.id===row.dataset.masterId);if(!rec)return;
+     row.querySelector('.mythos-master-save').onclick=async()=>{
+       const newName=String(row.querySelector('.mythos-master-name').value||'').trim();
+       if(!newName){alert('神話生物名を入力してください。');return;}
+       const duplicate=mythosCatalog().find(x=>x.id!==rec.id&&normalizeMythosName(x.name)===normalizeMythosName(newName));
+       if(duplicate){alert('同じ名前の神話生物がすでに登録されています。');return;}
+       const oldName=rec.name;rec.name=newName;
+       // Keep cached names current in every character record for offline shares and backups.
+       const chars=await all();
+       for(const ch of chars){
+         let changed=false;
+         (ch.mythosEncounters||[]).forEach(enc=>{if(enc.creatureId===rec.id){enc.name=newName;changed=true;}});
+         if(changed){ch.updatedAt=new Date().toISOString();await put(ch);}
+       }
+       if(current)(current.mythosEncounters||[]).forEach(enc=>{if(enc.creatureId===rec.id)enc.name=newName;});
+       saveAppData();renderMythosHub();
+       if(current)renderMythosEncounters();
+       $('mythosMasterMessage').textContent=`「${oldName}」を「${newName}」に変更しました。`;
+     };
+     row.querySelector('.mythos-master-toggle').onclick=()=>{
+       rec.active=rec.active===false;
+       saveAppData();renderMythosHub();
+       if(current)renderMythosEncounters();
+     };
+   });
+ }
+}
+function openMythosHub(){showHubView('mythos');}
+
 async function showHubView(kind){
  if(current)syncFormToModel();
  document.body.classList.remove('database-mode','viewer-mode','choice-mode');
@@ -16412,6 +16649,7 @@ async function showHubView(kind){
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
+ $('mythosHub').classList.add('hidden');
  $('taskHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
 
@@ -16427,6 +16665,10 @@ async function showHubView(kind){
    setTopNav('other');
    $('yosoHub').classList.remove('hidden');
    renderYoso();
+ }else if(kind==='mythos'){
+   setTopNav('mythos');
+   $('mythosHub').classList.remove('hidden');
+   renderMythosHub();
  }else if(kind==='task'){
    setTopNav('task');
    $('taskHub').classList.remove('hidden');
@@ -16451,6 +16693,7 @@ async function showDatabaseView(){
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
+ $('mythosHub').classList.add('hidden');
  $('taskHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
  $('databaseView').style.display='';
@@ -17093,6 +17336,20 @@ async function renderDatabaseView(){
  });
 }
 
+function renderViewerMythosSummary(ch){
+ const totals=new Map();
+ for(const enc of (ch?.mythosEncounters||[])){
+   const name=mythosDisplayName(enc);
+   if(!name||name==='未設定')continue;
+   const key=normalizeMythosName(name);
+   const item=totals.get(key)||{name,count:0};
+   item.count+=Math.max(1,Math.floor(num(enc.count)||1));
+   totals.set(key,item);
+ }
+ const items=[...totals.values()].sort((a,b)=>compareText(a.name,b.name));
+ if(!items.length)return '';
+ return `<div class="viewer-mythos-summary"><h3>遭遇した神話生物</h3><div class="viewer-mythos-list">${items.map(x=>`<div class="viewer-mythos-item"><span>${esc(x.name)}</span><span class="viewer-mythos-count">×${x.count}</span></div>`).join('')}</div></div>`;
+}
 function showViewer(){
  syncFormToModel();
  document.body.classList.remove('database-mode','hub-mode','choice-mode');
@@ -17104,6 +17361,7 @@ function showViewer(){
  $('sessionHub').classList.add('hidden');
  $('reportHub').classList.add('hidden');
  $('yosoHub').classList.add('hidden');
+ $('mythosHub').classList.add('hidden');
  $('taskHub').classList.add('hidden');
  $('linkHub').classList.add('hidden');
  $('editor').classList.add('hidden');
@@ -17114,8 +17372,9 @@ function showViewer(){
 
  const d=derived(), cs=currentStats();
  const skillsByCategory=current.skills||{};
- const thumb=current.thumbnail
-   ? `<img src="${current.thumbnail}" alt="">`
+ const viewImages=characterProfileImages(current);
+ const thumb=viewImages.length
+   ? `<div class="viewer-image-carousel"><img class="viewer-image-frame" data-viewer-image src="${esc(viewImages[0])}" alt=""><div class="viewer-image-controls"><button type="button" data-viewer-image-prev aria-label="前の画像">◀</button><span data-viewer-image-count>${viewImages.length>1?`1 / ${viewImages.length}`:''}</span><button type="button" data-viewer-image-next aria-label="次の画像">▶</button></div></div>`
    : `<div class="noimg">NO IMAGE</div>`;
 
  const personal=[
@@ -17325,6 +17584,7 @@ function showViewer(){
        </div>
      </details>`:''}
 
+     ${renderViewerMythosSummary(current)}
      <details>
        <summary>通過シナリオ <span class="scenario-total-count">${current.scenarios.length}件</span></summary>
        <div class="viewer-accordion-content">
@@ -17333,6 +17593,22 @@ function showViewer(){
      </details>
    </section>
  `;
+ if(viewImages.length>1){
+   let viewerImageIndex=0;
+   const imageEl=v.querySelector('[data-viewer-image]');
+   const countEl=v.querySelector('[data-viewer-image-count]');
+   const prevBtn=v.querySelector('[data-viewer-image-prev]');
+   const nextBtn=v.querySelector('[data-viewer-image-next]');
+   const updateViewerImage=()=>{
+     imageEl.src=viewImages[viewerImageIndex];
+     countEl.textContent=`${viewerImageIndex+1} / ${viewImages.length}`;
+   };
+   prevBtn.onclick=()=>{viewerImageIndex=(viewerImageIndex-1+viewImages.length)%viewImages.length;updateViewerImage();};
+   nextBtn.onclick=()=>{viewerImageIndex=(viewerImageIndex+1)%viewImages.length;updateViewerImage();};
+ }else{
+   v.querySelector('[data-viewer-image-prev]')?.classList.add('hidden');
+   v.querySelector('[data-viewer-image-next]')?.classList.add('hidden');
+ }
  v.querySelectorAll('[data-viewer-skill-sort]').forEach(btn=>{
    btn.onclick=()=>{
      viewerSkillSortMode=btn.dataset.viewerSkillSort==='kana'?'kana':'category';
@@ -17368,7 +17644,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.35',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.36',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -17383,6 +17659,7 @@ function importBackup(file){
        appData={
          kpSessions:Array.isArray(j.appData.kpSessions)?j.appData.kpSessions:[],
          yosoRecords:Array.isArray(j.appData.yosoRecords)?j.appData.yosoRecords:[],
+         mythosCatalog:Array.isArray(j.appData.mythosCatalog)?j.appData.mythosCatalog:[],
          plExtraSessions:Array.isArray(j.appData.plExtraSessions)?j.appData.plExtraSessions:[],
          reportHiddenKeys:Array.isArray(j.appData.reportHiddenKeys)?j.appData.reportHiddenKeys:[],
          links:Array.isArray(j.appData.links)?j.appData.links:[],
@@ -18359,9 +18636,24 @@ $('choiceViewBtn').onclick=showChoiceView;
 $('sessionViewBtn').onclick=()=>showHubView('session');
 $('reportViewBtn').onclick=()=>showHubView('report');
 $('otherPcViewBtn').onclick=()=>showHubView('other');
+$('mythosViewBtn').onclick=()=>showHubView('mythos');
 $('taskViewBtn').onclick=()=>showHubView('task');
 $('linkViewBtn').onclick=()=>showHubView('link');
 $('backFromDatabaseBtn').onclick=leaveDatabaseView;
+$('mythosAddBtn').onclick=()=>{
+ const value=$('mythosNewName').value;
+ if(!String(value||'').trim()){alert('神話生物名を入力してください。');return;}
+ const before=mythosCatalog().length;
+ const rec=addMythosCatalogEntry(value);
+ $('mythosNewName').value='';
+ $('mythosMasterMessage').textContent=rec?(mythosCatalog().length>before?`「${rec.name}」を追加しました。`:`「${rec.name}」は登録済みのため、一覧に戻しました。`):'';
+ renderMythosHub();
+};
+$('mythosNewName').onkeydown=e=>{if(e.key==='Enter')$('mythosAddBtn').click()};
+$('mythosSearch').oninput=renderMythosHub;
+$('mythosBackBtn').onclick=()=>{if(current)renderAll();else showHomeWorkspace();};
+$('openMythosMasterBtn').onclick=openMythosHub;
+$('addMythosEncounterBtn').onclick=addMythosEncounter;
 $('databaseEditionFilter').onchange=()=>{dbFilterState.filters={};dbFilterState.sortKey='no';dbFilterState.sortDir='asc';closeDbFilterPopover();renderDatabaseView()};
 $('databaseAbilityModeBtn').onclick=()=>setDatabaseValueMode('ability');
 $('databaseSkillModeBtn').onclick=()=>setDatabaseValueMode('skill');
@@ -18688,11 +18980,15 @@ function setThumbnailSource(value){
  if(!current)return;
  const src=String(value||'').trim();
  if(!src)return;
- current.thumbnail=src;
+ const images=syncCharacterProfileImages(current);
+ if(!images.includes(src))images.push(src);
+ current.profileImages=images;
+ current.thumbnail=images[0]||'';
+ currentThumbnailIndex=Math.max(0,images.indexOf(src));
  renderHeader();
  const status=$('thumbPasteStatus');
  if(status){
-   status.textContent='画像を反映しました。保存ボタンで確定します。';
+   status.textContent=`画像を追加しました（${images.length}枚）。保存ボタンで確定します。`;
    clearTimeout(setThumbnailSource._timer);
    setThumbnailSource._timer=setTimeout(()=>{if(status)status.textContent=''},2200);
  }
@@ -18751,6 +19047,18 @@ async function pasteThumbnailFromClipboard(){
 }
 $('thumbButton').onclick=e=>{e.stopPropagation();$('thumbFile').click()};
 $('thumbPasteButton').onclick=e=>{e.stopPropagation();pasteThumbnailFromClipboard()};
+$('thumbPrevBtn').onclick=e=>{e.stopPropagation();const images=characterProfileImages(current);if(images.length>1){currentThumbnailIndex=(currentThumbnailIndex-1+images.length)%images.length;renderHeader();}};
+$('thumbNextBtn').onclick=e=>{e.stopPropagation();const images=characterProfileImages(current);if(images.length>1){currentThumbnailIndex=(currentThumbnailIndex+1)%images.length;renderHeader();}};
+$('thumbRemoveButton').onclick=e=>{
+ e.stopPropagation();if(!current)return;
+ const images=syncCharacterProfileImages(current);if(!images.length)return;
+ if(!confirm('表示中のプロフィール画像を削除しますか？'))return;
+ images.splice(currentThumbnailIndex,1);
+ current.profileImages=images;current.thumbnail=images[0]||'';
+ currentThumbnailIndex=Math.min(currentThumbnailIndex,Math.max(0,images.length-1));
+ renderHeader();
+ $('thumbPasteStatus').textContent='画像を削除しました。保存ボタンで確定します。';
+};
 $('thumbBox').onclick=e=>{
  if(e.target.closest('button'))return;
  $('thumbBox').focus();
@@ -18762,7 +19070,11 @@ $('thumbBox').onpaste=e=>{
    e.stopPropagation();
  }
 };
-$('thumbFile').onchange=e=>{const f=e.target.files[0];if(f)setThumbnail(f)};
+$('thumbFile').onchange=e=>{
+ const files=[...(e.target.files||[])];
+ files.forEach(f=>{if(f)setThumbnail(f)});
+ e.target.value='';
+};
 
 document.querySelectorAll('.tab-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab-btn,.tab-panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('tab-'+b.dataset.tab).classList.add('active')});
 document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{
