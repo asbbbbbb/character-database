@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE v7.12.38</title>
+<title>CHARACTER DATABASE v7.12.39</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -9061,7 +9061,7 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
 }
 
 
-/* v7.12.38: Mythos creature autocomplete suggestions */
+/* v7.12.39: Mythos creature autocomplete suggestions */
 .thumb-carousel-controls{display:flex;align-items:center;justify-content:center;gap:12px;padding:5px 0;color:var(--muted);font-size:11px;font-weight:800}
 .thumb-carousel-controls button,.viewer-image-controls button{border:1px solid #cfd8df;border-radius:6px;background:#fff;color:#31404c;min-width:30px;min-height:26px;cursor:pointer}
 .thumb-carousel-controls button:disabled,.viewer-image-controls button:disabled{opacity:.35;cursor:default}
@@ -10154,7 +10154,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.38';
+const PUBLIC_VIEWER_VERSION='7.12.39';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -10218,7 +10218,7 @@ const SKILLS7={
  '交渉技能':[['言いくるめ',5],['説得',10],['母国語',0],['威圧',15],['魅力',15],['言語',1,true]],
  '知識技能':[['医学',1],['オカルト',5],['クトゥルフ神話',0],['芸術',5,true],['経理',5],['考古学',1],['コンピューター',5],['科学',1,true],['心理学',10],['人類学',1],['電子工学',1],['自然',10],['法律',5],['歴史',20],['サバイバル',10,true]]
 };
-const FEATURES6=["1-1：風邪をひかない", "1-2：大きな体", "1-3：素早い", "1-4：オシャレ", "1-5：天才", "1-6：強固な意志", "1-7：勉強家", "1-8：幸運のお守り", "1-9：一族伝来の宝物", "1-10：予期せぬ協力者", "2-1：手先が器用", "2-2：影が薄い", "2-3：親の七光り", "2-4：愛書家", "2-5：鋭い洞察力", "2-6：アウトドア派", "2-7：珍しい技能", "2-8：芸術的才能", "2-9：バイリンガル", "2-10：前職", "3-1：天気予報士", "3-2：プロ・ドライバー", "3-3：飛ばし屋", "3-4：戦士", "3-5：銃火器の達人", "3-6：格闘センスの持ち主", "3-7：俊敏", "3-8：信頼のおける人", "3-9：スポーツ万能", "3-10：平凡な容姿", "4-1：目つきが悪い(D)", "4-2：方向音痴(D)", "4-3：異性が苦手(D)", "4-4：動物に嫌われる(D)", "4-5：不思議ちゃん(D)", "4-6：寄せ餌(D)", "4-7：眼鏡をかけている(D)", "4-8：大切なもの(D)", "4-9：暗黒の祖先(D)", "4-10：夜に弱い(D)", "5-1：動物に好かれる", "5-2：斜め上からの発想", "5-3：失敗は発明の母", "5-4：ペット", "5-5：おおらか", "5-6：異物への耐性", "5-7：潜水の名人", "5-8：大酒飲み", "5-9：ド根性", "5-10：受け身", "6-1：奇妙な幸運", "6-2：投擲の才能", "6-3：鋼の筋力", "6-4：生きていた", "6-5：急所を見抜く", "6-6：急速な回復力", "6-7：不屈の精神力", "6-8：マニア・コレクター", "6-9：行方不明の家族", "6-10：好意を寄せられている"];
+const FEATURES6=["1-1：君は風邪を引かない", "1-2：大きな体", "1-3：素早い", "1-4：オシャレ", "1-5：天才", "1-6：強固な意志", "1-7：勉強家", "1-8：幸運のお守り", "1-9：一族伝来の宝物", "1-10：予期せぬ協力者", "2-1：手先が器用", "2-2：影が薄い", "2-3：親の七光り", "2-4：愛書家", "2-5：鋭い洞察力", "2-6：アウトドア派", "2-7：珍しい技能", "2-8：芸術的才能", "2-9：バイリンガル", "2-10：前職", "3-1：天気予報士", "3-2：プロ・ドライバー", "3-3：飛ばし屋", "3-4：戦士", "3-5：銃火器の達人", "3-6：格闘センスの持ち主", "3-7：俊敏", "3-8：信頼のおける人", "3-9：スポーツ万能", "3-10：平凡な容姿", "4-1：目つきが悪い(D)", "4-2：方向音痴(D)", "4-3：異性が苦手(D)", "4-4：動物に嫌われる(D)", "4-5：不思議ちゃん(D)", "4-6：寄せ餌(D)", "4-7：眼鏡をかけている(D)", "4-8：大切なもの(D)", "4-9：暗黒の祖先(D)", "4-10：夜に弱い(D)", "5-1：動物に好かれる", "5-2：斜め上からの発想", "5-3：失敗は発明の母", "5-4：ペット", "5-5：おおらか", "5-6：異物への耐性", "5-7：潜水の名人", "5-8：大酒飲み", "5-9：ド根性", "5-10：受け身", "6-1：奇妙な幸運", "6-2：投擲の才能", "6-3：鋼の筋力", "6-4：実は生きていた", "6-5：急所を見抜く", "6-6：急速な回復力", "6-7：不屈の精神力", "6-8：マニア・コレクター", "6-9：行方不明の家族", "6-10：好意を寄せられている"];
 const BACK7=['容姿の描写','イデオロギー/信念','重要な人々','意味のある場所','秘蔵の品','特徴','恐怖症・マニア','負傷・傷跡','魔導書・呪文・AF','遭遇した超自然の存在'];
 const BACK_OPTIONS={
  'イデオロギー/信念':['1：あなたには崇拝して祈りをささげる崇高な存在がある。','2：人類は宗教なしでやっていける。','3：化学にはすべての答えがある。','4：運命への信念','5：社会あるいは秘密結社の一員である。','6：社会には根絶すべき悪がある。','7：オカルト','8：政治','9：「お金は力であり、得られるものはすべて得るつもりだ」。','10：運動員/活動家'],
@@ -17782,7 +17782,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.38',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.39',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
