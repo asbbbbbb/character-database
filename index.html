@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHARACTER DATABASE v7.12.39</title>
+<title>CHARACTER DATABASE v7.12.40</title>
 <style>
 :root{
   --bg:#eef1f4; --panel:#ffffff; --ink:#202833; --muted:#6f7b88; --line:#d8dee6;
@@ -1805,6 +1805,20 @@ body.viewer-mode #workspaceTools{display:none!important}
   color:#73808a;
   margin-bottom:8px;
 }
+.kp-ics-import{border:1px solid #d5dde3;border-radius:8px;background:#f8fafb;padding:11px;margin:10px 0 12px}
+.kp-ics-import-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;font-size:12px;color:#34424d}
+.kp-ics-import-head span{font-size:11px;color:#74818b}
+.kp-ics-controls{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-top:9px}
+.kp-ics-controls label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:#5d6a74}
+.kp-ics-controls input{font:inherit;border:1px solid #cbd4dc;border-radius:5px;padding:6px;background:#fff;max-width:190px}
+.kp-ics-preview{margin-top:10px;border-top:1px solid #dce3e8;padding-top:9px}
+.kp-ics-preview-list{max-height:260px;overflow:auto;display:grid;gap:5px;margin:8px 0}
+.kp-ics-preview-item{display:flex;gap:8px;align-items:flex-start;background:#fff;border:1px solid #e0e6ea;border-radius:5px;padding:6px 8px;font-size:11px}
+.kp-ics-preview-item input{margin-top:2px}
+.kp-ics-preview-item span{color:#6e7b85;white-space:nowrap}
+.kp-ics-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.kp-ics-message{font-size:11px;color:#63717c}
+
 .session-kp-head{
   display:flex;
   justify-content:space-between;
@@ -1841,7 +1855,7 @@ body.viewer-mode #workspaceTools{display:none!important}
   z-index:2;
 }
 .session-table .col-no{width:58px;text-align:center}
-.session-table .col-date{width:112px}
+.session-table .col-date{width:132px}
 .session-table .col-link{width:46px;text-align:center}
 .session-table .col-title{width:31%}
 .session-table .col-uchi{width:18%}
@@ -9061,7 +9075,7 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
 }
 
 
-/* v7.12.39: Mythos creature autocomplete suggestions */
+/* v7.12.40: Mythos creature autocomplete suggestions */
 .thumb-carousel-controls{display:flex;align-items:center;justify-content:center;gap:12px;padding:5px 0;color:var(--muted);font-size:11px;font-weight:800}
 .thumb-carousel-controls button,.viewer-image-controls button{border:1px solid #cfd8df;border-radius:6px;background:#fff;color:#31404c;min-width:30px;min-height:26px;cursor:pointer}
 .thumb-carousel-controls button:disabled,.viewer-image-controls button:disabled{opacity:.35;cursor:default}
@@ -9580,6 +9594,15 @@ body.public-mobile-editor-desktop .mobile-editor-create-panel .btn{
         </section>
         <section class="hub-tab-panel" id="sessionTabKP">
           <div class="session-note">KP記録はExcel取込に加えて、この画面から追加できます。確定後は読み取り表示になり、必要な時だけ「編集」を押します。</div>
+          <div class="kp-ics-import">
+            <div class="kp-ics-import-head"><strong>Googleカレンダー（ICS）取込</strong><span>対象カレンダーから書き出した .ics を選択</span></div>
+            <div class="kp-ics-controls">
+              <label>期間（開始）<input type="date" id="kpIcsFrom"></label>
+              <label>期間（終了）<input type="date" id="kpIcsTo"></label>
+              <label class="kp-ics-file">ICSファイル<input type="file" id="kpIcsFile" accept=".ics,text/calendar"></label>
+            </div>
+            <div id="kpIcsPreview" class="kp-ics-preview hidden"></div>
+          </div>
           <div class="session-table-wrap" id="sessionKPTable"></div>
           <div class="hub-add-bottom"><button type="button" class="btn primary" id="addKPSessionBtn">＋ 追加</button></div>
         </section>
@@ -10154,7 +10177,7 @@ const SHARE_BASE_URL_KEY='characterDatabaseV03ShareBaseUrlV1';
 const ONLINE_SYNC_KEY='characterDatabaseV04OnlineSyncV1';
 const ONLINE_LAST_SEEN_KEY='characterDatabaseV069CloudSeenV1';
 const PUBLIC_CONFIG_PATH='public_config.json';
-const PUBLIC_VIEWER_VERSION='7.12.39';
+const PUBLIC_VIEWER_VERSION='7.12.40';
 const PUBLIC_VIEWER_ONLY=true;
 function loadAppData(){
  try{
@@ -13365,7 +13388,7 @@ async function renderSessionPL(){
 
      return `<tr class="${r.unlinked?'session-unlinked-row':''}" data-fill-index="${rowIndex}" data-report-key="${esc(r.reportKey)}" data-source="${esc(r.source)}" data-char-id="${esc(r.charId||'')}" data-scenario-id="${esc(r.scenarioId||'')}">
        <td class="col-no"><span class="session-edition-badge">${esc(r.edition||'6')}版</span>${esc(r.no)}</td>
-       <td class="col-date">${esc(r.date||'—')}</td>
+       <td class="col-date">${esc((r.date||'—')+(r.time?' '+r.time:''))}</td>
        <td class="col-link">${sessionLinkCell(r.url)}</td>
        <td class="col-title">${esc(r.title)}</td>
        <td class="col-uchi"><div class="session-fill-cell">
@@ -13638,6 +13661,88 @@ async function addPlSessionToCharacter(){
  await renderReport();
 }
 
+
+function kpIcsUnescape(value){
+ return String(value||'').replace(/\\n/gi,'\n').replace(/\\,/g,',').replace(/\\;/g,';').replace(/\\\\/g,'\\');
+}
+function kpIcsDateValue(raw,params){
+ const v=String(raw||'').trim();
+ if(/^\d{8}$/.test(v))return {date:`${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`,time:''};
+ const m=v.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})?(Z)?$/);
+ if(!m)return null;
+ let date=`${m[1]}-${m[2]}-${m[3]}`,time=`${m[4]}:${m[5]}`;
+ if(m[7]){
+   const d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0)));
+   date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+   time=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+ }
+ return {date,time};
+}
+function parseKpIcs(text){
+ const lines=String(text||'').replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+ const unfolded=[];
+ lines.forEach(line=>{if(/^[ \t]/.test(line)&&unfolded.length)unfolded[unfolded.length-1]+=line.slice(1);else unfolded.push(line)});
+ const events=[];let cur=null;
+ unfolded.forEach(line=>{
+   if(line==='BEGIN:VEVENT'){cur={};return}
+   if(line==='END:VEVENT'){if(cur)events.push(cur);cur=null;return}
+   if(!cur)return;
+   const i=line.indexOf(':');if(i<0)return;
+   const left=line.slice(0,i),value=line.slice(i+1),parts=left.split(';'),key=parts.shift().toUpperCase();
+   const params={};parts.forEach(p=>{const j=p.indexOf('=');if(j>0)params[p.slice(0,j).toUpperCase()]=p.slice(j+1)});
+   if(key==='DTSTART')cur.start=kpIcsDateValue(value,params);
+   if(key==='SUMMARY')cur.title=kpIcsUnescape(value).trim();
+   if(key==='UID')cur.uid=value.trim();
+ });
+ return events.filter(e=>e.start&&e.title).map(e=>({...e,date:e.start.date,time:e.start.time}));
+}
+function kpIcsKey(e){
+ return `${String(e.date||'').trim()}|${String(e.title||'').trim().toLocaleLowerCase().replace(/\s+/g,' ')}`;
+}
+let kpIcsPending=[];
+function renderKpIcsPreview(){
+ const host=$('kpIcsPreview');if(!host)return;
+ const from=$('kpIcsFrom').value,to=$('kpIcsTo').value;
+ const existing=new Set((appData.kpSessions||[]).map(kpIcsKey));
+ const seen=new Set();
+ const rows=kpIcsPending.filter(e=>e.date>=from&&e.date<=to&&!existing.has(kpIcsKey(e))&&!seen.has(kpIcsKey(e))&&seen.add(kpIcsKey(e)));
+ if(!kpIcsPending.length){host.classList.add('hidden');host.innerHTML='';return}
+ host.classList.remove('hidden');
+ host.innerHTML=`<div class="kp-ics-message">${rows.length}件の未登録予定が見つかりました。追加しない予定のチェックを外してください。</div>
+ <div class="kp-ics-preview-list">${rows.map((e,i)=>`<label class="kp-ics-preview-item"><input type="checkbox" class="kp-ics-check" data-index="${i}" checked><span>${esc(e.date)}${e.time?' '+esc(e.time):''}</span><strong>${esc(e.title)}</strong></label>`).join('')||'<div class="kp-ics-message">指定期間に未登録の予定はありません。</div>'}</div>
+ <div class="kp-ics-actions"><button type="button" class="btn primary small" id="kpIcsAddSelected" ${rows.length?'':'disabled'}>チェックした予定をKP SESSIONに追加</button><span class="kp-ics-message">${kpIcsPending.length}件をファイルから読み込みました</span></div>`;
+ const addBtn=$('kpIcsAddSelected');
+ if(addBtn)addBtn.onclick=()=>{
+   const selected=[...host.querySelectorAll('.kp-ics-check:checked')].map(x=>rows[Number(x.dataset.index)]).filter(Boolean);
+   if(!selected.length){alert('追加する予定を選択してください。');return}
+   const edition=$('sessionEditionFilter')?.value||'6';
+   selected.forEach(e=>{
+     const rec={id:uid(),no:nextKPSessionNo(),date:e.date,time:e.time||'',title:e.title,yoso:'',edition,source:'ics',icsUid:e.uid||'',edited:false,draft:false};
+     appData.kpSessions.push(rec);
+   });
+   saveAppData();renderSessionHub();
+   kpIcsPending=[];
+   $('kpIcsFile').value='';
+   $('kpIcsPreview').classList.add('hidden');
+   alert(`${selected.length}件をKP SESSIONに追加しました。`);
+ };
+}
+function initKpIcsImport(){
+ const today=new Date(),end=new Date(today);end.setFullYear(end.getFullYear()+1);
+ const fmt=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+ $('kpIcsFrom').value=fmt(today);$('kpIcsTo').value=fmt(end);
+ $('kpIcsFrom').onchange=renderKpIcsPreview;$('kpIcsTo').onchange=renderKpIcsPreview;
+ $('kpIcsFile').onchange=async e=>{
+   const file=e.target.files?.[0];if(!file)return;
+   try{
+     const parsed=parseKpIcs(await file.text());
+     kpIcsPending=parsed;
+     renderKpIcsPreview();
+     if(!parsed.length)alert('ICSファイルから予定を読み取れませんでした。');
+   }catch(err){console.error(err);alert('ICSファイルを読み込めませんでした。')}
+ };
+}
+
 function nextKPSessionNo(){
  const used=new Set(appData.kpSessions.map(x=>Number(String(x.no||'').replace(/\D/g,''))).filter(Boolean));
  let n=1;while(used.has(n))n++;
@@ -13662,7 +13767,7 @@ function renderSessionKP(){
            <select data-field="edition"><option value="6" ${r.edition==='6'?'selected':''}>6版</option><option value="7" ${r.edition==='7'?'selected':''}>7版</option></select>
            <span class="session-auto-no">${esc(r.no||'—')}</span>
          </div></td>
-         <td class="col-date"><input data-field="date" type="date" min="1000-01-01" max="9999-12-31" value="${esc(normalizeScenarioDate(r.date||''))}"></td>
+         <td class="col-date"><input data-field="date" type="date" min="1000-01-01" max="9999-12-31" value="${esc(normalizeScenarioDate(r.date||''))}"><input data-field="time" type="time" value="${esc(r.time||'')}" aria-label="時刻"></td>
          <td class="col-link"><span class="session-link disabled">—</span></td>
          <td class="col-title"><input data-field="title" value="${esc(r.title||'')}"></td>
          <td class="col-uchi">—</td>
@@ -17782,7 +17887,7 @@ async function exportBackup(){
  const data=await all();
  const reportImages=await allReportImages();
  {
-   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.39',characters:data,appData,reportImages},null,2)],{type:'application/json'});
+   const blob=new Blob([JSON.stringify({format:'CHARACTER DATABASE',version:'7.12.40',characters:data,appData,reportImages},null,2)],{type:'application/json'});
    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='character_database_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
  }
 }
@@ -18871,9 +18976,10 @@ $('sessionDeduplicateBtn').onclick=deleteDuplicateSessionRecords;
 $('sessionCsvDownloadBtn').onclick=downloadDisplayedSessionCsv;
 $('sessionPlAddBtn').onclick=addPlSessionToCharacter;
 $('sessionDeleteAllBtn').onclick=deleteAllSessionRecords;
+initKpIcsImport();
 $('addKPSessionBtn').onclick=()=>{
  const edition=$('sessionEditionFilter').value||'6';
- const rec={id:uid(),no:nextKPSessionNo(),date:'',title:'',yoso:'',edition,source:'manual',edited:true,draft:true};
+ const rec={id:uid(),no:nextKPSessionNo(),date:'',time:'',title:'',yoso:'',edition,source:'manual',edited:true,draft:true};
  appData.kpSessions.push(rec);
  editingKPSessionIds.add(rec.id);
  saveAppData();
